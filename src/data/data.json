@@ -1,0 +1,26 @@
+{
+  "1": {
+    "bed": 1,
+    "lastName": "Doe",
+    "firstName": "John",
+    "teamNumber": 1,
+    "oneLiner": "3yoM w/ renovascular HTN now s/p b/l renal autotransplant 4/7",
+    "body": "NEURO: Mo, Mz, dex gtts\nRESP: PCV 25/5 x20 FiO2 60%\nCV: dopa 5, epi 0.02, MAP>50\nFEN: NPO, MIVF\nID: Vanc Cefepime r/o\nHEME: 7/7\nENDO: SDS"
+  },
+  "2": {
+    "bed": 2,
+    "lastName": "Lane",
+    "firstName": "Harriet",
+    "teamNumber": 3,
+    "oneLiner": "1wkF w/ repaired L CDH, s/p VA-ECMO 4/2-4/14, grade 3 IVH, pulm HTN, single kidney, intubated",
+    "body": "NEURO: Mo, Mz, dex gtts\nRESP: PCV 25/5 x20 FiO2 60%\nCV: dopa 5, epi 0.02, MAP>50\nFEN: NPO, MIVF\nID: Vanc Cefepime r/o\nHEME: 7/7\nENDO: SDS"
+  },
+  "7": {
+    "bed": 7,
+    "lastName": "Rogers",
+    "firstName": "Rafi",
+    "teamNumber": 2,
+    "oneLiner": "2yoM with relapsed AML, neutropenic, septic shock, renal failure on iHD",
+    "body": "NEURO: Mo, Mz, dex gtts\nRESP: PCV 25/5 x20 FiO2 60%\nCV: dopa 5, epi 0.02, MAP>50\nFEN: NPO, MIVF\nID: Vanc Cefepime r/o\nHEME: 7/7\nENDO: SDS"
+  }
+}

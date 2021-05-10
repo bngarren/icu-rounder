@@ -1,24 +1,22 @@
-import logo from './logo.svg';
-import './App.css';
+import { makeStyles } from "@material-ui/core/styles";
+import "./App.css";
+import { Router, Link } from "wouter";
+
+// Where all of our pages come from
+import PageRouter from "./components/PageRouter";
+import useHashLocation from "./hooks/wouter-hash";
+
+const useStyles = makeStyles((theme) => ({}));
 
 function App() {
+  const classes = useStyles();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router hook={useHashLocation}>
+      <div className="app">
+        <PageRouter />
+      </div>
+    </Router>
   );
 }
 
