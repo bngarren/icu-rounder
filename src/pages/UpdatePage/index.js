@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-
 import {
   makeStyles,
   Table,
@@ -10,12 +9,17 @@ import {
   TableRow,
   TablePagination,
   Paper,
-  Typography,
+  Tooltip,
   Grid,
   TextField,
   Button,
+  Toolbar,
+  Avatar,
 } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
+import DeleteIcon from "@material-ui/icons/Delete";
+
+import BedspaceEditor from "../../components/BedspaceEditor";
 
 import sampleData from "../../data/data.json";
 
@@ -24,33 +28,36 @@ const useStyles = makeStyles({
     margin: "10 10",
   },
   table: {
-    minWidth: 650,
+    minWidth: "400px",
   },
   tableHeader: {
-    backgroundColor: "rgb(0, 39, 168)",
+    backgroundColor: "black",
     color: "white",
   },
-  bedspaceViewGridContainer: {
-    width: "100%",
-    marginTop: "20px",
+  tableHeaderBedspaceGrid: {
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    justifyContent: "space-between",
   },
-  bedspaceViewGridLeft: {
-    padding: "4px",
+  bedNumberAvatar: {
+    width: "26px",
+    height: "26px",
+    fontSize: "14px",
+    backgroundColor: "black",
   },
-  bedspaceViewGridRight: {},
   demoBox: {
-    whiteSpace: "pre-line",
+    backgroundColor: "white",
+    width: "200pt",
+    height: "150pt",
+    margin: "auto",
     border: "2px solid black",
-    height: "400px",
+    fontSize: "9pt",
   },
   demoBoxHeader: {
     display: "flex",
     flexDirection: "row",
     width: "100%",
     borderBottom: "1pt solid black",
-    "&:hover": {
-      backgroundColor: "#f24f21",
-    },
   },
   demoBoxHeaderBed: {
     marginRight: "4px",
@@ -70,14 +77,22 @@ const useStyles = makeStyles({
     borderLeft: "1px solid black",
   },
   demoBoxBody: {
-    fontSize: "0.8rem",
-    padding: "1px",
-    "&:hover": {
-      backgroundColor: "#f24f21",
-    },
+    fontSize: "8pt",
+    padding: "3px",
   },
   demoBoxBodyOneLiner: {
     marginBottom: "4px",
+  },
+  bedspaceEditorToolbar: {
+    backgroundColor: "white",
+    borderBottom: "2px solid black",
+  },
+  saveButton: {
+    backgroundColor: "#dcdcdc",
+    color: "black",
+    "&:hover": {
+      backgroundColor: "yellow",
+    }
   },
 });
 
@@ -86,7 +101,9 @@ const BED_CENSUS = 30;
 const UpdatePage = () => {
   const classes = useStyles();
   const [data, setData] = useState(null);
+  const [bedspaceEditorData, setBedspaceEditorData] = useState();
   const [selectedKey, setSelectedKey] = useState();
+  const [needsSave, setNeedsSave] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -98,6 +115,7 @@ const UpdatePage = () => {
   };
 
   const getJsonObjectFromSortedArray = (arr) => {
+    // converts the array back to a JSON "object of objects"
     const result = {};
     arr.forEach((b) => {
       result[b.bed] = b;
@@ -105,6 +123,10 @@ const UpdatePage = () => {
     return result;
   };
 
+  /* Takes the array of non-empty beds (i.e. the data
+    and merges with a "census" which is a total number of bedspace
+    
+    In the future, census may also include beds to exclude, i.e. no bed 13*/
   const mergeWithBedCensus = (arr, census) => {
     let resultArray = [];
     for (let i = 0; i < census; i++) {
@@ -167,34 +189,57 @@ const UpdatePage = () => {
     }
   }, [data]);
 
-  const handleRowClick = (event, key) => {
-    console.log(`clicked ${data[key]["lastName"]}`);
+  const handleEditIconClick = (key) => {
+    // This is the key of the data array that corresponds to this selected bedspace
     setSelectedKey(key);
+
+    /* When a new bed is selected, copy the truth data's (data) JSON object for this
+    selected bedspace to the bedspaceEditorData so that we can fill in our initial
+    form fields and start editing */
+    setBedspaceEditorData(data[key]);
   };
+
+  const handleDeleteIconClick = (key) => {
+    let updatedData = [...data];
+    let deleted = updatedData.splice(key, 1);
+    console.log(`Removed bedspace: ${JSON.stringify(deleted)}`);
+    setData(mergeWithBedCensus(updatedData, BED_CENSUS));
+  };
+
+  /* When a change in the BedspaceEditor's data occurs, it
+  sends the new bedspace JSON object here.  */
+  const handleOnEditorDataChange = (newBedspaceData) => {
+    setBedspaceEditorData(newBedspaceData);
+    setNeedsSave(true);
+  }
 
   // Receives the new data from the BedspaceView
 
   /* This is data for a single bedspace that needs to be merged with the
   data object prior to saving */
-  const handleOnSave = (newBedspaceData, e) => {
+  const handleOnSave = (e) => {
+    e.preventDefault();
+
     const updatedData = [...data];
     const objIndex = updatedData.findIndex(
-      (obj) => obj.bed === newBedspaceData.bed
+      (obj) => obj.bed === bedspaceEditorData.bed
     );
 
     if (objIndex >= 0) {
-      updatedData[objIndex] = newBedspaceData;
+      updatedData[objIndex] = bedspaceEditorData;
     } else {
-      updatedData.push(newBedspaceData);
+      updatedData.push(bedspaceEditorData);
     }
 
     setData(sortByBed(updatedData));
   };
 
+  // table pagination
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
+  // table pagination
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(event.target.value);
     setPage(0);
@@ -203,82 +248,129 @@ const UpdatePage = () => {
   if (data != null) {
     return (
       <div>
-        <Paper>
-          <TableContainer className={classes.tableContainer}>
-            <Table
-              className={classes.table}
-              aria-label="simple table"
-              size="small"
+        <Grid container>
+          <Grid item sm={5}>
+            <TableContainer
+              component={Paper}
+              className={classes.tableContainer}
             >
-              <TableHead>
-                <TableRow>
-                  <TableCell className={classes.tableHeader}>
-                    Bedspace
-                  </TableCell>
-                  <TableCell className={classes.tableHeader} align="left">
-                    Patient
-                  </TableCell>
-                  <TableCell className={classes.tableHeader} align="left">
-                    Team
-                  </TableCell>
-                  <TableCell className={classes.tableHeader} align="left">
-                    One Liner
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {data
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((value, key) => (
-                    <TableRow
-                      key={value.bed}
-                      onClick={(event) => handleRowClick(event, key)}
-                      hover
-                      selected={key === selectedKey}
+              <Table
+                className={classes.table}
+                aria-label="simple table"
+                size="small"
+              >
+                <TableHead>
+                  <TableRow>
+                    <TableCell
+                      className={classes.tableHeader}
+                      style={{ width: "10%" }}
                     >
-                      <TableCell component="th" scope="row">
-                        <Typography variant="h5">{value.bed}</Typography>
-                        {key === selectedKey && <EditIcon />}
-                      </TableCell>
-                      <TableCell align="left">
-                        <Typography variant="h6">
-                          {value["lastName"]}
-                          {value["lastName"] && value["firstName"] && ", "}
-                          {value["firstName"]}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="left">
-                        <Typography variant="h6">
-                          {value["teamNumber"]}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="left">
-                        <Typography variant="body2">
-                          {value["oneLiner"]}
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 50]}
-              component="div"
-              count={data.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onChangePage={handleChangePage}
-              onChangeRowsPerPage={handleChangeRowsPerPage}
-            />
-          </TableContainer>
-        </Paper>
-
-        {selectedKey != null && (
-          <BedspaceView
-            bedspace={data[selectedKey]}
-            onClickSave={handleOnSave}
-          />
-        )}
+                      Bedspace
+                    </TableCell>
+                    <TableCell
+                      className={classes.tableHeader}
+                      style={{ width: "30%" }}
+                    >
+                      Patient
+                    </TableCell>
+                    <TableCell
+                      className={classes.tableHeader}
+                      style={{ width: "10%" }}
+                    >
+                      Team
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {data
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((value, key) => (
+                      <TableRow
+                        key={value.bed}
+                        hover
+                        selected={key === selectedKey}
+                      >
+                        <TableCell component="th" scope="row">
+                          <Grid
+                            container
+                            className={classes.tableHeaderBedspaceGrid}
+                          >
+                            <Grid item>
+                              <Avatar
+                                variant="rounded"
+                                className={classes.bedNumberAvatar}
+                              >
+                                {value.bed}
+                              </Avatar>
+                            </Grid>
+                            <Grid item>
+                              {
+                                <Tooltip title="Edit">
+                                  <EditIcon
+                                    fontSize="small"
+                                    onClick={() => handleEditIconClick(key)}
+                                    style={{ cursor: "pointer" }}
+                                  />
+                                </Tooltip>
+                              }
+                              {
+                                <Tooltip title="Clear">
+                                  <DeleteIcon
+                                    fontSize="small"
+                                    onClick={() => handleDeleteIconClick(key)}
+                                    style={{ cursor: "pointer" }}
+                                  />
+                                </Tooltip>
+                              }
+                            </Grid>
+                          </Grid>
+                        </TableCell>
+                        <TableCell align="left">
+                          <span>
+                            {value["lastName"]}
+                            {value["lastName"] && value["firstName"] && ", "}
+                            {value["firstName"]}
+                          </span>
+                        </TableCell>
+                        <TableCell align="left">
+                          <span>{value["teamNumber"]}</span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 50]}
+                component="div"
+                count={data.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+              />
+            </TableContainer>
+          </Grid>
+          <Grid item sm={7}>
+            {selectedKey != null && (
+              <Grid container>
+                <Grid item xs={12}>
+                  <BedspaceView data={bedspaceEditorData} />
+                </Grid>
+                <Grid item xs={12}>
+                  <Toolbar variant="dense" className={classes.bedspaceEditorToolbar}>
+                    <Button className={classes.saveButton} size="small" disabled={!needsSave} onClick={(e) => handleOnSave(e)}>Save</Button>
+                  </Toolbar>
+                </Grid>
+                <Grid item xs={12}>
+                  <BedspaceEditor
+                    data={bedspaceEditorData}
+                    onEditorDataChange={handleOnEditorDataChange}
+                  />
+                </Grid>
+              </Grid>
+            )}
+          </Grid>
+        </Grid>
       </div>
     );
   } else {
@@ -286,207 +378,40 @@ const UpdatePage = () => {
   }
 };
 
-const BedspaceView = ({ bedspace, onClickSave = (f) => f }) => {
+const BedspaceView = ({ data }) => {
   const classes = useStyles();
-  const [selectedDemoBoxComponent, setSelectedDemoBoxComponent] = useState();
   const [thisViewData, setThisViewData] = useState({});
-  const [needsSave, setNeedsSave] = useState(false);
 
   useEffect(() => {
-    setThisViewData(bedspace);
-  }, [bedspace]);
-
-  const onClickDemoBoxEdit = (value, event) => {
-    setSelectedDemoBoxComponent(value);
-  };
-
-  const handleOnDataChange = (newData) => {
-    setThisViewData(newData);
-    setNeedsSave(true);
-  };
-
-  const renderEditBoxSwitch = (value) => {
-    switch (value) {
-      case "header":
-        return (
-          <EditBoxHeader
-            data={thisViewData}
-            onDataChange={handleOnDataChange}
-          />
-        );
-      case "body":
-        return (
-          <EditBoxBody data={thisViewData} onDataChange={handleOnDataChange} />
-        );
-      default:
-        return "Error: Undefined component to edit";
-    }
-  };
+    setThisViewData(data);
+  }, [data]);
 
   return (
-    <Grid container className={classes.bedspaceViewGridContainer}>
-      <Grid item xs={12}>
-        {needsSave && (
-          <Button onClick={(dataToSave, e) => onClickSave(thisViewData, e)}>
-            Save
-          </Button>
-        )}
-      </Grid>
-      <Grid item md={5} className={classes.bedspaceViewGridLeft}>
-        <div className={classes.demoBox}>
-          <div
-            className={classes.demoBoxHeader}
-            onClick={(e) => onClickDemoBoxEdit("header", e)}
-          >
-            <div className={classes.demoBoxHeaderBed}>{thisViewData.bed}</div>
-            <div className={classes.demoBoxHeaderName}>
-              {thisViewData.lastName}
-              {thisViewData.lastName !== "" &&
-                thisViewData.firstName !== "" &&
-                ","}{" "}
-              {thisViewData.firstName}
-            </div>
-            <div className={classes.demoBoxHeaderTeam}>
-              {thisViewData.teamNumber}
-            </div>
+    <>
+      <Paper className={classes.demoBox}>
+        <div className={classes.demoBoxHeader}>
+          <div className={classes.demoBoxHeaderBed}>{thisViewData.bed}</div>
+          <div className={classes.demoBoxHeaderName}>
+            {thisViewData.lastName}
+            {thisViewData.lastName !== "" &&
+              thisViewData.firstName !== "" &&
+              ","}{" "}
+            {thisViewData.firstName}
           </div>
-          <div
-            className={classes.demoBoxBody}
-            onClick={(e) => onClickDemoBoxEdit("body", e)}
-          >
-            <div className={classes.demoBoxBodyOneLiner}>
-              {thisViewData.oneLiner}
-            </div>
-            {thisViewData.body}
+          <div className={classes.demoBoxHeaderTeam}>
+            {thisViewData.teamNumber}
           </div>
         </div>
-      </Grid>
-      <Grid item md={7} className={classes.bedspaceViewGridRight}>
-        {selectedDemoBoxComponent != null && (
-          <div className={classes.editBox}>
-            {renderEditBoxSwitch(selectedDemoBoxComponent)}
+        <div className={classes.demoBoxBody}>
+          <div className={classes.demoBoxBodyOneLiner}>
+            {thisViewData.oneLiner}
           </div>
-        )}
-      </Grid>
-    </Grid>
+          {thisViewData.body}
+        </div>
+      </Paper>
+    </>
   );
 };
 
-const EditBoxHeader = ({ data, onDataChange = (f) => f }) => {
-  const [inputBedNumberValue, setInputBedNumberValue] = useState(0);
-  const [inputLastNameValue, setInputLastNameValue] = useState("");
-  const [inputFirstNameValue, setInputFirstNameValue] = useState("");
-
-  useEffect(() => {
-    if (data.bed) {
-      setInputBedNumberValue(data.bed);
-    }
-
-    if (data.lastName) {
-      setInputLastNameValue(data.lastName);
-    }
-
-    if (data.firstName) {
-      setInputFirstNameValue(data.firstName);
-    }
-  }, [data]);
-
-  const handleInputBedNumberChange = (value) => {
-    onDataChange({
-      ...data,
-      bed: value,
-    });
-    setInputBedNumberValue(value);
-  };
-
-  const handleInputLastNameChange = (value) => {
-    const newLastName = value.trim();
-    onDataChange({
-      ...data,
-      lastName: newLastName,
-    });
-    setInputLastNameValue(newLastName);
-  };
-
-  const handleInputFirstNameChange = (value) => {
-    const newFirstName = value.trim();
-    onDataChange({
-      ...data,
-      firstName: newFirstName,
-    });
-    setInputFirstNameValue(newFirstName);
-  };
-
-  return (
-    <form autoComplete="off">
-      <TextField
-        label="Bed"
-        value={inputBedNumberValue}
-        onChange={(e) => handleInputBedNumberChange(e.target.value)}
-      ></TextField>
-      <TextField
-        label="Last Name"
-        value={inputLastNameValue}
-        onChange={(e) => handleInputLastNameChange(e.target.value)}
-      ></TextField>
-      <TextField
-        label="First Name"
-        value={inputFirstNameValue}
-        onChange={(e) => handleInputFirstNameChange(e.target.value)}
-      ></TextField>
-    </form>
-  );
-};
-
-const EditBoxBody = ({ data, onDataChange = (f) => f }) => {
-  const [inputOneLinerValue, setInputOneLinerValue] = useState("");
-  const [inputBodyValue, setInputBodyValue] = useState("");
-
-  useEffect(() => {
-    if (data.oneLiner != null) {
-      setInputOneLinerValue(data.oneLiner);
-    }
-    if (data.body != null) {
-      setInputBodyValue(data.oneLiner);
-    }
-  }, [data]);
-
-  const handleInputOneLinerChange = (value) => {
-    let newOneLiner = value;
-    setInputOneLinerValue(newOneLiner);
-    onDataChange({
-      ...data,
-      oneLiner: newOneLiner,
-    });
-  };
-
-  const handleInputBodyChange = (value) => {
-    let newBody = value;
-    setInputBodyValue(newBody);
-    onDataChange({
-      ...data,
-      body: newBody,
-    });
-  };
-
-  return (
-    <form autoComplete="off">
-      <TextField
-        label="One Liner"
-        value={inputOneLinerValue}
-        onChange={(e) => handleInputOneLinerChange(e.target.value)}
-      ></TextField>
-      <br></br>
-      <TextField
-        multiline
-        rows={4}
-        variant="outlined"
-        label="Body"
-        value={inputBodyValue}
-        onChange={(e) => handleInputBodyChange(e.target.value)}
-      ></TextField>
-    </form>
-  );
-};
 
 export default UpdatePage;
