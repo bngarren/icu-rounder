@@ -1,6 +1,9 @@
 import { makeStyles } from "@material-ui/core/styles";
+import { AppBar, Toolbar, IconButton } from "@material-ui/core";
+import DescriptionIcon from "@material-ui/icons/Description";
+import ViewListIcon from "@material-ui/icons/ViewList";
 import "./App.css";
-import { Router, Link } from "wouter";
+import { Router, useLocation } from "wouter";
 
 // Where all of our pages come from
 import PageRouter from "./components/PageRouter";
@@ -10,10 +13,22 @@ const useStyles = makeStyles((theme) => ({}));
 
 function App() {
   const classes = useStyles();
+  const [location, setLocation] = useLocation();
 
   return (
-    <Router hook={useHashLocation}>
+    <Router>
       <div className="app">
+        <AppBar>
+          <Toolbar variant="dense">
+            <IconButton onClick={() => setLocation("/document")}>
+              <DescriptionIcon />
+            </IconButton>
+            <IconButton onClick={() => setLocation("/update")}>
+              <ViewListIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+        <Toolbar />
         <PageRouter />
       </div>
     </Router>

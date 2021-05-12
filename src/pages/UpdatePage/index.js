@@ -79,6 +79,7 @@ const useStyles = makeStyles({
   demoBoxBody: {
     fontSize: "8pt",
     padding: "3px",
+    whiteSpace: "pre-line",
   },
   demoBoxBodyOneLiner: {
     marginBottom: "4px",
@@ -92,7 +93,7 @@ const useStyles = makeStyles({
     color: "black",
     "&:hover": {
       backgroundColor: "yellow",
-    }
+    },
   },
 });
 
@@ -194,8 +195,7 @@ const UpdatePage = () => {
     setSelectedKey(key);
 
     /* When a new bed is selected, copy the truth data's (data) JSON object for this
-    selected bedspace to the bedspaceEditorData so that we can fill in our initial
-    form fields and start editing */
+    selected bedspace to the bedspaceEditorData */
     setBedspaceEditorData(data[key]);
   };
 
@@ -211,7 +211,7 @@ const UpdatePage = () => {
   const handleOnEditorDataChange = (newBedspaceData) => {
     setBedspaceEditorData(newBedspaceData);
     setNeedsSave(true);
-  }
+  };
 
   // Receives the new data from the BedspaceView
 
@@ -357,13 +357,24 @@ const UpdatePage = () => {
                   <BedspaceView data={bedspaceEditorData} />
                 </Grid>
                 <Grid item xs={12}>
-                  <Toolbar variant="dense" className={classes.bedspaceEditorToolbar}>
-                    <Button className={classes.saveButton} size="small" disabled={!needsSave} onClick={(e) => handleOnSave(e)}>Save</Button>
+                  <Toolbar
+                    variant="dense"
+                    className={classes.bedspaceEditorToolbar}
+                  >
+                    <Button
+                      className={classes.saveButton}
+                      size="small"
+                      disabled={!needsSave}
+                      onClick={(e) => handleOnSave(e)}
+                    >
+                      Save
+                    </Button>
                   </Toolbar>
                 </Grid>
                 <Grid item xs={12}>
                   <BedspaceEditor
                     data={bedspaceEditorData}
+                    defaultValues={data[selectedKey]}
                     onEditorDataChange={handleOnEditorDataChange}
                   />
                 </Grid>
@@ -386,6 +397,12 @@ const BedspaceView = ({ data }) => {
     setThisViewData(data);
   }, [data]);
 
+  const renderNameComma = () => {
+    if (thisViewData.lastName && thisViewData.firstName) {
+      return ", ";
+    }
+  };
+
   return (
     <>
       <Paper className={classes.demoBox}>
@@ -393,9 +410,7 @@ const BedspaceView = ({ data }) => {
           <div className={classes.demoBoxHeaderBed}>{thisViewData.bed}</div>
           <div className={classes.demoBoxHeaderName}>
             {thisViewData.lastName}
-            {thisViewData.lastName !== "" &&
-              thisViewData.firstName !== "" &&
-              ","}{" "}
+            {renderNameComma()}
             {thisViewData.firstName}
           </div>
           <div className={classes.demoBoxHeaderTeam}>
@@ -412,6 +427,5 @@ const BedspaceView = ({ data }) => {
     </>
   );
 };
-
 
 export default UpdatePage;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Document,
   Page,
@@ -7,6 +7,7 @@ import {
   PDFViewer,
   StyleSheet,
   Font,
+  PDFDownloadLink,
 } from "@react-pdf/renderer";
 
 import RobotoRegular from "../../fonts/roboto/roboto-v27-latin-regular.woff";
@@ -88,12 +89,61 @@ const pdfViewerStyles = StyleSheet.create({
   },
 });
 
+const TestDoc = () => (
+  <Document>
+    <Page>My document data</Page>
+  </Document>
+);
+
 const DocumentPage = () => {
   const [gridSettings, setGridSettings] = useState({
     colsPerPage: 4,
     beds: 30,
   });
 
+  const [pdfDoc, setPdfDocument] = useState();
+  const [showProgress, setShowProgress] = useState(true);
+
+  useEffect(() => {
+    const getDoc = () => {
+      const doc = getDocument({
+        beds: gridSettings.beds,
+        colsPerPage: gridSettings.colsPerPage,
+      });
+      console.log(doc);
+      setPdfDocument(doc);
+      console.log(`set document. ${doc}`);
+    };
+    getDoc();
+  }, [gridSettings]);
+
+  const onChangeSelectNumCols = (e) => {
+    setGridSettings({ ...gridSettings, colsPerPage: e.target.value });
+  };
+
+  return (
+    <div>
+      <select
+        name="selectNumCols"
+        onChange={onChangeSelectNumCols}
+        defaultValue={gridSettings.colsPerPage}
+      >
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
+
+      <PDFDownloadLink document={pdfDoc} fileName="somename.pdf">
+        {({ blob, url, loading, error }) => 
+          loading ? 'Loading document...' : 'Download now!'
+        }
+      </PDFDownloadLink>
+    </div>
+  );
+};
+
+const getDocument = ({ beds, colsPerPage }) => {
   const matrix = (r, c) => {
     let matrix = [];
     let box = 1;
@@ -107,15 +157,11 @@ const DocumentPage = () => {
     return matrix;
   };
 
-  const MyDocument = () => (
+  return (
     <Document>
       <Page size="letter" style={pdfViewerStyles.page}>
         <View style={pdfViewerStyles.gridListRoot}>
-          {matrix(
-            Math.ceil(gridSettings.beds / gridSettings.colsPerPage),
-            gridSettings.colsPerPage
-          ).map((row) => {
-            console.log(`row = ${row}`);
+          {matrix(Math.ceil(beds / colsPerPage), colsPerPage).map((row) => {
             return (
               <View style={pdfViewerStyles.gridListRow} wrap={false}>
                 {row.map((box) => {
@@ -127,29 +173,6 @@ const DocumentPage = () => {
         </View>
       </Page>
     </Document>
-  );
-
-  const onChangeSelectNumCols = (e) => {
-    setGridSettings({ ...gridSettings, colsPerPage: e.target.value });
-    console.log("onChange");
-  };
-
-  return (
-    <div className="App">
-      <select
-        name="selectNumCols"
-        onChange={onChangeSelectNumCols}
-        defaultValue={gridSettings.colsPerPage}
-      >
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-      </select>
-      <PDFViewer className="pdfViewer" width={900} height={1200}>
-        <MyDocument />
-      </PDFViewer>
-    </div>
   );
 };
 
