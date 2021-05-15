@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   makeStyles,
   Table,
@@ -23,12 +23,25 @@ import BedspaceEditor from "../../components/BedspaceEditor";
 
 import sampleData from "../../data/data.json";
 
+import { sortByBed } from "../../utils/Utility";
+
 const useStyles = makeStyles({
+  root: {
+    padding: "0 1vw",
+  },
   tableContainer: {
     margin: "10 10",
   },
   table: {
     minWidth: "400px",
+  },
+  tableRow: {
+    "&.Mui-selected": {
+      backgroundColor: "#b7d10033",
+    },
+    "&.Mui-selected:hover": {
+      backgroundColor: "#b7d10059",
+    },
   },
   tableHeader: {
     backgroundColor: "black",
@@ -47,8 +60,8 @@ const useStyles = makeStyles({
   },
   demoBox: {
     backgroundColor: "white",
-    width: "200pt",
-    height: "150pt",
+    width: "185pt",
+    height: "250pt",
     margin: "auto",
     border: "2px solid black",
     fontSize: "9pt",
@@ -61,8 +74,8 @@ const useStyles = makeStyles({
   },
   demoBoxHeaderBed: {
     marginRight: "4px",
-    paddingLeft: "4px",
-    paddingRight: "4px",
+    paddingLeft: "0.5em",
+    paddingRight: "0.5em",
     borderRight: "1px solid black",
     fontWeight: "bold",
   },
@@ -70,10 +83,9 @@ const useStyles = makeStyles({
     flexGrow: "4",
   },
   demoBoxHeaderTeam: {
-    alignSelf: "flex-end",
     marginLeft: "4px",
-    paddingLeft: "4px",
-    paddingRight: "4px",
+    paddingLeft: "0.5em",
+    paddingRight: "0.5em",
     borderLeft: "1px solid black",
   },
   demoBoxBody: {
@@ -85,15 +97,29 @@ const useStyles = makeStyles({
     marginBottom: "4px",
   },
   bedspaceEditorToolbar: {
-    backgroundColor: "white",
     borderBottom: "2px solid black",
   },
   saveButton: {
-    backgroundColor: "#dcdcdc",
-    color: "black",
+    backgroundColor: "rgba(223, 255, 0, 0.9)",
+    color: "#000000ab",
     "&:hover": {
-      backgroundColor: "yellow",
+      backgroundColor: "rgba(223, 255, 0, 0.95)",
+      color: "black",
     },
+  },
+  saveButtonDisabled: {
+    backgroundColor: "#f4f4f466",
+  },
+  resetButton: {
+    backgroundColor: "rgba(223, 255, 0, 0.9)",
+    color: "#000000ab",
+    "&:hover": {
+      backgroundColor: "rgba(223, 255, 0, 0.95)",
+      color: "black",
+    },
+  },
+  resetButtonDisabled: {
+    backgroundColor: "#f4f4f466",
   },
 });
 
@@ -107,13 +133,6 @@ const UpdatePage = () => {
   const [needsSave, setNeedsSave] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  const sortByBed = (arr) => {
-    // sorts by bed number in ascending order
-    return arr.sort((el1, el2) => {
-      return el1.bed - el2.bed;
-    });
-  };
 
   const getJsonObjectFromSortedArray = (arr) => {
     // converts the array back to a JSON "object of objects"
@@ -219,20 +238,35 @@ const UpdatePage = () => {
   data object prior to saving */
   const handleOnSave = (e) => {
     e.preventDefault();
-
     const updatedData = [...data];
+
+    /* For each object in data array, see if there is a bed number
+    matching the bed currently being stored in bedspaceEditordata.
+    If so, return the index of this object in the array */
     const objIndex = updatedData.findIndex(
       (obj) => obj.bed === bedspaceEditorData.bed
     );
 
     if (objIndex >= 0) {
       updatedData[objIndex] = bedspaceEditorData;
-    } else {
+    } else { // If bed doesn't exist, add new one
       updatedData.push(bedspaceEditorData);
     }
 
-    setData(sortByBed(updatedData));
+    // sort by bed number again since we've updated the bed data
+    const sortedData = sortByBed(updatedData);
+    setData(sortedData);
+    setNeedsSave(false);
   };
+
+  /* Want to reset the data being used in the bedspaceEditor
+  to the saved "truth" data, i.e. reset changes back to the 
+  last saved state */
+  const handleOnReset = (e) => {
+    e.preventDefault();
+    setBedspaceEditorData(data[selectedKey])
+    setNeedsSave(false);
+  }
 
   // table pagination
   const handleChangePage = (event, newPage) => {
@@ -248,8 +282,8 @@ const UpdatePage = () => {
   if (data != null) {
     return (
       <div>
-        <Grid container>
-          <Grid item sm={5}>
+        <Grid container className={classes.root}>
+          <Grid item sm={4}>
             <TableContainer
               component={Paper}
               className={classes.tableContainer}
@@ -286,6 +320,7 @@ const UpdatePage = () => {
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((value, key) => (
                       <TableRow
+                        className={classes.tableRow}
                         key={value.bed}
                         hover
                         selected={key === selectedKey}
@@ -350,7 +385,7 @@ const UpdatePage = () => {
               />
             </TableContainer>
           </Grid>
-          <Grid item sm={7}>
+          <Grid item sm={8}>
             {selectedKey != null && (
               <Grid container>
                 <Grid item xs={12}>
@@ -362,12 +397,26 @@ const UpdatePage = () => {
                     className={classes.bedspaceEditorToolbar}
                   >
                     <Button
-                      className={classes.saveButton}
+                      classes={{
+                        root: classes.saveButton,
+                        disabled: classes.saveButtonDisabled,
+                      }}
                       size="small"
                       disabled={!needsSave}
                       onClick={(e) => handleOnSave(e)}
                     >
                       Save
+                    </Button>
+                    <Button
+                      classes={{
+                        root: classes.resetButton,
+                        disabled: classes.resetButtonDisabled,
+                      }}
+                      size="small"
+                      disabled={!needsSave}
+                      onClick={(e) => handleOnReset(e)}
+                    >
+                      Reset
                     </Button>
                   </Toolbar>
                 </Grid>
@@ -376,6 +425,7 @@ const UpdatePage = () => {
                     data={bedspaceEditorData}
                     defaultValues={data[selectedKey]}
                     onEditorDataChange={handleOnEditorDataChange}
+                    needsSave={needsSave}
                   />
                 </Grid>
               </Grid>

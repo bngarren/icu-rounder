@@ -31,18 +31,21 @@ export function getCursorPos(input) {
   return -1;
 }
 
-export function setCursorPos(input, start, end) {
+export function setCursorPos(elem, start, end) {
   if (arguments.length < 3) end = start;
-  if ("selectionStart" in input) {
-    setTimeout(function () {
-      input.selectionStart = start;
-      input.selectionEnd = end;
-    }, 1);
-  } else if (input.createTextRange) {
-    var rng = input.createTextRange();
-    rng.moveStart("character", start);
-    rng.collapse();
-    rng.moveEnd("character", end - start);
-    rng.select();
+
+  let range;
+
+  if (elem.createTextRange) {
+    range = elem.createTextRange();
+    range.collapse(true);
+    range.moveEnd("character", end);
+    range.moveStart("character", start);
+    range.select();
+  } else {
+    elem.focus();
+    if (elem.selectionStart !== undefined) {
+      elem.setSelectionRange(start, end);
+    }
   }
 }

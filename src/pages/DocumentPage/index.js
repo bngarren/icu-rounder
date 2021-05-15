@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { saveAs } from 'file-saver';
 import {
   Document,
   Page,
@@ -8,6 +9,7 @@ import {
   StyleSheet,
   Font,
   PDFDownloadLink,
+  pdf
 } from "@react-pdf/renderer";
 
 import RobotoRegular from "../../fonts/roboto/roboto-v27-latin-regular.woff";
@@ -74,11 +76,11 @@ const pdfViewerStyles = StyleSheet.create({
     flexGrow: "4",
   },
   gridBoxHeaderTeam: {
-    alignSelf: "flex-end",
     marginLeft: "2pt",
     paddingLeft: "2pt",
     paddingRight: "2pt",
     borderLeft: "1pt solid black",
+    minWidth: "8pt",
   },
   gridBoxBody: {
     fontSize: "7pt",
@@ -91,7 +93,14 @@ const pdfViewerStyles = StyleSheet.create({
 
 const TestDoc = () => (
   <Document>
-    <Page>My document data</Page>
+    <Page size="A4">
+      <View>
+        <Text>Section #1</Text>
+      </View>
+      <View>
+        <Text>Section #2</Text>
+      </View>
+    </Page>
   </Document>
 );
 
@@ -104,18 +113,7 @@ const DocumentPage = () => {
   const [pdfDoc, setPdfDocument] = useState();
   const [showProgress, setShowProgress] = useState(true);
 
-  useEffect(() => {
-    const getDoc = () => {
-      const doc = getDocument({
-        beds: gridSettings.beds,
-        colsPerPage: gridSettings.colsPerPage,
-      });
-      console.log(doc);
-      setPdfDocument(doc);
-      console.log(`set document. ${doc}`);
-    };
-    getDoc();
-  }, [gridSettings]);
+
 
   const onChangeSelectNumCols = (e) => {
     setGridSettings({ ...gridSettings, colsPerPage: e.target.value });
@@ -123,7 +121,7 @@ const DocumentPage = () => {
 
   return (
     <div>
-      <select
+      {/* <select
         name="selectNumCols"
         onChange={onChangeSelectNumCols}
         defaultValue={gridSettings.colsPerPage}
@@ -132,18 +130,16 @@ const DocumentPage = () => {
         <option value="3">3</option>
         <option value="4">4</option>
         <option value="5">5</option>
-      </select>
-
-      <PDFDownloadLink document={pdfDoc} fileName="somename.pdf">
-        {({ blob, url, loading, error }) => 
-          loading ? 'Loading document...' : 'Download now!'
-        }
-      </PDFDownloadLink>
+      </select> */}
+      {showProgress && <>Generating PDF...</>}
+      {/* !showProgress && (
+        <iframe src={URL.createObjectURL(pdfDoc)} title="PDF"/>
+      ) */}
     </div>
   );
 };
 
-const getDocument = ({ beds, colsPerPage }) => {
+const MyDocument = ({ beds, colsPerPage }) => {
   const matrix = (r, c) => {
     let matrix = [];
     let box = 1;
