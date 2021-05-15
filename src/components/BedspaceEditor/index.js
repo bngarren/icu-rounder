@@ -17,7 +17,7 @@ const useStyles = makeStyles({
   textFieldRoot: {
     border: "1px solid #e2e2e1",
     overflow: "hidden",
-    borderRadius: 1,
+    borderRadius: "3px",
     backgroundColor: "white",
     "&:hover": {
       backgroundColor: "white",

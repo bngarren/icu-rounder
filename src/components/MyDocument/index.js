@@ -51,9 +51,12 @@ const pdfStyles = StyleSheet.create({
     textAlign: "left",
     backgroundColor: "white",
     border: "1pt solid black",
-    margin: "0.2pt",
     height: "185pt",
     fontFamily: "Roboto",
+    marginTop: "-1pt",
+  },
+  removeLeftBorder: {
+    borderLeft: "0",
   },
   gridBoxHeader: {
     display: "flex",
@@ -78,18 +81,35 @@ const pdfStyles = StyleSheet.create({
     borderLeft: "1pt solid black",
     minWidth: "11pt",
   },
+  gridBoxBodyOneLiner: {
+    marginBottom: "1.5pt",
+  },
+  gridBoxBodyContingencies: {
+    display: "flex",
+    flexDirection: "row",
+    fontSize: "6pt",
+    fontWeight: "bold",
+    justifyContent: "flex-start",
+    flexWrap: "wrap",
+    alignContent: "center",
+    marginBottom: "1.5pt",
+  },
+  gridBoxBodyContingencyItem: {
+    border: "1pt solid #dbdbdb",
+    borderRadius: "2pt",
+    paddingLeft: "2pt",
+    paddingTop: "1pt",
+    marginTop: "0.5pt",
+    marginRight: "2pt",
+  },
   gridBoxBody: {
     fontSize: "7pt",
     padding: "1pt",
   },
-  gridBoxBodyOneLiner: {
-    marginBottom: "2pt",
-  },
 });
 
 const MyDocument = ({ beds, colsPerPage, data }) => {
-
-  const matrix = (r, c) => {
+  const getMatrix = (r, c) => {
     let matrix = [];
     let box = 1;
     for (let i = 0; i < r; i++) {
@@ -102,18 +122,25 @@ const MyDocument = ({ beds, colsPerPage, data }) => {
     return matrix;
   };
 
+  const matrix = getMatrix(Math.ceil(beds / colsPerPage), colsPerPage);
+  console.log(matrix);
+
   return (
     <Document>
       <Page size="letter" style={pdfStyles.page}>
         <View style={pdfStyles.gridListRoot}>
-          {matrix(Math.ceil(beds / colsPerPage), colsPerPage).map((row) => {
+          {matrix.map((row, rIndex) => {
             return (
               <View style={pdfStyles.gridListRow} wrap={false}>
-                {row.map((box) => {
-                  const objIndex = data.findIndex(
-                    (obj) => obj.bed === box
+                {row.map((box, cIndex) => {
+                  const objIndex = data.findIndex((obj) => obj.bed === box);
+                  return (
+                    <GridBox
+                      bedspaceData={objIndex >= 0 ? data[objIndex] : null}
+                      box={box}
+                      removeLeftBorder={cIndex !== 0}
+                    />
                   );
-                  return <GridBox bedspaceData={objIndex >= 0 ? data[objIndex] : null} box={box} />;
                 })}
               </View>
             );
@@ -124,17 +151,25 @@ const MyDocument = ({ beds, colsPerPage, data }) => {
   );
 };
 
-const GridBox = ({ bedspaceData, box }) => {
-
+const GridBox = ({ bedspaceData, box, removeLeftBorder }) => {
   if (bedspaceData) {
     return (
-      <View style={pdfStyles.gridBoxRoot}>
+      <View
+        style={[
+          pdfStyles.gridBoxRoot,
+          removeLeftBorder && pdfStyles.removeLeftBorder,
+        ]}
+      >
         <View style={pdfStyles.gridBoxHeader}>
           <View style={pdfStyles.gridBoxHeaderBed}>
             <Text>{bedspaceData.bed}</Text>
           </View>
           <View style={pdfStyles.gridBoxHeaderName}>
-            <Text>{bedspaceData.lastName}{bedspaceData.lastName && bedspaceData.firstName && ", "}{bedspaceData.firstName}</Text>
+            <Text>
+              {bedspaceData.lastName}
+              {bedspaceData.lastName && bedspaceData.firstName && ", "}
+              {bedspaceData.firstName}
+            </Text>
           </View>
           <View style={pdfStyles.gridBoxHeaderTeam}>
             <Text>{bedspaceData.teamNumber}</Text>
@@ -144,20 +179,30 @@ const GridBox = ({ bedspaceData, box }) => {
           <Text style={pdfStyles.gridBoxBodyOneLiner}>
             {bedspaceData.oneLiner}
           </Text>
-          <Text>
-            {bedspaceData.body}
-          </Text>
+          <View style={pdfStyles.gridBoxBodyContingencies}>
+            {bedspaceData.contingencies &&
+              bedspaceData.contingencies.map((item) => {
+                return (
+                  <Text style={pdfStyles.gridBoxBodyContingencyItem}>
+                    {item}
+                  </Text>
+                );
+              })}
+          </View>
+          <Text>{bedspaceData.body}</Text>
         </View>
       </View>
     );
   } else {
-    return <View style={pdfStyles.gridBoxRoot}>
-
-    </View>
+    return (
+      <View
+        style={[
+          pdfStyles.gridBoxRoot,
+          removeLeftBorder && pdfStyles.removeLeftBorder,
+        ]}
+      ></View>
+    );
   }
-
-
 };
-
 
 export default MyDocument;

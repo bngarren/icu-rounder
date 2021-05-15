@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   makeStyles,
   Table,
@@ -11,7 +11,6 @@ import {
   Paper,
   Tooltip,
   Grid,
-  TextField,
   Button,
   Toolbar,
   Avatar,
@@ -44,8 +43,8 @@ const useStyles = makeStyles({
     },
   },
   tableHeader: {
-    backgroundColor: "black",
-    color: "white",
+    backgroundColor: "#f6f8fa",
+    color: "black",
   },
   tableHeaderBedspaceGrid: {
     flexDirection: "row",
@@ -94,10 +93,28 @@ const useStyles = makeStyles({
     whiteSpace: "pre-line",
   },
   demoBoxBodyOneLiner: {
-    marginBottom: "4px",
+    marginBottom: "2px",
+  },
+  demoBoxBodyContingencies: {
+    display: "flex",
+    flexDirection: "row",
+    fontSize: "7pt",
+    fontWeight: "bold",
+    justifyContent: "flex-start",
+    flexWrap: "wrap",
+    alignContent: "center",
+    marginBottom: "2px",
+  },
+  demoBoxBodyContingencyItem: {
+    border: "1pt solid #dbdbdb",
+    borderRadius: "2pt",
+    padding: "0 1px 1px 2px",
+    marginTop: "1pt",
+    marginRight: "2pt",
   },
   bedspaceEditorToolbar: {
-    borderBottom: "2px solid black",
+    borderBottom: "2px solid #f6f8fa",
+    boxShadow: "0px 1px 0px 0px rgba(0,0,0,0.1)",
   },
   saveButton: {
     backgroundColor: "rgba(223, 255, 0, 0.9)",
@@ -106,17 +123,19 @@ const useStyles = makeStyles({
       backgroundColor: "rgba(223, 255, 0, 0.95)",
       color: "black",
     },
+    marginRight: "3px",
   },
   saveButtonDisabled: {
     backgroundColor: "#f4f4f466",
   },
   resetButton: {
-    backgroundColor: "rgba(223, 255, 0, 0.9)",
+    backgroundColor: "rgba(110, 214, 247, 0.30)",
     color: "#000000ab",
     "&:hover": {
-      backgroundColor: "rgba(223, 255, 0, 0.95)",
+      backgroundColor: "rgba(110, 214, 247, 0.5)",
       color: "black",
     },
+    marginRight: "3px",
   },
   resetButtonDisabled: {
     backgroundColor: "#f4f4f466",
@@ -249,7 +268,8 @@ const UpdatePage = () => {
 
     if (objIndex >= 0) {
       updatedData[objIndex] = bedspaceEditorData;
-    } else { // If bed doesn't exist, add new one
+    } else {
+      // If bed doesn't exist, add new one
       updatedData.push(bedspaceEditorData);
     }
 
@@ -264,9 +284,9 @@ const UpdatePage = () => {
   last saved state */
   const handleOnReset = (e) => {
     e.preventDefault();
-    setBedspaceEditorData(data[selectedKey])
+    setBedspaceEditorData(data[selectedKey]);
     setNeedsSave(false);
-  }
+  };
 
   // table pagination
   const handleChangePage = (event, newPage) => {
@@ -470,6 +490,16 @@ const BedspaceView = ({ data }) => {
         <div className={classes.demoBoxBody}>
           <div className={classes.demoBoxBodyOneLiner}>
             {thisViewData.oneLiner}
+          </div>
+          <div className={classes.demoBoxBodyContingencies}>
+            {thisViewData.contingencies &&
+              thisViewData.contingencies.map((item) => {
+                return (
+                  <div className={classes.demoBoxBodyContingencyItem}>
+                    {item}
+                  </div>
+                );
+              })}
           </div>
           {thisViewData.body}
         </div>
