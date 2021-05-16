@@ -22,7 +22,7 @@ const DocumentPage = () => {
     return (
       <div>
         <PDFViewer style={{ width: "100%", height: "900px" }}>
-          <MyDocument beds={30} colsPerPage={4} data={data} />
+          <MyDocument beds={30} colsPerPage={3} data={data} />
         </PDFViewer>
       </div>
     );

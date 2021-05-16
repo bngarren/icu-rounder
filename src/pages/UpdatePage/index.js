@@ -14,6 +14,7 @@ import {
   Button,
   Toolbar,
   Avatar,
+  Typography,
 } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -114,13 +115,16 @@ const useStyles = makeStyles({
   },
   bedspaceEditorToolbar: {
     borderBottom: "2px solid #f6f8fa",
-    boxShadow: "0px 1px 0px 0px rgba(0,0,0,0.1)",
+  },
+  bedspaceEditorToolbarBedNumber: {
+    marginRight: 5,
+    color: "#8c888821",
   },
   saveButton: {
-    backgroundColor: "rgba(223, 255, 0, 0.9)",
+    backgroundColor: "#b7d100",
     color: "#000000ab",
     "&:hover": {
-      backgroundColor: "rgba(223, 255, 0, 0.95)",
+      backgroundColor: "#b7d100a3",
       color: "black",
     },
     marginRight: "3px",
@@ -345,60 +349,68 @@ const UpdatePage = () => {
                 <TableBody>
                   {data
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((value, key) => (
-                      <TableRow
-                        className={classes.tableRow}
-                        key={value.bed}
-                        hover
-                        selected={key === selectedKey}
-                      >
-                        <TableCell component="th" scope="row">
-                          <Grid
-                            container
-                            className={classes.tableHeaderBedspaceGrid}
-                          >
-                            <Grid item>
-                              <Avatar
-                                variant="rounded"
-                                className={classes.bedNumberAvatar}
-                              >
-                                {value.bed}
-                              </Avatar>
+                    .map((value, key) => {
+                      let adjustedKey = key + page * rowsPerPage;
+                      return (
+                        <TableRow
+                          className={classes.tableRow}
+                          key={value.bed}
+                          hover
+                          selected={adjustedKey === selectedKey}
+                        >
+                          {console.log(adjustedKey)}
+                          <TableCell component="th" scope="row">
+                            <Grid
+                              container
+                              className={classes.tableHeaderBedspaceGrid}
+                            >
+                              <Grid item>
+                                <Avatar
+                                  variant="rounded"
+                                  className={classes.bedNumberAvatar}
+                                >
+                                  {value.bed}
+                                </Avatar>
+                              </Grid>
+                              <Grid item>
+                                {
+                                  <Tooltip title="Edit">
+                                    <EditIcon
+                                      fontSize="small"
+                                      onClick={() =>
+                                        handleEditIconClick(adjustedKey)
+                                      }
+                                      style={{ cursor: "pointer" }}
+                                    />
+                                  </Tooltip>
+                                }
+                                {
+                                  <Tooltip title="Clear">
+                                    <DeleteIcon
+                                      fontSize="small"
+                                      onClick={() =>
+                                        handleDeleteIconClick(adjustedKey)
+                                      }
+                                      style={{ cursor: "pointer" }}
+                                    />
+                                  </Tooltip>
+                                }
+                              </Grid>
                             </Grid>
-                            <Grid item>
-                              {
-                                <Tooltip title="Edit">
-                                  <EditIcon
-                                    fontSize="small"
-                                    onClick={() => handleEditIconClick(key)}
-                                    style={{ cursor: "pointer" }}
-                                  />
-                                </Tooltip>
-                              }
-                              {
-                                <Tooltip title="Clear">
-                                  <DeleteIcon
-                                    fontSize="small"
-                                    onClick={() => handleDeleteIconClick(key)}
-                                    style={{ cursor: "pointer" }}
-                                  />
-                                </Tooltip>
-                              }
-                            </Grid>
-                          </Grid>
-                        </TableCell>
-                        <TableCell align="left">
-                          <span>
-                            {value["lastName"]}
-                            {value["lastName"] && value["firstName"] && ", "}
-                            {value["firstName"]}
-                          </span>
-                        </TableCell>
-                        <TableCell align="left">
-                          <span>{value["teamNumber"]}</span>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                          </TableCell>
+                          <TableCell align="left">
+                            <span>
+                              {value["lastName"]}
+                              {value["lastName"] && value["firstName"] && ", "}
+                              {value["firstName"]}
+                            </span>
+                          </TableCell>
+                          <TableCell align="left">
+                            <span>{value["teamNumber"]}</span>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                 </TableBody>
               </Table>
               <TablePagination
@@ -423,6 +435,12 @@ const UpdatePage = () => {
                     variant="dense"
                     className={classes.bedspaceEditorToolbar}
                   >
+                    <Typography
+                      variant="h1"
+                      className={classes.bedspaceEditorToolbarBedNumber}
+                    >
+                      {data[selectedKey].bed}
+                    </Typography>
                     <Button
                       classes={{
                         root: classes.saveButton,

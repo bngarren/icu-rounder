@@ -35,7 +35,7 @@ const useStyles = makeStyles({
     boxShadow: "none",
     margin: 0,
     color: "#586069",
-    fontSize: 13,
+    fontSize: 14,
   },
   option: {
     minHeight: "auto",

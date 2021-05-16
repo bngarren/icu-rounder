@@ -63,6 +63,8 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
+    marginLeft: "2px",
+    marginTop: "8px",
   },
   contingencyItem: {
     borderBottom: "1px solid gray",
@@ -84,7 +86,7 @@ const CustomTextField = ({
     setValue(forcedValue);
   }, [forcedValue, reset]);
 
-  const handleInputChange = (id, e) => {
+  const handleInputChange = (e, id) => {
     const val = e.target.value;
 
     setValue(val);
@@ -94,7 +96,7 @@ const CustomTextField = ({
 
   return (
     <TextField
-      onChange={(e) => handleInputChange(id, e)}
+      onChange={(e) => handleInputChange(e, id)}
       value={value}
       InputProps={{
         classes: {
@@ -151,7 +153,7 @@ const BedspaceEditor = ({
         firstName: data.firstName ? data.firstName : "",
         teamNumber: data.teamNumber ? data.teamNumber : "",
         oneLiner: data.oneLiner ? data.oneLiner : "",
-        contingencies: data.contingencies ? data.contingencies : "",
+        contingencies: data.contingencies ? data.contingencies : [],
         body: data.body ? data.body : "",
       }
     );
@@ -355,7 +357,14 @@ const BedspaceEditor = ({
               customStyle={classes}
             ></CustomTextField>
             <div className={classes.contingenciesRoot}>
-              {/* <ContingencyInput items={editorData.contingencies} /> */}
+              {
+                <ContingencyInput
+                  customStyle={classes}
+                  reset={forceValue.current}
+                  forcedValue={forcedValues.current.contingencies}
+                  sendInputChange={handleInputChange}
+                />
+              }
             </div>
             <CustomTextField
               id="body"

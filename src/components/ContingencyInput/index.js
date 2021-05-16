@@ -1,26 +1,150 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import { makeStyles } from "@material-ui/core/styles";
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import Checkbox from "@material-ui/core/Checkbox";
 import { TextField } from "@material-ui/core";
+import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
+import CheckBoxIcon from "@material-ui/icons/CheckBox";
 
-const ContingencyInput = ({ items: initialItems }) => {
+const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+const checkedIcon = <CheckBoxIcon fontSize="small" />;
+
+const useStyles = makeStyles({
+  popper: {
+    width: "300px !important",
+    zIndex: 1,
+    fontSize: 13,
+    color: "#586069",
+    backgroundColor: "#f6f8fa",
+  },
+  autocompletePaper: {
+    margin: 0,
+    color: "#586069",
+    fontSize: 14,
+    backgroundColor: "#f6f8fa",
+  },
+  option: {
+    minHeight: "auto",
+    alignItems: "center",
+    padding: 3,
+    '&[aria-selected="true"]': {
+      backgroundColor: "transparent",
+    },
+    '&[data-focus="true"]': {},
+  },
+  checkboxRoot: {
+    "&:hover": {
+      backgroundColor: "rgba(196, 196, 196, 0.18)",
+    },
+  },
+  checkboxColorSecondary: {
+    "&.Mui-checked": {
+      color: "#b7d100",
+      "&:hover": {
+        backgroundColor: "rgba(183, 209, 0, 0.1)",
+      },
+    },
+  },
+});
+
+const ContingencyInput = ({
+  customStyle: textFieldClasses,
+  reset = false,
+  forcedValue: initialItems,
+  sendInputChange = (f) => f,
+}) => {
+  const classes = useStyles();
   const [currentItems, setCurrentItems] = useState(
-    initialItems ? initialItems : []
+    initialItems ? initialItems : null
   );
+
+  useEffect(() => {
+    setCurrentItems(initialItems);
+  }, [initialItems, reset]);
+
+  const handleOnChange = (e, value) => {
+    setCurrentItems(value);
+
+    sendInputChange("contingencies", value);
+  };
 
   return (
     <Autocomplete
+      debug={true}
+      classes={{
+        popper: classes.popper,
+        option: classes.option,
+        paper: classes.autocompletePaper,
+      }}
+      size="small"
       fullWidth
       multiple
       freeSolo
-      id="tags-outlined"
-      options={[]}
+      autoHighlight
+      disableCloseOnSelect
+      id="contingencies"
+      options={customOptions}
       value={currentItems}
-      onChange={(e, value) => setCurrentItems(value)}
-      noOptionsText={""}
-      renderInput={(params) => <TextField {...params} variant="outlined" />}
+      onChange={handleOnChange}
+      renderInput={(params) => {
+        return (
+          <TextField
+            InputProps={{
+              ...params.InputProps,
+              classes: {
+                root: textFieldClasses.textFieldRoot,
+                focused: textFieldClasses.textFieldFocused,
+              },
+              disableUnderline: true,
+            }}
+            inputProps={{
+              ...params.inputProps,
+              style: { fontSize: "11pt" },
+            }}
+            InputLabelProps={{
+              ...params.InputLabelProps,
+              classes: {
+                root: textFieldClasses.textFieldInputLabelRoot,
+                focused: textFieldClasses.textFieldInputLabelFocused,
+              },
+            }}
+            variant="filled"
+            fullWidth
+            label="Contingencies"
+            placeholder="Add contingency"
+          />
+        );
+      }}
+      renderOption={(option, { selected }) => (
+        <>
+          <Checkbox
+            classes={{
+              root: classes.checkboxRoot,
+              colorSecondary: classes.checkboxColorSecondary,
+            }}
+            icon={icon}
+            checkedIcon={checkedIcon}
+            style={{ marginRight: 8 }}
+            checked={selected}
+          />
+          {option}
+        </>
+      )}
     />
   );
 };
+
+const customOptions = [
+  "Critical Airway",
+  "Critical Brain",
+  "Difficult Airway",
+  "ORL STAT",
+  "Anesthesia STAT",
+  "No ECMO",
+  "DNR/DNI",
+  "Modified DNR",
+  "Comfort measures only",
+  "Pulm HTN",
+];
 
 export default ContingencyInput;

@@ -6,10 +6,10 @@ import "./App.css";
 import { Router, useLocation } from "wouter";
 
 import MyDocument from "./components/MyDocument";
-import {pdf} from "@react-pdf/renderer";
-import { saveAs } from 'file-saver';
+import { pdf } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
 
-import {sortByBed} from "./utils/Utility";
+import { sortByBed } from "./utils/Utility";
 
 // Where all of our pages come from
 import PageRouter from "./components/PageRouter";
@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
   },
   iconButtonEdit: {
     color: "rgba(223, 255, 0, 0.82)",
-  }
+  },
 }));
 
 function App() {
@@ -32,15 +32,15 @@ function App() {
   const [location, setLocation] = useLocation();
 
   const getPdf = async () => {
-    const localData = JSON.parse(localStorage.getItem('gridData'));
+    const localData = JSON.parse(localStorage.getItem("gridData"));
     let arr = [];
-        for (let i in localData) {
-          arr.push(localData[i]);
-        }
+    for (let i in localData) {
+      arr.push(localData[i]);
+    }
     const arraySortedByBed = sortByBed(arr);
-    const blob = await pdf((
-      <MyDocument beds={30} colsPerPage={4} data={arraySortedByBed}/>
-    )).toBlob();
+    const blob = await pdf(
+      <MyDocument beds={30} colsPerPage={4} data={arraySortedByBed} />
+    ).toBlob();
     saveAs(blob, "icu.pdf");
   };
 
@@ -54,7 +54,10 @@ function App() {
                 <DescriptionIcon />
               </Tooltip>
             </IconButton>
-            <IconButton onClick={() => setLocation("/update")} className={classes.iconButtonEdit}>
+            <IconButton
+              onClick={() => setLocation("/update")}
+              className={classes.iconButtonEdit}
+            >
               <ViewListIcon />
             </IconButton>
           </Toolbar>
