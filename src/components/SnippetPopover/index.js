@@ -105,7 +105,6 @@ const SnippetPopover = ({ popupState, onSelect = (f) => f }) => {
       <ClickAwayListener onClickAway={() => popupState.close()}>
         <Popper
           {...bindPopper(popupState)}
-          getContentAnchorEl={null}
           className={classes.popper}
           transition
           placement={"top-start"}
@@ -121,8 +120,11 @@ const SnippetPopover = ({ popupState, onSelect = (f) => f }) => {
                   className={classes.header}
                 >
                   Choose snippet to insert
-                  <IconButton className={classes.closeButton}>
-                    <CloseIcon size="small" onClick={handleClose} />
+                  <IconButton
+                    className={classes.closeButton}
+                    onClick={handleClose}
+                  >
+                    <CloseIcon size="small" />
                   </IconButton>
                 </Grid>
                 <Autocomplete

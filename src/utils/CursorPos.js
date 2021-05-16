@@ -1,5 +1,5 @@
 export function getCursorPos(input) {
-  if ("selectionStart" in input && document.activeElement == input) {
+  if ("selectionStart" in input && document.activeElement === input) {
     return {
       start: input.selectionStart,
       end: input.selectionEnd,

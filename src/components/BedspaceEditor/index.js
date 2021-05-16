@@ -9,6 +9,8 @@ import { getCursorPos, setCursorPos } from "../../utils/CursorPos";
 import { usePopupState, bindTrigger } from "material-ui-popup-state/hooks";
 import SnippetPopover from "../SnippetPopover";
 
+import ContingencyInput from "../ContingencyInput";
+
 const useStyles = makeStyles({
   editorRoot: {
     padding: "10px",
@@ -48,17 +50,78 @@ const useStyles = makeStyles({
     marginTop: "8px",
     width: "100%",
   },
+  textFieldContingencies: {
+    margin: "2px",
+    marginTop: "8px",
+  },
   textFieldBody: {
     margin: "2px",
     marginTop: "8px",
     width: "100%",
   },
+  contingenciesRoot: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  contingencyItem: {
+    borderBottom: "1px solid gray",
+    marginRight: "2px",
+  },
 });
+
+const CustomTextField = ({
+  id,
+  customStyle: classes,
+  reset = false,
+  forcedValue = "",
+  sendInputChange = (f) => f,
+  ...props
+}) => {
+  const [value, setValue] = useState("");
+
+  useEffect(() => {
+    setValue(forcedValue);
+  }, [forcedValue, reset]);
+
+  const handleInputChange = (id, e) => {
+    const val = e.target.value;
+
+    setValue(val);
+
+    sendInputChange(id, val);
+  };
+
+  return (
+    <TextField
+      onChange={(e) => handleInputChange(id, e)}
+      value={value}
+      InputProps={{
+        classes: {
+          root: classes.textFieldRoot,
+          focused: classes.textFieldFocused,
+        },
+        disableUnderline: true,
+        inputProps: {
+          style: { fontSize: "11pt" },
+        },
+      }}
+      InputLabelProps={{
+        classes: {
+          root: classes.textFieldInputLabelRoot,
+          focused: classes.textFieldInputLabelFocused,
+        },
+      }}
+      id={id}
+      {...props}
+    />
+  );
+};
 
 const BedspaceEditor = ({
   data: propData,
   defaultValues,
-  needsSave,
+  reset,
   onEditorDataChange = (f) => f,
 }) => {
   const classes = useStyles();
@@ -72,23 +135,31 @@ const BedspaceEditor = ({
     _setEditorData(data);
   };
 
-  const [inputValues, _setInputValues] = useState({
-    lastName: defaultValues ? defaultValues.lastName : "",
-    firstName: defaultValues ? defaultValues.firstName : "",
-    teamNumber: defaultValues ? defaultValues.teamNumber : "",
-    oneLiner: defaultValues ? defaultValues.oneLiner : "",
-    body: defaultValues ? defaultValues.body : "",
-  });
-
-  /* Copy the inputValues state to a ref so that our event handler can 
-  have access to the up-to-date state as well
-  see: https://medium.com/geographit/accessing-react-state-in-event-listeners-with-usestate-and-useref-hooks-8cceee73c559 */
-  const inputValuesRef = useRef(inputValues);
-  // Update state and the ref at the same time to keep them in sync
-  const setInputValues = (data) => {
-    inputValuesRef.current = data;
-    _setInputValues(data);
+  // Toggle this ref value to force a re-render in components with this passed as a prop
+  // ! yes it's hacky
+  const forceValue = useRef(false);
+  const toggleForceValue = () => {
+    forceValue.current = !forceValue.current;
   };
+
+  /* Easily set all the forced values for our inputs with one function, passing in a 
+  data object that has a value for each input field */
+  const getForcedValues = (data) => {
+    return (
+      data && {
+        lastName: data.lastName ? data.lastName : "",
+        firstName: data.firstName ? data.firstName : "",
+        teamNumber: data.teamNumber ? data.teamNumber : "",
+        oneLiner: data.oneLiner ? data.oneLiner : "",
+        contingencies: data.contingencies ? data.contingencies : "",
+        body: data.body ? data.body : "",
+      }
+    );
+  };
+
+  /* These are the values we can reset our input fields to reflect, e.g,
+  when default values need to be populated or the reset button is clicked */
+  const forcedValues = useRef(getForcedValues(defaultValues));
 
   // Popover - using a hook from material-ui-popup-state package
   const popupState = usePopupState({ variant: "popover", popupId: "demoMenu" });
@@ -104,28 +175,18 @@ const BedspaceEditor = ({
   useEffect(() => {
     // Update our editor's bedspace data (JSON object)
     setEditorData(propData);
+
+    // Force out input fields to match this new truth data
+    forcedValues.current = getForcedValues(propData);
   }, [propData]);
 
-  /* Need to manually set the values of all these input fields
-  when a new bedspace is selected (in UpdatePage) or when the Reset
-  button is hit (set all the input field values to the "truth" data) 
-  
-  Using the needsSave prop (boolean) as a trigger, so that when the reset
-  button is hit, needsSave is flipped to false, and the input fields are reset
-  to default values
-  */
+  /* When a new bedspace is selected or the reset button is clicked,
+  the input fields need to be repopulated with the "default data" which is
+  just the "truth"/saved data from UpdatePage */
   useEffect(() => {
-    if (needsSave) return;
-
-    // Update our controlled form fields
-    setInputValues({
-      lastName: defaultValues.lastName || "",
-      firstName: defaultValues.firstName || "",
-      teamNumber: defaultValues.teamNumber || "",
-      oneLiner: defaultValues.oneLiner || "",
-      body: defaultValues.body || "",
-    });
-  }, [defaultValues, needsSave]);
+    forcedValues.current = getForcedValues(defaultValues);
+    toggleForceValue();
+  }, [defaultValues, reset]);
 
   /* Since we don't want to run the onEditorDataChange function
   every time a keystroke is entered, we debounce it using lodash */
@@ -136,38 +197,23 @@ const BedspaceEditor = ({
         ...editorDataRef.current, //* use ref here, otherwise stale closure
         [target]: value || "",
       });
-    }, 500), // time interval before allowing onEditorChange to fire
+    }, 300), // time interval before allowing onEditorChange to fire
     [onEditorDataChange]
   );
 
   /*  Handles the onChange callbacks for all these input fields */
   const handleInputChange = useCallback(
     (target, value) => {
-      switch (target) {
-        case "lastName":
-          setInputValues({ ...inputValues, lastName: value || "" });
-          break;
-        case "firstName":
-          setInputValues({ ...inputValues, firstName: value || "" });
-          break;
-        case "teamNumber":
-          setInputValues({ ...inputValues, teamNumber: value || "" });
-          break;
-        case "oneLiner":
-          setInputValues({ ...inputValues, oneLiner: value || "" });
-          break;
-        case "body":
-          setInputValues({ ...inputValues, body: value || "" });
-          break;
-        default:
-      }
-
       /* Will eventually send the data back to parent component (UpdatePage), but
       we use debounced function so that it doesn't happen every keystroke */
       debouncedOnEditorChange(target, value);
     },
-    [debouncedOnEditorChange, inputValues] //! Really don't want this memoization to change because inputValues change...
+    [debouncedOnEditorChange]
   );
+
+  const addContingency = (value) => {
+    debouncedOnEditorChange("contingencies", value);
+  };
 
   /* The user has selected a snippet to insert */
   const onSnippetSelected = (snippet) => {
@@ -190,7 +236,7 @@ const BedspaceEditor = ({
     /* setTimeout is a hacky way to get the focus to work correctly... */
     window.setTimeout(() => {
       setCursorPos(
-        document.getElementById(lastCursorPos.current.element),
+        document.getElementById(lastCursorPos.current.element.id),
         lastCursorPos.current.pos.start,
         lastCursorPos.current.pos.end
       );
@@ -198,13 +244,13 @@ const BedspaceEditor = ({
   };
 
   const insertSnippet = useCallback(
-    (snippet, target, pos) => {
-      let currentText = inputValuesRef.current[target];
+    (snippet, element, pos) => {
+      let currentText = element.value;
       let newText =
         currentText.substring(0, pos.start) +
         snippet +
         currentText.substring(pos.end);
-      handleInputChange(target, newText);
+      handleInputChange(element.id, newText);
     },
     [handleInputChange]
   );
@@ -213,7 +259,8 @@ const BedspaceEditor = ({
   const handleKeyDown = useCallback(
     (event) => {
       let key = event.key;
-      let element = document.activeElement.id;
+      let element = document.activeElement;
+      let elementId = element.id;
 
       if (key === "Control") {
         // do nothing when only Control key is pressed.
@@ -227,15 +274,19 @@ const BedspaceEditor = ({
 
       // this is the CTRL + SPACEBAR combination
       if (keyIsSpacebar && event.ctrlKey) {
-        console.log(document.activeElement);
-        if (element === "oneLiner" || element === "body") {
-          console.log("Popover event.");
-          event.preventDefault();
-          let pos = getCursorPos(document.activeElement);
+        if (elementId === "oneLiner" || elementId === "body") {
+          console.log(`Popover event triggered from element = ${elementId}`);
 
+          // Don't let the CTRL or SPACEBAR keydown do anything else
+          event.stopPropagation();
+
+          /* Store the cursor position and HTML element from which the snippet popup
+          was triggered so that we know where to insert the snippet */
+          let pos = getCursorPos(element);
           lastCursorPos.current = { pos, element };
 
-          popupState.open(document.activeElement);
+          // This will be the anchor for the popper
+          popupState.open(element);
         }
       }
     },
@@ -250,90 +301,82 @@ const BedspaceEditor = ({
     };
   }, [handleKeyDown]);
 
-  return (
-    <div className={classes.editorRoot}>
-      <form className={classes.form} autoComplete="off" spellCheck="false">
-        <div>
-          <CustomTextField
-            className={classes.textFieldLastNameFirstName}
-            label="Last Name"
-            variant="filled"
-            value={inputValues.lastName}
-            onChange={(e) => handleInputChange("lastName", e.target.value)}
-            size="small"
-            customStyle={classes}
-          ></CustomTextField>
-          <CustomTextField
-            className={classes.textFieldLastNameFirstName}
-            label="First Name"
-            variant="filled"
-            value={inputValues.firstName}
-            onChange={(e) => handleInputChange("firstName", e.target.value)}
-            size="small"
-            customStyle={classes}
-          ></CustomTextField>
-          <CustomTextField
-            className={classes.textFieldTeam}
-            label="Team"
-            variant="filled"
-            value={inputValues.teamNumber}
-            onChange={(e) => handleInputChange("teamNumber", e.target.value)}
-            size="small"
-            customStyle={classes}
-          ></CustomTextField>
-        </div>
-        <div>
-          <CustomTextField
-            id="oneLiner"
-            className={classes.textFieldOneLiner}
-            label="One Liner"
-            variant="filled"
-            value={inputValues.oneLiner}
-            onChange={(e) => handleInputChange("oneLiner", e.target.value)}
-            multiline
-            rows={2}
-            customStyle={classes}
-          ></CustomTextField>
-          <CustomTextField
-            id="body"
-            className={classes.textFieldBody}
-            label="Content"
-            variant="filled"
-            value={inputValues.body}
-            onChange={(e) => handleInputChange("body", e.target.value)}
-            multiline
-            rows={10}
-            customStyle={classes}
-          ></CustomTextField>
-        </div>
-      </form>
-      <SnippetPopover popupState={popupState} onSelect={onSnippetSelected} />
-    </div>
-  );
-};
-
-const CustomTextField = ({ customStyle: classes, ...props }) => {
-  return (
-    <TextField
-      InputProps={{
-        classes: {
-          root: classes.textFieldRoot,
-          focused: classes.textFieldFocused,
-        },
-        disableUnderline: true,
-        inputProps: {
-          style: { fontSize: "11pt" },
-        },
-      }}
-      InputLabelProps={{
-        classes: {
-          root: classes.textFieldInputLabelRoot,
-          focused: classes.textFieldInputLabelFocused,
-        },
-      }}
-      {...props}
-    />
-  );
+  /*  - - - - - RETURN - - - -  */
+  if (editorData) {
+    return (
+      <div className={classes.editorRoot}>
+        <form className={classes.form} autoComplete="off" spellCheck="false">
+          <div>
+            <CustomTextField
+              id="lastName"
+              className={classes.textFieldLastNameFirstName}
+              label="Last Name"
+              variant="filled"
+              reset={forceValue.current}
+              forcedValue={forcedValues.current.lastName}
+              sendInputChange={handleInputChange}
+              size="small"
+              customStyle={classes}
+            ></CustomTextField>
+            <CustomTextField
+              id="firstName"
+              className={classes.textFieldLastNameFirstName}
+              label="First Name"
+              variant="filled"
+              reset={forceValue.current}
+              forcedValue={forcedValues.current.firstName}
+              sendInputChange={handleInputChange}
+              size="small"
+              customStyle={classes}
+            ></CustomTextField>
+            <CustomTextField
+              id="teamNumber"
+              className={classes.textFieldTeam}
+              label="Team"
+              variant="filled"
+              reset={forceValue.current}
+              forcedValue={forcedValues.current.teamNumber}
+              sendInputChange={handleInputChange}
+              size="small"
+              customStyle={classes}
+            ></CustomTextField>
+          </div>
+          <div>
+            <CustomTextField
+              id="oneLiner"
+              className={classes.textFieldOneLiner}
+              label="One Liner"
+              variant="filled"
+              reset={forceValue.current}
+              forcedValue={forcedValues.current.oneLiner}
+              sendInputChange={handleInputChange}
+              multiline
+              rows={2}
+              customStyle={classes}
+            ></CustomTextField>
+            <div className={classes.contingenciesRoot}>
+              {/* <ContingencyInput items={editorData.contingencies} /> */}
+            </div>
+            <CustomTextField
+              id="body"
+              className={classes.textFieldBody}
+              label="Content"
+              variant="filled"
+              reset={forceValue.current}
+              forcedValue={forcedValues.current.body}
+              sendInputChange={handleInputChange}
+              multiline
+              rows={10}
+              customStyle={classes}
+            ></CustomTextField>
+          </div>
+        </form>
+        <SnippetPopover popupState={popupState} onSelect={onSnippetSelected} />
+      </div>
+    );
+  } else {
+    return <></>;
+  }
 };
 
 export default BedspaceEditor;

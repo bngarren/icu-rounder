@@ -62,7 +62,7 @@ const useStyles = makeStyles({
     width: "185pt",
     height: "250pt",
     margin: "auto",
-    border: "2px solid black",
+    border: "1px solid #1e1e1e",
     fontSize: "9pt",
   },
   demoBoxHeader: {
@@ -150,6 +150,7 @@ const UpdatePage = () => {
   const [bedspaceEditorData, setBedspaceEditorData] = useState();
   const [selectedKey, setSelectedKey] = useState();
   const [needsSave, setNeedsSave] = useState(false);
+  const [resetBedspaceEditor, setResetBedspaceEditor] = useState(false); // value not important, just using it to trigger re-render
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -241,7 +242,11 @@ const UpdatePage = () => {
     let updatedData = [...data];
     let deleted = updatedData.splice(key, 1);
     console.log(`Removed bedspace: ${JSON.stringify(deleted)}`);
-    setData(mergeWithBedCensus(updatedData, BED_CENSUS));
+    updatedData = mergeWithBedCensus(updatedData, BED_CENSUS);
+
+    setData(updatedData); // set truth data, save to storage
+    setBedspaceEditorData(updatedData[selectedKey]); // should clear the bedspaceEditor data
+    setNeedsSave(false);
   };
 
   /* When a change in the BedspaceEditor's data occurs, it
@@ -275,7 +280,7 @@ const UpdatePage = () => {
 
     // sort by bed number again since we've updated the bed data
     const sortedData = sortByBed(updatedData);
-    setData(sortedData);
+    setData(sortedData); // set truth data, save to storage
     setNeedsSave(false);
   };
 
@@ -285,6 +290,7 @@ const UpdatePage = () => {
   const handleOnReset = (e) => {
     e.preventDefault();
     setBedspaceEditorData(data[selectedKey]);
+    setResetBedspaceEditor((prevValue) => !prevValue); // triggers re-render of BedspaceEditor
     setNeedsSave(false);
   };
 
@@ -299,6 +305,7 @@ const UpdatePage = () => {
     setPage(0);
   };
 
+  /* - - - - - RETURN - - - - - */
   if (data != null) {
     return (
       <div>
@@ -445,7 +452,7 @@ const UpdatePage = () => {
                     data={bedspaceEditorData}
                     defaultValues={data[selectedKey]}
                     onEditorDataChange={handleOnEditorDataChange}
-                    needsSave={needsSave}
+                    reset={resetBedspaceEditor}
                   />
                 </Grid>
               </Grid>
@@ -493,9 +500,12 @@ const BedspaceView = ({ data }) => {
           </div>
           <div className={classes.demoBoxBodyContingencies}>
             {thisViewData.contingencies &&
-              thisViewData.contingencies.map((item) => {
+              thisViewData.contingencies.map((item, index) => {
                 return (
-                  <div className={classes.demoBoxBodyContingencyItem}>
+                  <div
+                    className={classes.demoBoxBodyContingencyItem}
+                    key={`${item}-${index}`}
+                  >
                     {item}
                   </div>
                 );
