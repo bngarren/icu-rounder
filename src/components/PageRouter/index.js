@@ -1,7 +1,8 @@
 import React, { Suspense, lazy } from 'react';
-import { Switch, Route} from "wouter";
+import { Switch, Route } from "wouter";
 import HomePage from "../../pages/HomePage";
 import UpdatePage from "../../pages/UpdatePage";
+import SettingsPage from "../../pages/SettingsPage";
 //import DocumentPage from "../../pages/DocumentPage";
 
 const DocumentPage = lazy(() => import('../../pages/DocumentPage'));
@@ -11,6 +12,7 @@ const PageRouter = () => (
   <Switch>
     <Route path="/" component={HomePage} />
     <Route path="/update" component={UpdatePage} />
+    <Route path="/settings" component={SettingsPage} />
 
     <Suspense fallback={Loading()}>
       <Route path="/document" component={DocumentPage} />

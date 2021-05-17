@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import {
   Document,
   Page,
@@ -29,13 +28,18 @@ Font.registerHyphenationCallback((word) => [word]);
 const pdfStyles = StyleSheet.create({
   page: {
     backgroundColor: "white",
-    marginTop: "20pt",
+    marginTop: "5pt",
     paddingHorizontal: "2pt",
+  },
+  header: {
+    fontSize: "13pt",
+    textAlign: "center",
   },
   gridListRoot: {
     display: "flex",
     alignItems: "stretch",
     flexDirection: "column",
+    marginTop: "5pt",
   },
   gridListRow: {
     display: "flex",
@@ -108,7 +112,7 @@ const pdfStyles = StyleSheet.create({
   },
 });
 
-const MyDocument = ({ beds, colsPerPage, data }) => {
+const MyDocument = ({ beds, title, colsPerPage, data }) => {
   const getMatrix = (r, c) => {
     let matrix = [];
     let box = 1;
@@ -128,6 +132,9 @@ const MyDocument = ({ beds, colsPerPage, data }) => {
   return (
     <Document>
       <Page size="letter" style={pdfStyles.page}>
+        <View style={pdfStyles.header}>
+          <Text>{title}</Text>
+        </View>
         <View style={pdfStyles.gridListRoot}>
           {matrix.map((row, rIndex) => {
             return (

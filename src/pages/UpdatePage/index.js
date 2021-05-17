@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   makeStyles,
+  useMediaQuery,
   Table,
   TableBody,
   TableCell,
@@ -16,6 +17,9 @@ import {
   Avatar,
   Typography,
 } from "@material-ui/core";
+
+import classNames from "classnames";
+
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 
@@ -28,13 +32,11 @@ import { sortByBed } from "../../utils/Utility";
 const useStyles = makeStyles({
   root: {
     padding: "0 1vw",
+    justifyContent: "center",
   },
   tableContainer: {
-    margin: "10 10",
   },
-  table: {
-    minWidth: "400px",
-  },
+  table: {},
   tableRow: {
     "&.Mui-selected": {
       backgroundColor: "#b7d10033",
@@ -46,17 +48,48 @@ const useStyles = makeStyles({
   tableHeader: {
     backgroundColor: "#f6f8fa",
     color: "black",
+    padding: "4px 2px 4px 10px"
   },
-  tableHeaderBedspaceGrid: {
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    justifyContent: "space-between",
+  tableHeaderBedNumber: {
+    color: "#626060",
+    fontWeight: "bold",
   },
-  bedNumberAvatar: {
-    width: "26px",
-    height: "26px",
-    fontSize: "14px",
-    backgroundColor: "black",
+  tableEditButton: {
+    cursor: "pointer",
+    color: "#626060",
+    fontSize: "22px",
+  },
+  tableEditButtonSelected: {
+    color: "#b7d100",
+  },
+  tableDeleteButton: {
+    cursor: "pointer",
+    fontSize: "22px",
+    color: "#626060",
+  },
+  tableCellDefault: {
+    padding: "6px 10px 6px 15px",
+    fontSize: "12pt",
+  },
+  tableCellSmall: {
+    padding: "4px 2px 4px 10px",
+    fontSize: "10pt",
+  },
+  tablePaginationRoot: {
+    overflow: "hidden",
+    padding: 0,
+  },
+  tablePaginationToolbar: {
+    paddingLeft: "5px",
+  },
+  tablePaginationInput: {
+    marginRight: "15px",
+  },
+  tablePaginationCaption: {
+    fontSize: "9pt",
+  },
+  tablePaginationButton: {
+    padding: "6px",
   },
   demoBox: {
     backgroundColor: "white",
@@ -147,16 +180,27 @@ const useStyles = makeStyles({
 });
 
 const BED_CENSUS = 30;
+const ROWS_PER_PAGE = 15;
 
 const UpdatePage = () => {
   const classes = useStyles();
+  const media_atleast_lg = useMediaQuery('(min-width:1280px)'); 
+  const media_atleast_md = useMediaQuery('(min-width:960px)'); 
+
   const [data, setData] = useState(null);
   const [bedspaceEditorData, setBedspaceEditorData] = useState();
   const [selectedKey, setSelectedKey] = useState();
   const [needsSave, setNeedsSave] = useState(false);
   const [resetBedspaceEditor, setResetBedspaceEditor] = useState(false); // value not important, just using it to trigger re-render
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(ROWS_PER_PAGE);
+
+  /* const [refToBedspaceEditorDiv, setRefToBedspaceEditorDiv] = useState(null);
+  const onSetRefToBedspaceEditorDiv = useCallback(node => {
+    // ref has been set to node
+    setRefToBedspaceEditorDiv(node); // will trigger re-render
+  }, []) */
+  const refToBedspaceEditorDiv = useRef(null);
 
   const getJsonObjectFromSortedArray = (arr) => {
     // converts the array back to a JSON "object of objects"
@@ -234,12 +278,24 @@ const UpdatePage = () => {
   }, [data]);
 
   const handleEditIconClick = (key) => {
-    // This is the key of the data array that corresponds to this selected bedspace
-    setSelectedKey(key);
-
-    /* When a new bed is selected, copy the truth data's (data) JSON object for this
+    if (selectedKey === key) {
+      setSelectedKey(null);
+    } else {
+      // This is the key of the data array that corresponds to this selected bedspace
+      setSelectedKey(key);
+      /* When a new bed is selected, copy the truth data's (data) JSON object for this
     selected bedspace to the bedspaceEditorData */
-    setBedspaceEditorData(data[key]);
+      setBedspaceEditorData(data[key]);
+
+      
+      if (refToBedspaceEditorDiv && !media_atleast_md) {
+        setTimeout(() => {
+          refToBedspaceEditorDiv.current.scrollIntoView(false);
+        }, 200)
+      }
+    }
+
+    
   };
 
   const handleDeleteIconClick = (key) => {
@@ -309,12 +365,14 @@ const UpdatePage = () => {
     setPage(0);
   };
 
+  const tableCellClasses = [classes.tableCellDefault, !media_atleast_lg && classes.tableCellSmall].join(' ');
+
   /* - - - - - RETURN - - - - - */
   if (data != null) {
     return (
       <div>
         <Grid container className={classes.root}>
-          <Grid item sm={4}>
+          <Grid item md={4} sm={7} xs={12} style={{padding: "0 6px", marginBottom: "8px",}}>
             <TableContainer
               component={Paper}
               className={classes.tableContainer}
@@ -322,28 +380,31 @@ const UpdatePage = () => {
               <Table
                 className={classes.table}
                 aria-label="simple table"
-                size="small"
               >
                 <TableHead>
                   <TableRow>
                     <TableCell
                       className={classes.tableHeader}
-                      style={{ width: "10%" }}
+                      style={{ minWidth: 30 }}
                     >
-                      Bedspace
+                      Bed
                     </TableCell>
                     <TableCell
                       className={classes.tableHeader}
-                      style={{ width: "30%" }}
+                      style={{ }}
                     >
                       Patient
                     </TableCell>
                     <TableCell
                       className={classes.tableHeader}
-                      style={{ width: "10%" }}
+                      style={{ minWidth: 30, maxWidth: 30 }}
                     >
                       Team
                     </TableCell>
+                    <TableCell
+                      className={classes.tableHeader}
+                      style={{ minWidth: "30px", maxWidth: "30px" }}
+                    />
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -351,62 +412,59 @@ const UpdatePage = () => {
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((value, key) => {
                       let adjustedKey = key + page * rowsPerPage;
+                      let isSelected = adjustedKey === selectedKey;
                       return (
                         <TableRow
                           className={classes.tableRow}
                           key={value.bed}
                           hover
-                          selected={adjustedKey === selectedKey}
+                          selected={isSelected}
                         >
-                          {console.log(adjustedKey)}
-                          <TableCell component="th" scope="row">
-                            <Grid
-                              container
-                              className={classes.tableHeaderBedspaceGrid}
+                          <TableCell component="th" scope="row" align="left" className={tableCellClasses}>
+                            <Typography
+                              variant="h5"
+                              className={classes.tableHeaderBedNumber}
                             >
-                              <Grid item>
-                                <Avatar
-                                  variant="rounded"
-                                  className={classes.bedNumberAvatar}
-                                >
-                                  {value.bed}
-                                </Avatar>
-                              </Grid>
-                              <Grid item>
-                                {
-                                  <Tooltip title="Edit">
-                                    <EditIcon
-                                      fontSize="small"
-                                      onClick={() =>
-                                        handleEditIconClick(adjustedKey)
-                                      }
-                                      style={{ cursor: "pointer" }}
-                                    />
-                                  </Tooltip>
-                                }
-                                {
-                                  <Tooltip title="Clear">
-                                    <DeleteIcon
-                                      fontSize="small"
-                                      onClick={() =>
-                                        handleDeleteIconClick(adjustedKey)
-                                      }
-                                      style={{ cursor: "pointer" }}
-                                    />
-                                  </Tooltip>
-                                }
-                              </Grid>
-                            </Grid>
+                              {value.bed}
+                            </Typography>
                           </TableCell>
-                          <TableCell align="left">
+                          <TableCell align="left" className={tableCellClasses}>
                             <span>
                               {value["lastName"]}
                               {value["lastName"] && value["firstName"] && ", "}
                               {value["firstName"]}
                             </span>
                           </TableCell>
-                          <TableCell align="left">
+                          <TableCell align="center" className={tableCellClasses}>
                             <span>{value["teamNumber"]}</span>
+                          </TableCell>
+                          <TableCell className={tableCellClasses}>
+                            <div
+                              style={{ display: "flex", alignItems: "center", justifyContent: "space-around" }}
+                            >
+                              {
+                                <Tooltip title="Edit">
+                                  <EditIcon
+                                    fontSize="small"
+                                    onClick={() =>
+                                      handleEditIconClick(adjustedKey)
+                                    }
+                                    className={[classes.tableEditButton, isSelected && classes.tableEditButtonSelected].join(' ')}
+                                  />
+                                </Tooltip>
+                              }
+                              {
+                                <Tooltip title="Clear">
+                                  <DeleteIcon
+                                    fontSize="small"
+                                    onClick={() =>
+                                      handleDeleteIconClick(adjustedKey)
+                                    }
+                                    className={classes.tableDeleteButton}
+                                  />
+                                </Tooltip>
+                              }
+                            </div>
                           </TableCell>
                         </TableRow>
                       );
@@ -414,7 +472,24 @@ const UpdatePage = () => {
                 </TableBody>
               </Table>
               <TablePagination
-                rowsPerPageOptions={[5, 10, 50]}
+                classes={{
+                  root: classes.tablePaginationRoot,
+                  toolbar: classes.tablePaginationToolbar,
+                  input: classes.tablePaginationInput,
+                  caption: classes.tablePaginationCaption,
+                }}
+                backIconButtonProps={{
+                  classes: {
+                    root: classes.tablePaginationButton,
+                  }
+                }}
+                nextIconButtonProps={{
+                  classes: {
+                    root: classes.tablePaginationButton,
+                  }
+                }}
+                rowsPerPageOptions={[5, 15, 30]}
+                colSpan={5}
                 component="div"
                 count={data.length}
                 rowsPerPage={rowsPerPage}
@@ -424,7 +499,7 @@ const UpdatePage = () => {
               />
             </TableContainer>
           </Grid>
-          <Grid item sm={8}>
+          <Grid item lg md={8} sm={12} xs={12} ref={refToBedspaceEditorDiv}>
             {selectedKey != null && (
               <Grid container>
                 <Grid item xs={12}>
@@ -432,6 +507,7 @@ const UpdatePage = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <Toolbar
+                  
                     variant="dense"
                     className={classes.bedspaceEditorToolbar}
                   >

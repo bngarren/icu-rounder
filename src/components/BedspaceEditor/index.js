@@ -1,12 +1,12 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { debounce } from "lodash";
 
-import { Grid, TextField, Button, Popover } from "@material-ui/core";
+import { Grid, TextField, Paper } from "@material-ui/core";
 import { makeStyles, fade } from "@material-ui/core/styles";
 
 import { getCursorPos, setCursorPos } from "../../utils/CursorPos";
 
-import { usePopupState, bindTrigger } from "material-ui-popup-state/hooks";
+import { usePopupState } from "material-ui-popup-state/hooks";
 import SnippetPopover from "../SnippetPopover";
 
 import ContingencyInput from "../ContingencyInput";
@@ -306,7 +306,7 @@ const BedspaceEditor = ({
   /*  - - - - - RETURN - - - -  */
   if (editorData) {
     return (
-      <div className={classes.editorRoot}>
+      <Paper className={classes.editorRoot}>
         <form className={classes.form} autoComplete="off" spellCheck="false">
           <div>
             <CustomTextField
@@ -381,7 +381,7 @@ const BedspaceEditor = ({
           </div>
         </form>
         <SnippetPopover popupState={popupState} onSelect={onSnippetSelected} />
-      </div>
+      </Paper>
     );
   } else {
     return <></>;
