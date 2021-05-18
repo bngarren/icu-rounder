@@ -8,37 +8,47 @@ import {
   Button,
 } from "@material-ui/core";
 
-export const YesNoDialog = (
-  shouldOpen,
-  body = "",
-  onYes = (f) => f,
-  onNo = (f) => f
-) => {
-  const [open, setOpen] = useState(shouldOpen);
+const TRANSITION_DURATION = 50; //ms
 
-  useEffect(() => {
-    setOpen(true);
-  }, [shouldOpen]);
+export const useDialog = () => {
+  const [open, setOpen] = useState(false);
+  const [dialog, setDialog] = useState(null);
 
-  const handleClose = () => {
+  const handleOnClose = () => {
     setOpen(false);
   };
 
-  const handleYes = () => {
-    onYes();
-    handleClose();
+  const handleOnAction = (cb) => {
+    handleOnClose();
+    cb();
   };
 
-  const handleNo = () => {
-    onNo();
-    handleClose();
+  const showYesNoDialog = (
+    content = "",
+    onSubmit = () => console.log("Dialog sumbit."),
+    onCancel = () => console.log("Dialog cancel."),
+    buttonLabels = { yes: "Yes", no: "Cancel" }
+  ) => {
+    if (!content) {
+      throw new Error("Cannot show Dialog without content.");
+    } else if (open) {
+      throw new Error("Dialog is already open.");
+    }
+
+    setOpen(true);
+
+    setDialog(
+      <Dialog open={true} onClose={handleOnClose} transitionDuration={TRANSITION_DURATION}>
+        {content}
+        <Button onClick={() => handleOnAction(onSubmit)}>{buttonLabels.yes}</Button>
+        <Button onClick={() => handleOnAction(onCancel)}>{buttonLabels.no}</Button>
+      </Dialog>
+    );
   };
 
-  return (
-    <Dialog open={open} onClose={handleClose}>
-      {body}
-      <Button onClick={handleYes}>Okay</Button>
-      <Button onClick={handleNo}>Cancel</Button>
-    </Dialog>
-  );
+  return {
+    dialogIsOpen: open,
+    dialog,
+    showYesNoDialog,
+  };
 };

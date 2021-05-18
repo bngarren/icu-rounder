@@ -24,7 +24,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 // Components
 import DemoBox from "../../components/DemoBox";
 import BedspaceEditor from "../../components/BedspaceEditor";
-import { YesNoDialog } from "../../components/Dialog";
+import { useDialog } from "../../components/Dialog";
 
 // Utility
 import sampleData from "../../data/data.json";
@@ -141,6 +141,8 @@ const UpdatePage = () => {
   const [needsSave, setNeedsSave] = useState(false);
   const [resetBedspaceEditor, setResetBedspaceEditor] = useState(false); // value not important, just using it to trigger re-render
 
+  const { dialogIsOpen, dialog, showYesNoDialog } = useDialog();
+
   // table pagination
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(ROWS_PER_PAGE);
@@ -243,14 +245,24 @@ const UpdatePage = () => {
   };
 
   const handleDeleteIconClick = (key) => {
-    let updatedData = [...data];
-    let deleted = updatedData.splice(key, 1);
-    console.log(`Removed bedspace: ${JSON.stringify(deleted)}`);
-    updatedData = mergeWithBedCensus(updatedData, BED_CENSUS);
+    showYesNoDialog(
+      "Are you sure you want to empty this bed?",
+      () => {
+        //should delete
+        let updatedData = [...data];
+        let deleted = updatedData.splice(key, 1);
+        console.log(`Removed bedspace: ${JSON.stringify(deleted)}`);
+        updatedData = mergeWithBedCensus(updatedData, BED_CENSUS);
 
-    setData(updatedData); // set truth data, save to storage
-    setBedspaceEditorData(updatedData[selectedKey]); // should clear the bedspaceEditor data
-    setNeedsSave(false);
+        setData(updatedData); // set truth data, save to storage
+        setBedspaceEditorData(updatedData[selectedKey]); // should clear the bedspaceEditor data
+        setNeedsSave(false);
+      },
+      () => {
+        //should cancel
+        return false;
+      }
+    );
   };
 
   /* When a change in the BedspaceEditor's data occurs, it
@@ -541,6 +553,7 @@ const UpdatePage = () => {
             )}
           </Grid>
         </Grid>
+        {dialogIsOpen && dialog}
       </div>
     );
   } else {
