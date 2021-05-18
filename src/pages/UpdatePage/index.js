@@ -14,19 +14,20 @@ import {
   Grid,
   Button,
   Toolbar,
-  Avatar,
+  IconButton,
   Typography,
 } from "@material-ui/core";
-
-import classNames from "classnames";
 
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 
+// Components
+import DemoBox from "../../components/DemoBox";
 import BedspaceEditor from "../../components/BedspaceEditor";
+import { YesNoDialog } from "../../components/Dialog";
 
+// Utility
 import sampleData from "../../data/data.json";
-
 import { sortByBed } from "../../utils/Utility";
 
 const useStyles = makeStyles({
@@ -34,8 +35,7 @@ const useStyles = makeStyles({
     padding: "0 1vw",
     justifyContent: "center",
   },
-  tableContainer: {
-  },
+  tableContainer: {},
   table: {},
   tableRow: {
     "&.Mui-selected": {
@@ -48,7 +48,7 @@ const useStyles = makeStyles({
   tableHeader: {
     backgroundColor: "#f6f8fa",
     color: "black",
-    padding: "4px 2px 4px 10px"
+    padding: "4px 2px 4px 10px",
   },
   tableHeaderBedNumber: {
     color: "#626060",
@@ -67,13 +67,16 @@ const useStyles = makeStyles({
     fontSize: "22px",
     color: "#626060",
   },
+  transparent: {
+    color: "transparent",
+  },
   tableCellDefault: {
     padding: "6px 10px 6px 15px",
     fontSize: "12pt",
   },
   tableCellSmall: {
     padding: "4px 2px 4px 10px",
-    fontSize: "10pt",
+    fontSize: "11pt",
   },
   tablePaginationRoot: {
     overflow: "hidden",
@@ -90,61 +93,6 @@ const useStyles = makeStyles({
   },
   tablePaginationButton: {
     padding: "6px",
-  },
-  demoBox: {
-    backgroundColor: "white",
-    width: "185pt",
-    height: "250pt",
-    margin: "auto",
-    border: "1px solid #1e1e1e",
-    fontSize: "9pt",
-  },
-  demoBoxHeader: {
-    display: "flex",
-    flexDirection: "row",
-    width: "100%",
-    borderBottom: "1pt solid black",
-  },
-  demoBoxHeaderBed: {
-    marginRight: "4px",
-    paddingLeft: "0.5em",
-    paddingRight: "0.5em",
-    borderRight: "1px solid black",
-    fontWeight: "bold",
-  },
-  demoBoxHeaderName: {
-    flexGrow: "4",
-  },
-  demoBoxHeaderTeam: {
-    marginLeft: "4px",
-    paddingLeft: "0.5em",
-    paddingRight: "0.5em",
-    borderLeft: "1px solid black",
-  },
-  demoBoxBody: {
-    fontSize: "8pt",
-    padding: "3px",
-    whiteSpace: "pre-line",
-  },
-  demoBoxBodyOneLiner: {
-    marginBottom: "2px",
-  },
-  demoBoxBodyContingencies: {
-    display: "flex",
-    flexDirection: "row",
-    fontSize: "7pt",
-    fontWeight: "bold",
-    justifyContent: "flex-start",
-    flexWrap: "wrap",
-    alignContent: "center",
-    marginBottom: "2px",
-  },
-  demoBoxBodyContingencyItem: {
-    border: "1pt solid #dbdbdb",
-    borderRadius: "2pt",
-    padding: "0 1px 1px 2px",
-    marginTop: "1pt",
-    marginRight: "2pt",
   },
   bedspaceEditorToolbar: {
     borderBottom: "2px solid #f6f8fa",
@@ -184,22 +132,21 @@ const ROWS_PER_PAGE = 15;
 
 const UpdatePage = () => {
   const classes = useStyles();
-  const media_atleast_lg = useMediaQuery('(min-width:1280px)'); 
-  const media_atleast_md = useMediaQuery('(min-width:960px)'); 
+  const media_atleast_lg = useMediaQuery("(min-width:1280px)");
+  const media_atleast_md = useMediaQuery("(min-width:960px)");
 
-  const [data, setData] = useState(null);
-  const [bedspaceEditorData, setBedspaceEditorData] = useState();
+  const [data, setData] = useState(null); // i.e. "Truth" data
+  const [bedspaceEditorData, setBedspaceEditorData] = useState(); // i.e. "Working" data
   const [selectedKey, setSelectedKey] = useState();
   const [needsSave, setNeedsSave] = useState(false);
   const [resetBedspaceEditor, setResetBedspaceEditor] = useState(false); // value not important, just using it to trigger re-render
+
+  // table pagination
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(ROWS_PER_PAGE);
 
-  /* const [refToBedspaceEditorDiv, setRefToBedspaceEditorDiv] = useState(null);
-  const onSetRefToBedspaceEditorDiv = useCallback(node => {
-    // ref has been set to node
-    setRefToBedspaceEditorDiv(node); // will trigger re-render
-  }, []) */
+  /* Used as a target for the scrollToElement(), in order to put
+ the BedspaceEditor into view after clicking the edit icon on smaller screens */
   const refToBedspaceEditorDiv = useRef(null);
 
   const getJsonObjectFromSortedArray = (arr) => {
@@ -212,7 +159,7 @@ const UpdatePage = () => {
   };
 
   /* Takes the array of non-empty beds (i.e. the data
-    and merges with a "census" which is a total number of bedspace
+    and merges with a "census" which is a total number of bedspaces
     
     In the future, census may also include beds to exclude, i.e. no bed 13*/
   const mergeWithBedCensus = (arr, census) => {
@@ -287,15 +234,12 @@ const UpdatePage = () => {
     selected bedspace to the bedspaceEditorData */
       setBedspaceEditorData(data[key]);
 
-      
       if (refToBedspaceEditorDiv && !media_atleast_md) {
         setTimeout(() => {
           refToBedspaceEditorDiv.current.scrollIntoView(false);
-        }, 200)
+        }, 200);
       }
     }
-
-    
   };
 
   const handleDeleteIconClick = (key) => {
@@ -365,22 +309,39 @@ const UpdatePage = () => {
     setPage(0);
   };
 
-  const tableCellClasses = [classes.tableCellDefault, !media_atleast_lg && classes.tableCellSmall].join(' ');
+  const isBedEmpty = useCallback((bedData) => {
+    let result = true;
+    for (const [key, value] of Object.entries(bedData)) {
+      if (key !== "bed" && value) {
+        // if any value but bed is non-empty
+        result = false;
+      }
+    }
+    return result;
+  }, []);
+
+  const tableCellClasses = [
+    classes.tableCellDefault,
+    !media_atleast_lg && classes.tableCellSmall,
+  ].join(" ");
 
   /* - - - - - RETURN - - - - - */
   if (data != null) {
     return (
       <div>
         <Grid container className={classes.root}>
-          <Grid item md={4} sm={7} xs={12} style={{padding: "0 6px", marginBottom: "8px",}}>
+          <Grid
+            item
+            md={4}
+            sm={7}
+            xs={12}
+            style={{ padding: "0 6px", marginBottom: "8px" }}
+          >
             <TableContainer
               component={Paper}
               className={classes.tableContainer}
             >
-              <Table
-                className={classes.table}
-                aria-label="simple table"
-              >
+              <Table className={classes.table} aria-label="simple table">
                 <TableHead>
                   <TableRow>
                     <TableCell
@@ -391,7 +352,7 @@ const UpdatePage = () => {
                     </TableCell>
                     <TableCell
                       className={classes.tableHeader}
-                      style={{ }}
+                      style={{ width: "100%" }}
                     >
                       Patient
                     </TableCell>
@@ -411,8 +372,9 @@ const UpdatePage = () => {
                   {data
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((value, key) => {
-                      let adjustedKey = key + page * rowsPerPage;
+                      let adjustedKey = key + page * rowsPerPage; // the key resets to index 0 for every pagination page
                       let isSelected = adjustedKey === selectedKey;
+                      const emptyBed = isBedEmpty(value);
                       return (
                         <TableRow
                           className={classes.tableRow}
@@ -420,7 +382,12 @@ const UpdatePage = () => {
                           hover
                           selected={isSelected}
                         >
-                          <TableCell component="th" scope="row" align="left" className={tableCellClasses}>
+                          <TableCell
+                            component="th"
+                            scope="row"
+                            align="left"
+                            className={tableCellClasses}
+                          >
                             <Typography
                               variant="h5"
                               className={classes.tableHeaderBedNumber}
@@ -435,33 +402,55 @@ const UpdatePage = () => {
                               {value["firstName"]}
                             </span>
                           </TableCell>
-                          <TableCell align="center" className={tableCellClasses}>
+                          <TableCell
+                            align="center"
+                            className={tableCellClasses}
+                          >
                             <span>{value["teamNumber"]}</span>
                           </TableCell>
                           <TableCell className={tableCellClasses}>
                             <div
-                              style={{ display: "flex", alignItems: "center", justifyContent: "space-around" }}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-around",
+                              }}
                             >
                               {
                                 <Tooltip title="Edit">
-                                  <EditIcon
-                                    fontSize="small"
+                                  <IconButton
                                     onClick={() =>
                                       handleEditIconClick(adjustedKey)
                                     }
-                                    className={[classes.tableEditButton, isSelected && classes.tableEditButtonSelected].join(' ')}
-                                  />
+                                  >
+                                    <EditIcon
+                                      fontSize="small"
+                                      className={[
+                                        classes.tableEditButton,
+                                        isSelected &&
+                                          classes.tableEditButtonSelected,
+                                      ].join(" ")}
+                                    />
+                                  </IconButton>
                                 </Tooltip>
                               }
                               {
-                                <Tooltip title="Clear">
-                                  <DeleteIcon
-                                    fontSize="small"
+                                <Tooltip title={!emptyBed ? "Clear" : ""}>
+                                  <IconButton
                                     onClick={() =>
                                       handleDeleteIconClick(adjustedKey)
                                     }
-                                    className={classes.tableDeleteButton}
-                                  />
+                                    disabled={emptyBed}
+                                  >
+                                    <DeleteIcon
+                                      fontSize="small"
+                                      className={
+                                        emptyBed
+                                          ? classes.transparent
+                                          : classes.tableDeleteButton
+                                      }
+                                    />
+                                  </IconButton>
                                 </Tooltip>
                               }
                             </div>
@@ -481,12 +470,12 @@ const UpdatePage = () => {
                 backIconButtonProps={{
                   classes: {
                     root: classes.tablePaginationButton,
-                  }
+                  },
                 }}
                 nextIconButtonProps={{
                   classes: {
                     root: classes.tablePaginationButton,
-                  }
+                  },
                 }}
                 rowsPerPageOptions={[5, 15, 30]}
                 colSpan={5}
@@ -503,11 +492,10 @@ const UpdatePage = () => {
             {selectedKey != null && (
               <Grid container>
                 <Grid item xs={12}>
-                  <BedspaceView data={bedspaceEditorData} />
+                  <DemoBox data={bedspaceEditorData} />
                 </Grid>
                 <Grid item xs={12}>
                   <Toolbar
-                  
                     variant="dense"
                     className={classes.bedspaceEditorToolbar}
                   >
@@ -558,58 +546,6 @@ const UpdatePage = () => {
   } else {
     return <>Loading...</>;
   }
-};
-
-const BedspaceView = ({ data }) => {
-  const classes = useStyles();
-  const [thisViewData, setThisViewData] = useState({});
-
-  useEffect(() => {
-    setThisViewData(data);
-  }, [data]);
-
-  const renderNameComma = () => {
-    if (thisViewData.lastName && thisViewData.firstName) {
-      return ", ";
-    }
-  };
-
-  return (
-    <>
-      <Paper className={classes.demoBox}>
-        <div className={classes.demoBoxHeader}>
-          <div className={classes.demoBoxHeaderBed}>{thisViewData.bed}</div>
-          <div className={classes.demoBoxHeaderName}>
-            {thisViewData.lastName}
-            {renderNameComma()}
-            {thisViewData.firstName}
-          </div>
-          <div className={classes.demoBoxHeaderTeam}>
-            {thisViewData.teamNumber}
-          </div>
-        </div>
-        <div className={classes.demoBoxBody}>
-          <div className={classes.demoBoxBodyOneLiner}>
-            {thisViewData.oneLiner}
-          </div>
-          <div className={classes.demoBoxBodyContingencies}>
-            {thisViewData.contingencies &&
-              thisViewData.contingencies.map((item, index) => {
-                return (
-                  <div
-                    className={classes.demoBoxBodyContingencyItem}
-                    key={`${item}-${index}`}
-                  >
-                    {item}
-                  </div>
-                );
-              })}
-          </div>
-          {thisViewData.body}
-        </div>
-      </Paper>
-    </>
-  );
 };
 
 export default UpdatePage;
