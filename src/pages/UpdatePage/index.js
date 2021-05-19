@@ -30,6 +30,10 @@ import { useDialog } from "../../components/Dialog";
 import sampleData from "../../data/data.json";
 import { sortByBed } from "../../utils/Utility";
 
+// Firebase
+import { useAuthStateContext } from "../../context/AuthState";
+import { useGridStateContext } from "../../context/GridState";
+
 const useStyles = makeStyles({
   root: {
     padding: "0 1vw",
@@ -135,6 +139,9 @@ const UpdatePage = () => {
   const media_atleast_lg = useMediaQuery("(min-width:1280px)");
   const media_atleast_md = useMediaQuery("(min-width:960px)");
 
+  const { gridData, saveGridToDb } = useGridStateContext();
+  const { authState, userIsLoggedIn } = useAuthStateContext();
+
   const [data, setData] = useState(null); // i.e. "Truth" data
   const [bedspaceEditorData, setBedspaceEditorData] = useState(); // i.e. "Working" data
   const [selectedKey, setSelectedKey] = useState();
@@ -179,6 +186,11 @@ const UpdatePage = () => {
     return resultArray;
   };
 
+  //! Load data from GridStateContext
+  useEffect(() => {
+    console.log(`Current gridState in UpdatePage = ${gridData}`);
+  }, [gridData]);
+
   // Load data (either from localStorage or sampleData file)
 
   /* This is ONLY for development. In production, the persistence of the data would need a better method */
@@ -222,7 +234,7 @@ const UpdatePage = () => {
     if (data != null) {
       const dataToSave = JSON.stringify(getJsonObjectFromSortedArray(data));
       localStorage.setItem("gridData", dataToSave);
-      console.log(`Saved data to localStorage: ${dataToSave}`);
+      //console.log(`Saved data to localStorage: ${dataToSave}`);
     }
   }, [data]);
 
@@ -307,6 +319,21 @@ const UpdatePage = () => {
     const sortedData = sortByBed(updatedData);
     setData(sortedData); // set truth data, save to storage
     setNeedsSave(false);
+
+    //! Firestore save
+    const dataForDb = JSON.stringify(getJsonObjectFromSortedArray(sortedData));
+    console.log(dataForDb);
+    saveGridToDb(
+      authState.user,
+      dataForDb,
+      () => {
+        // success
+      },
+      (error) => {
+        // error
+        console.log(error.message);
+      }
+    );
   };
 
   /* Want to reset the data being used in the bedspaceEditor
