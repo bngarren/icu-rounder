@@ -3,6 +3,7 @@ import { useSettings } from "../../context/Settings";
 
 import { makeStyles } from "@material-ui/core/styles";
 import SaveIcon from "@material-ui/icons/Save";
+import WarningIcon from "@material-ui/icons/Warning";
 import {
   Container,
   Grid,
@@ -15,7 +16,13 @@ import {
   MenuItem,
   InputLabel,
   TextField,
+  Divider,
+  Button,
 } from "@material-ui/core";
+
+// custom components
+import Exporter from "../../components/Exporter";
+import Importer from "../../components/Importer";
 
 const useStyles = makeStyles({
   header: {
@@ -33,18 +40,30 @@ const useStyles = makeStyles({
     flexDirection: "column",
   },
   inputsGridItem: {
-    marginBottom: "10px",
+    marginBottom: "20px",
   },
   inputLabel: {
     width: "max-content",
     fontSize: "13pt",
   },
+  confirmImportButton: {
+    color: "white",
+    backgroundColor: "#ff4747",
+  },
+  confirmImportText: {
+    color: "#ff4747",
+  },
+  followingImportText: {
+    color: "#b7d100",
+  },
 });
 
 const SettingsPage = () => {
   const classes = useStyles();
-  const { settings, dispatchSettings } = useSettings();
+  const { settings, dispatchSettings } = useSettings(); //hook in to the context and reducer
   const [needsSave, setNeedsSave] = useState(false);
+  const [pendingDataImport, setPendingDataImport] = useState(null);
+  const [confirmedDataImport, setConfirmedDataImport] = useState(false);
 
   const [inputValues, setInputValues] = useState();
 
@@ -79,6 +98,19 @@ const SettingsPage = () => {
     setNeedsSave(false);
   };
 
+  const handleNewDataImported = useCallback((data) => {
+    if (!data) return;
+    setPendingDataImport(data);
+    setConfirmedDataImport(false);
+  }, []);
+
+  const updateGridData = (data) => {
+    const dataToSave = JSON.stringify(data);
+    localStorage.setItem("gridData", dataToSave);
+    setPendingDataImport(null);
+    setConfirmedDataImport(true);
+  };
+
   if (inputValues) {
     return (
       <Container maxWidth="sm">
@@ -103,6 +135,7 @@ const SettingsPage = () => {
         </Grid>
 
         <Grid container className={classes.inputsGridContainer}>
+          <Typography variant="h6">Document</Typography>
           <Grid item className={classes.inputsGridItem}>
             <TextField
               label="Document Title"
@@ -134,6 +167,65 @@ const SettingsPage = () => {
                 <MenuItem value={5}>5</MenuItem>
               </Select>
             </FormControl>
+          </Grid>
+          <Divider />
+          <Grid item className={classes.inputsGridItem}>
+            <Typography variant="h6">Export</Typography>
+            <Typography variant="body2">
+              Download the current grid as a .json file.
+            </Typography>
+            <Exporter />
+          </Grid>
+          <Divider />
+          <Grid item className={classes.inputsGridItem}>
+            <Typography variant="h6">Import</Typography>
+            <Typography variant="body2">
+              Upload a previously saved .json file to populate the grid.
+            </Typography>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-around",
+                flexWrap: "wrap",
+                alignItems: "center",
+                margin: "5px 0px",
+              }}
+            >
+              {pendingDataImport ? (
+                <div>
+                  <Button
+                    className={classes.confirmImportButton}
+                    variant="contained"
+                    size="small"
+                    onClick={() => updateGridData(pendingDataImport)}
+                    startIcon={<WarningIcon />}
+                  >
+                    Use this data?
+                  </Button>
+                  <Typography
+                    variant="caption"
+                    className={classes.confirmImportText}
+                  >
+                    (This will overwrite your current grid. Consider exporting
+                    it first.)
+                  </Typography>
+                </div>
+              ) : (
+                <div>
+                  {confirmedDataImport && (
+                    <Typography
+                      variant="caption"
+                      className={classes.followingImportText}
+                    >
+                      Successfully imported.
+                    </Typography>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <Importer onNewDataSelected={handleNewDataImported} />
           </Grid>
         </Grid>
       </Container>

@@ -71,11 +71,11 @@ const useStyles = makeStyles({
     color: "transparent",
   },
   tableCellDefault: {
-    padding: "6px 10px 6px 15px",
+    padding: "3px 10px 3px 15px",
     fontSize: "12pt",
   },
   tableCellSmall: {
-    padding: "4px 2px 4px 10px",
+    padding: "2px 2px 2px 10px",
     fontSize: "11pt",
   },
   tablePaginationRoot: {
@@ -245,10 +245,19 @@ const UpdatePage = () => {
   };
 
   const handleDeleteIconClick = (key) => {
-    showYesNoDialog(
+    // Construct the delete message for the Dialog
+    let arr = [
       "Are you sure you want to empty this bed?",
+      `Bed: ${data[key].bed}`,
+    ];
+    arr.push(data[key].lastName ? `Patient: ${data[key].lastName}` : "");
+    const deleteMessage = arr.join("\n");
+
+    // Show the confirmation dialog before deleting
+    showYesNoDialog(
+      deleteMessage,
       () => {
-        //should delete
+        //should delete callback
         let updatedData = [...data];
         let deleted = updatedData.splice(key, 1);
         console.log(`Removed bedspace: ${JSON.stringify(deleted)}`);
@@ -259,7 +268,7 @@ const UpdatePage = () => {
         setNeedsSave(false);
       },
       () => {
-        //should cancel
+        //should cancel callback
         return false;
       }
     );

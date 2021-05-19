@@ -4,13 +4,21 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
+  Typography,
   Button,
 } from "@material-ui/core";
+import { makeStyles } from "@material-ui/styles";
+
+const useStyles = makeStyles({
+  paper: {
+    whiteSpace: "pre-line",
+  },
+});
 
 const TRANSITION_DURATION = 50; //ms
 
 export const useDialog = () => {
+  const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [dialog, setDialog] = useState(null);
 
@@ -38,10 +46,23 @@ export const useDialog = () => {
     setOpen(true);
 
     setDialog(
-      <Dialog open={true} onClose={handleOnClose} transitionDuration={TRANSITION_DURATION}>
-        {content}
-        <Button onClick={() => handleOnAction(onSubmit)}>{buttonLabels.yes}</Button>
-        <Button onClick={() => handleOnAction(onCancel)}>{buttonLabels.no}</Button>
+      <Dialog
+        classes={{ paper: classes.paper }}
+        open={true}
+        onClose={handleOnClose}
+        transitionDuration={TRANSITION_DURATION}
+      >
+        <DialogContent>
+          <DialogContentText>{content}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleOnAction(onSubmit)}>
+            {buttonLabels.yes}
+          </Button>
+          <Button onClick={() => handleOnAction(onCancel)} autoFocus>
+            {buttonLabels.no}
+          </Button>
+        </DialogActions>
       </Dialog>
     );
   };
