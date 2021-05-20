@@ -24,6 +24,9 @@ import {
 import Exporter from "../../components/Exporter";
 import Importer from "../../components/Importer";
 
+// GridData context
+import { useGridStateContext } from "../../context/GridState";
+
 const useStyles = makeStyles({
   header: {
     flexDirection: "row",
@@ -61,6 +64,7 @@ const useStyles = makeStyles({
 const SettingsPage = () => {
   const classes = useStyles();
   const { settings, dispatchSettings } = useSettings(); //hook in to the context and reducer
+  const { updateGridData } = useGridStateContext();
   const [needsSave, setNeedsSave] = useState(false);
   const [pendingDataImport, setPendingDataImport] = useState(null);
   const [confirmedDataImport, setConfirmedDataImport] = useState(false);
@@ -85,6 +89,7 @@ const SettingsPage = () => {
     setNeedsSave(true);
   };
 
+  /* Handling saving of Settings */
   const handleOnSave = (e) => {
     e.preventDefault();
     dispatchSettings({
@@ -98,15 +103,17 @@ const SettingsPage = () => {
     setNeedsSave(false);
   };
 
+  /* New data has been uploaded using the Importer component,
+  now awaiting confirmation */
   const handleNewDataImported = useCallback((data) => {
     if (!data) return;
     setPendingDataImport(data);
     setConfirmedDataImport(false);
   }, []);
 
-  const updateGridData = (data) => {
-    const dataToSave = JSON.stringify(data);
-    localStorage.setItem("gridData", dataToSave);
+  /* Imported data has been confirmed to overwrite the existing gridData */
+  const handleUpdateGridData = (data) => {
+    updateGridData(data);
     setPendingDataImport(null);
     setConfirmedDataImport(true);
   };
@@ -198,7 +205,7 @@ const SettingsPage = () => {
                     className={classes.confirmImportButton}
                     variant="contained"
                     size="small"
-                    onClick={() => updateGridData(pendingDataImport)}
+                    onClick={() => handleUpdateGridData(pendingDataImport)}
                     startIcon={<WarningIcon />}
                   >
                     Use this data?

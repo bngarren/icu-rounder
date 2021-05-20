@@ -29,7 +29,7 @@ const Importer = ({ onNewDataSelected = (f) => f }) => {
       fr.readAsText(file, "application/json");
     };
     getDataFromFile(file);
-  }, [file, onNewDataSelected]);
+  }, [file, onNewDataSelected]); //onNewDataSelected is memoized in SettingsPage
 
   const handleImportAction = (e) => {
     const files = e.target.files;

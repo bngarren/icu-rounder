@@ -139,7 +139,7 @@ const UpdatePage = () => {
   const media_atleast_lg = useMediaQuery("(min-width:1280px)");
   const media_atleast_md = useMediaQuery("(min-width:960px)");
 
-  const { gridData, saveGridToDb } = useGridStateContext();
+  const { gridData, updateGridData } = useGridStateContext();
   const { authState, userIsLoggedIn } = useAuthStateContext();
 
   const [data, setData] = useState(null); // i.e. "Truth" data
@@ -158,43 +158,15 @@ const UpdatePage = () => {
  the BedspaceEditor into view after clicking the edit icon on smaller screens */
   const refToBedspaceEditorDiv = useRef(null);
 
-  const getJsonObjectFromSortedArray = (arr) => {
-    // converts the array back to a JSON "object of objects"
-    const result = {};
-    arr.forEach((b) => {
-      result[b.bed] = b;
-    });
-    return result;
-  };
-
-  /* Takes the array of non-empty beds (i.e. the data
-    and merges with a "census" which is a total number of bedspaces
-    
-    In the future, census may also include beds to exclude, i.e. no bed 13*/
-  const mergeWithBedCensus = (arr, census) => {
-    let resultArray = [];
-    for (let i = 0; i < census; i++) {
-      resultArray[i] = { bed: i + 1 };
-      if (arr) {
-        arr.forEach((a) => {
-          if (a.bed === i + 1) {
-            resultArray[i] = a;
-          }
-        });
-      }
-    }
-    return resultArray;
-  };
-
   //! Load data from GridStateContext
   useEffect(() => {
-    console.log(`Current gridState in UpdatePage = ${gridData}`);
+    setData(gridData);
   }, [gridData]);
 
   // Load data (either from localStorage or sampleData file)
 
   /* This is ONLY for development. In production, the persistence of the data would need a better method */
-  useEffect(() => {
+  /*   useEffect(() => {
     const getData = async () => {
       // Try local storage first
       const resultJsonFromLocal = localStorage.getItem("gridData");
@@ -221,7 +193,7 @@ const UpdatePage = () => {
       }
     };
     getData();
-  }, []);
+  }, []); */
 
   // Each time data changes, save it to localStorage
 
@@ -230,13 +202,13 @@ const UpdatePage = () => {
      program as an Array (for sorting), BEFORE saving we have to convert to back to the regular
      JSON object of objects
   */
-  useEffect(() => {
+  /*   useEffect(() => {
     if (data != null) {
       const dataToSave = JSON.stringify(getJsonObjectFromSortedArray(data));
       localStorage.setItem("gridData", dataToSave);
       //console.log(`Saved data to localStorage: ${dataToSave}`);
     }
-  }, [data]);
+  }, [data]); */
 
   const handleEditIconClick = (key) => {
     if (selectedKey === key) {
@@ -273,9 +245,7 @@ const UpdatePage = () => {
         let updatedData = [...data];
         let deleted = updatedData.splice(key, 1);
         console.log(`Removed bedspace: ${JSON.stringify(deleted)}`);
-        updatedData = mergeWithBedCensus(updatedData, BED_CENSUS);
-
-        setData(updatedData); // set truth data, save to storage
+        updateGridData(updatedData); //send new data to GridStateContext (handles truth data)
         setBedspaceEditorData(updatedData[selectedKey]); // should clear the bedspaceEditor data
         setNeedsSave(false);
       },
@@ -293,10 +263,9 @@ const UpdatePage = () => {
     setNeedsSave(true);
   };
 
-  // Receives the new data from the BedspaceView
-
-  /* This is data for a single bedspace that needs to be merged with the
-  data object prior to saving */
+  /* This handles data for a single bedspace (currently stored in bedspaceEditorData)
+  that needs to be merged with the rest of the grid prior to sending
+  a new data object to GridStateContext to update the truth gridData */
   const handleOnSave = (e) => {
     e.preventDefault();
     const updatedData = [...data];
@@ -315,25 +284,9 @@ const UpdatePage = () => {
       updatedData.push(bedspaceEditorData);
     }
 
-    // sort by bed number again since we've updated the bed data
-    const sortedData = sortByBed(updatedData);
-    setData(sortedData); // set truth data, save to storage
+    // send updated data to GridStateContext
+    updateGridData(updatedData);
     setNeedsSave(false);
-
-    //! Firestore save
-    const dataForDb = JSON.stringify(getJsonObjectFromSortedArray(sortedData));
-    console.log(dataForDb);
-    saveGridToDb(
-      authState.user,
-      dataForDb,
-      () => {
-        // success
-      },
-      (error) => {
-        // error
-        console.log(error.message);
-      }
-    );
   };
 
   /* Want to reset the data being used in the bedspaceEditor
@@ -357,6 +310,7 @@ const UpdatePage = () => {
     setPage(0);
   };
 
+  /* Helpful for determining if delete icon should be shown or not */
   const isBedEmpty = useCallback((bedData) => {
     let result = true;
     for (const [key, value] of Object.entries(bedData)) {
