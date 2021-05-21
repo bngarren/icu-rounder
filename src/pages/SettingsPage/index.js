@@ -69,18 +69,25 @@ const SettingsPage = () => {
   const [pendingDataImport, setPendingDataImport] = useState(null);
   const [confirmedDataImport, setConfirmedDataImport] = useState(false);
 
-  const [inputValues, setInputValues] = useState();
+  const [inputValues, setInputValues] = useState(); // controlled inputs
 
   const updateInputValuesFromSettings = useCallback((stgs) => {
     setInputValues({
       document_cols_per_page: stgs.document_cols_per_page,
       document_title: stgs.document_title,
+      bedLayout: stgs.bedLayout,
     });
   }, []);
 
   useEffect(() => {
     updateInputValuesFromSettings(settings);
   }, [settings, updateInputValuesFromSettings]);
+
+  const validateBedLayout = (value) => {
+    let res = value.split(",");
+
+    handleOnChange("bedLayout", res);
+  };
 
   const handleOnChange = (target, value) => {
     setInputValues((prevState) => {
@@ -98,6 +105,7 @@ const SettingsPage = () => {
         // TODO Can we just map through the inputValues here?
         document_cols_per_page: inputValues.document_cols_per_page,
         document_title: inputValues.document_title,
+        bedLayout: inputValues.bedLayout,
       },
     });
     setNeedsSave(false);
@@ -142,6 +150,14 @@ const SettingsPage = () => {
         </Grid>
 
         <Grid container className={classes.inputsGridContainer}>
+          <Typography variant="h6">General</Typography>
+          <Grid item className={classes.inputsGridItem}>
+            <TextField
+              label="Bed Layout"
+              value={inputValues.bedLayout}
+              onChange={(e) => validateBedLayout(e.target.value)}
+            />
+          </Grid>
           <Typography variant="h6">Document</Typography>
           <Grid item className={classes.inputsGridItem}>
             <TextField

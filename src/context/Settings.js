@@ -5,6 +5,7 @@ const SettingsContext = createContext();
 const INITIAL_STATE = {
   document_cols_per_page: 4,
   document_title: "",
+  bedLayout: Array.from(new Array(30), (x, i) => i + 1), // default 30 bed unit
 };
 
 const settingsReducer = (state, action) => {
@@ -23,24 +24,22 @@ const SettingsProvider = ({ children }) => {
   useEffect(() => {
     const loadData = () => {
       const data = localStorage.getItem("settings");
-      if (data) {
-        dispatch({
-          type: "UPDATE",
-          payload: JSON.parse(data),
-        });
-      }
+
+      dispatch({
+        type: "UPDATE",
+        payload: JSON.parse(data),
+      });
     };
     loadData();
   }, []);
 
   useEffect(() => {
     const saveData = () => {
-      if (!state) return false;
       const dataToSave = JSON.stringify(state);
       localStorage.setItem("settings", dataToSave);
       console.log(`Saved settings to localStorage: ${dataToSave}`);
     };
-    saveData();
+    if (state != null) saveData();
   }, [state]);
 
   const value = { settings: state, dispatchSettings: dispatch };

@@ -112,22 +112,25 @@ const pdfStyles = StyleSheet.create({
   },
 });
 
-const MyDocument = ({ beds, title, colsPerPage, data }) => {
+const MyDocument = ({ bedLayout, title, colsPerPage, data }) => {
+  const beds = bedLayout.length;
+
   const getMatrix = (r, c) => {
     let matrix = [];
-    let box = 1;
+    let counter = 0;
     for (let i = 0; i < r; i++) {
+      // for each row
       matrix[i] = [];
       for (let j = 0; j < c; j++) {
-        matrix[i][j] = box;
-        box++;
+        // for each column
+        matrix[i][j] = bedLayout[counter];
+        counter++;
       }
     }
     return matrix;
   };
 
   const matrix = getMatrix(Math.ceil(beds / colsPerPage), colsPerPage);
-  console.log(matrix);
 
   return (
     <Document>
@@ -138,7 +141,11 @@ const MyDocument = ({ beds, title, colsPerPage, data }) => {
         <View style={pdfStyles.gridListRoot}>
           {matrix.map((row, rIndex) => {
             return (
-              <View style={pdfStyles.gridListRow} wrap={false}>
+              <View
+                style={pdfStyles.gridListRow}
+                wrap={false}
+                key={`row-${rIndex}`}
+              >
                 {row.map((box, cIndex) => {
                   const objIndex = data.findIndex((obj) => obj.bed === box);
                   return (
@@ -146,6 +153,7 @@ const MyDocument = ({ beds, title, colsPerPage, data }) => {
                       bedspaceData={objIndex >= 0 ? data[objIndex] : null}
                       box={box}
                       removeLeftBorder={cIndex !== 0}
+                      key={`grid-${cIndex}-${box}`}
                     />
                   );
                 })}

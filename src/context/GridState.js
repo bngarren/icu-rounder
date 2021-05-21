@@ -4,6 +4,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  useRef,
 } from "react";
 
 import { useSettings } from "../context/Settings";
@@ -11,7 +12,6 @@ import { useAuthStateContext } from "../context/AuthState";
 
 // Utility
 import { sortByBed } from "../utils/Utility";
-import { v4 as uuidv4 } from "uuid"; // unique id generator
 
 /* Takes the array of non-empty beds (i.e. the data
     and merges with a "bedLayout" which is a total number of bedspaces
@@ -51,88 +51,16 @@ const getJsonObjectFromSortedArray = (arr) => {
   return result;
 };
 
-const BED_LAYOUT = [
-  1,
-  2,
-  3,
-  4,
-  5,
-  6,
-  7,
-  8,
-  9,
-  "9b",
-  10,
-  11,
-  12,
-  14,
-  15,
-  16,
-  17,
-  18,
-  19,
-  20,
-  21,
-  22,
-  23,
-  24,
-  25,
-  26,
-  27,
-  28,
-  29,
-  30,
-];
-
-const INITIAL_STATE = {
-  gridData: undefined,
-  updateGridData: (f) => f,
-};
-
-const GridStateContext = createContext(INITIAL_STATE);
+const GridStateContext = createContext();
 
 export default function GridStateProvider({ children, Firebase }) {
   const { authState } = useAuthStateContext();
   const [gridData, setGridData] = useState();
   const [gridDataJson, setGridDataJson] = useState();
-  const [gridDataDeindentified, setGridDataDeidentified] = useState();
-  const [gridId, setGridId] = useState();
-  const { context: settings } = useSettings;
+  const { settings } = useSettings();
 
-  const setGridDataInStorage = useCallback(
-    (localStorageData, firestoreData) => {
-      try {
-        let userId = authState?.user?.uid;
-        if (!userId) {
-          throw new Error(`No userId`);
-        }
-
-        let batch = Firebase.db.batch();
-        let docRef = Firebase.db.collection("grids").doc(userId);
-        const id = uuidv4();
-        batch.set(docRef, {
-          id: id,
-          data: { ...firestoreData },
-        });
-        batch.commit().then(() => {
-          localStorage.setItem(
-            "gridData",
-            JSON.stringify({ id: id, data: localStorageData })
-          );
-        });
-      } catch (error) {
-        console.log(`Error setting grid data in firestore: ${error.message}`);
-      }
-    },
-    [Firebase, authState.user]
-  );
-
-  /* Recives JSON object data, converts to bed-ordered array,
-  merges with BED_LAYOUT, saves a deidentified version to localStorage,
-  and sets result as gridData */
   const updateGridData = useCallback(
     (data) => {
-      console.log("here");
       // ..verify input data
       const verifiedData = data;
 
@@ -146,94 +74,48 @@ export default function GridStateProvider({ children, Firebase }) {
       /* Sort the array by bedspace and make sure the data conforms
     to the bedLayout */
       try {
-        const mergedData = mergeWithBedLayout(arr, BED_LAYOUT); // ! should be from settings
+        const mergedData = mergeWithBedLayout(arr, settings.bedLayout);
         const sortedArrayData = sortByBed(mergedData);
         setGridData(sortedArrayData);
         setGridDataJson(getJsonObjectFromSortedArray(sortedArrayData));
-
-        /* Deidentified data will be stored in localStorage */
-        const { result: deidentified, removedData } =
-          getDeidentifiedData(sortedArrayData);
-
-        const dataForLocalStorage = deidentified;
-
-        // set grid data in both localStorage and Firestore
-        setGridDataInStorage(dataForLocalStorage, removedData);
-        setGridDataDeidentified(deidentified);
       } catch (error) {
         console.error(
           `Error updating grid in GridStateProvider: ${error.message}`
         );
       }
     },
-    [setGridDataInStorage]
+    [settings.bedLayout]
   );
 
-  const getGridDataFromDb = useCallback(async () => {
-    try {
-      let userId = authState?.user?.uid;
-      if (!userId) {
-        throw new Error(`No userId`);
-      }
-      let docRef = Firebase.db.collection("grids").doc(userId);
-      let res = await docRef.get();
-      if (res.exists) {
-        return res.data();
-      } else {
-        console.log(
-          `Did not find grids doc in Firestore for this userId: ${userId}`
-        );
-      }
-    } catch (error) {
-      console.log(
-        `Aborted Firestore query for getGridDataFromDb: ${error.message}`
-      );
-    }
-  }, [Firebase, authState.user]);
-
-  /* Try to combine deidentified data in localStorage with data
-  from Firestore, or pass a null parameter which will generate an empty grid */
+  /* Try to get data from localStorage,
+  if not, initialize the grid data with an empty array by passing null */
   useEffect(() => {
-    const getCombinedData = async () => {
-      const localStorageData = JSON.parse(localStorage.getItem("gridData"));
-      if (localStorageData && typeof localStorageData !== "undefined") {
-        let doc = await getGridDataFromDb().then((res) => {
-          return res;
-        });
-        if (doc?.id === localStorageData.id) {
-          // there is a matching grid!
-
-          // ! WORKING RIGHT HERE TO COMBINE DATA
-
-          console.log(
-            `We have matching grid data in localStorage and Firestore!`
-          );
-          return combinedData;
-        }
+    try {
+      const localStorageGridData = JSON.parse(localStorage.getItem("gridData"));
+      if (localStorageGridData != null && localStorageGridData !== "") {
+        updateGridData(localStorageGridData);
+        console.log("Initialing gridData with localStorage data.");
+      } else {
+        throw new Error("Could not load localStorage gridData or it is null.");
       }
-    };
-    getCombinedData().then((cd) => {
-      updateGridData(cd);
-    });
-  }, [updateGridData, getGridDataFromDb]); //updateGridData, getGridDataFromDb are memoized
+    } catch (err) {
+      console.log(err.message);
+      updateGridData(null);
+      console.log("Initialing gridData with empty array data.");
+    }
+  }, [updateGridData]);
 
-  const getDeidentifiedData = (arrayData) => {
-    let removedData = [];
-    const result = arrayData.map((value) => {
-      const { lastName, firstName, ...keep } = value;
-      removedData.push({
-        bed: value.bed,
-        lastName: lastName || "",
-        firstName: firstName || "",
-      });
-      return { ...keep };
-    });
-    return { result, removedData };
-  };
+  /* Each time gridData changes, save to local storage */
+  useEffect(() => {
+    if (gridData != null) {
+      localStorage.setItem("gridData", JSON.stringify(gridData));
+      console.log("Saved gridData to localStorage");
+    }
+  }, [gridData]);
 
   return (
     <GridStateContext.Provider
-      value={{ gridData, gridDataJson, gridDataDeindentified, updateGridData }}
+      value={{ gridData, gridDataJson, updateGridData }}
     >
       {children}
     </GridStateContext.Provider>

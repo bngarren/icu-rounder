@@ -19,6 +19,8 @@ import { useLocation } from "wouter";
 
 import { useSettings } from "../../context/Settings";
 
+import { useGridStateContext } from "../../context/GridState";
+
 const useStyles = makeStyles((theme) => ({
   navbar: {
     backgroundColor: "black",
@@ -44,23 +46,21 @@ const Header = () => {
   const classes = useStyles();
   const [location, setLocation] = useLocation();
   const { settings, dispatchSettings } = useSettings();
+  const { gridData } = useGridStateContext();
 
   const getPdf = async () => {
-    const localData = JSON.parse(localStorage.getItem("gridData"));
-    let arr = [];
-    for (let i in localData) {
-      arr.push(localData[i]);
-    }
-    const arraySortedByBed = sortByBed(arr);
-    const blob = await pdf(
+    await pdf(
       <MyDocument
-        beds={30}
+        bedLayout={settings.bedLayout}
         title={settings.document_title}
         colsPerPage={settings.document_cols_per_page}
-        data={arraySortedByBed}
+        data={gridData}
       />
-    ).toBlob();
-    saveAs(blob, "grid.pdf");
+    )
+      .toBlob()
+      .then((blob) => {
+        saveAs(blob, "grid.pdf");
+      });
   };
 
   return (
