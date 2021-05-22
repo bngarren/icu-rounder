@@ -1,7 +1,6 @@
 import MyDocument from "../MyDocument";
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
-import { sortByBed } from "../../utils/Utility";
 
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -46,12 +45,12 @@ const Header = () => {
   const classes = useStyles();
   const [location, setLocation] = useLocation();
   const { settings, dispatchSettings } = useSettings();
-  const { gridData } = useGridStateContext();
+  const { bedLayout, gridData } = useGridStateContext();
 
   const getPdf = async () => {
     await pdf(
       <MyDocument
-        bedLayout={settings.bedLayout}
+        bedLayout={bedLayout}
         title={settings.document_title}
         colsPerPage={settings.document_cols_per_page}
         data={gridData}

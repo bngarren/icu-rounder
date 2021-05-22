@@ -1,14 +1,18 @@
 import { useState, useEffect } from "react";
-import { Paper, makeStyles } from "@material-ui/core";
+import { Paper, makeStyles, Collapse, Switch } from "@material-ui/core";
+
+import { useSettings } from "../../context/Settings";
+
+import { getWidth } from "../../components/MyDocument";
 
 const useStyles = makeStyles({
   demoBox: {
     backgroundColor: "white",
-    width: "185pt",
     height: "250pt",
     margin: "auto",
     border: "1px solid #1e1e1e",
     fontSize: "9pt",
+    fontFamily: "Roboto",
   },
   demoBoxHeader: {
     display: "flex",
@@ -34,7 +38,7 @@ const useStyles = makeStyles({
   },
   demoBoxBody: {
     fontSize: "8pt",
-    padding: "3px",
+    padding: "3px 7px 7px 3px",
     whiteSpace: "pre-line",
   },
   demoBoxBodyOneLiner: {
@@ -63,6 +67,8 @@ const useStyles = makeStyles({
 const DemoBox = ({ data: propsData }) => {
   const classes = useStyles();
   const [data, setData] = useState({});
+  const { settings } = useSettings();
+  const [collapsed, setCollapsed] = useState(true);
 
   useEffect(() => {
     setData(propsData);
@@ -74,36 +80,47 @@ const DemoBox = ({ data: propsData }) => {
     }
   };
 
+  const convertedWidth = getWidth(settings.document_cols_per_page, 1.15);
+
   return (
     <>
-      <Paper className={classes.demoBox}>
-        <div className={classes.demoBoxHeader}>
-          <div className={classes.demoBoxHeaderBed}>{data.bed}</div>
-          <div className={classes.demoBoxHeaderName}>
-            {data.lastName}
-            {renderNameComma()}
-            {data.firstName}
+      <Switch
+        checked={!collapsed}
+        onChange={() => setCollapsed((prevValue) => !prevValue)}
+      />
+      <Collapse in={!collapsed}>
+        <Paper
+          className={classes.demoBox}
+          style={{ minWidth: convertedWidth, maxWidth: convertedWidth }}
+        >
+          <div className={classes.demoBoxHeader}>
+            <div className={classes.demoBoxHeaderBed}>{data.bed}</div>
+            <div className={classes.demoBoxHeaderName}>
+              {data.lastName}
+              {renderNameComma()}
+              {data.firstName}
+            </div>
+            <div className={classes.demoBoxHeaderTeam}>{data.teamNumber}</div>
           </div>
-          <div className={classes.demoBoxHeaderTeam}>{data.teamNumber}</div>
-        </div>
-        <div className={classes.demoBoxBody}>
-          <div className={classes.demoBoxBodyOneLiner}>{data.oneLiner}</div>
-          <div className={classes.demoBoxBodyContingencies}>
-            {data.contingencies &&
-              data.contingencies.map((item, index) => {
-                return (
-                  <div
-                    className={classes.demoBoxBodyContingencyItem}
-                    key={`${item}-${index}`}
-                  >
-                    {item}
-                  </div>
-                );
-              })}
+          <div className={classes.demoBoxBody}>
+            <div className={classes.demoBoxBodyOneLiner}>{data.oneLiner}</div>
+            <div className={classes.demoBoxBodyContingencies}>
+              {data.contingencies &&
+                data.contingencies.map((item, index) => {
+                  return (
+                    <div
+                      className={classes.demoBoxBodyContingencyItem}
+                      key={`-`}
+                    >
+                      {item}
+                    </div>
+                  );
+                })}
+            </div>
+            {data.body}
           </div>
-          {data.body}
-        </div>
-      </Paper>
+        </Paper>
+      </Collapse>
     </>
   );
 };

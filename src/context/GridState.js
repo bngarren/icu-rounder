@@ -4,7 +4,6 @@ import {
   useState,
   useEffect,
   useCallback,
-  useRef,
 } from "react";
 
 import { useSettings } from "../context/Settings";
@@ -20,28 +19,29 @@ const mergeWithBedLayout = (arr, bedLayout) => {
   if (typeof arr === "undefined") {
     throw new Error(`Cannot mergeWithBedLayout, invalid input array.`);
   }
-  if (typeof bedLayout === "undefined" || bedLayout.length === 0) {
-    console.log(
-      "Invalid bedLayout passed to mergeWithBedLayout. Using default 30 beds."
-    );
-    bedLayout = Array.from(new Array(30), (x, i) => i + 1);
+  if (bedLayout == null || bedLayout.length === 0) {
+    console.log("Invalid or empty bedLayout passed to mergeWithBedLayout.");
+    bedLayout = "";
   }
 
   let resultArray = [];
-  bedLayout.forEach((value, index) => {
-    resultArray[index] = { bed: value }; // create each bedspace with just a bed number
-    if (arr) {
-      arr.forEach((a) => {
-        if (a.bed === value) {
-          // if there is bed data put it in to that bedspace
-          resultArray[index] = a;
-        }
-      });
-    }
-  });
+  if (Array.isArray(bedLayout)) {
+    bedLayout.forEach((value, index) => {
+      resultArray[index] = { bed: value }; // create each bedspace with just a bed number
+      if (arr) {
+        arr.forEach((a) => {
+          if (a.bed === value) {
+            // if there is bed data put it in to that bedspace
+            resultArray[index] = a;
+          }
+        });
+      }
+    });
+  }
   return resultArray;
 };
 
+/* Used for importing/exporting actual .Json to file */
 const getJsonObjectFromSortedArray = (arr) => {
   // converts the array back to a JSON "object of objects"
   const result = {};
@@ -55,53 +55,64 @@ const GridStateContext = createContext();
 
 export default function GridStateProvider({ children, Firebase }) {
   const { authState } = useAuthStateContext();
+  const [bedLayout, setBedLayout] = useState();
   const [gridData, setGridData] = useState();
   const [gridDataJson, setGridDataJson] = useState();
-  const { settings } = useSettings();
+  const { settings, dispatchSettings } = useSettings();
 
-  const updateGridData = useCallback(
-    (data) => {
-      // ..verify input data
-      const verifiedData = data;
+  const updateGridData = useCallback((data, bedLayout = []) => {
+    // ..verify input data
+    const verifiedData = data;
 
-      // Put each bedspace data object into an array
-      let arr = [];
-      if (verifiedData) {
-        for (let i in verifiedData) {
-          arr.push(verifiedData[i]);
-        }
+    // Put each bedspace data object into an array
+    let arr = [];
+    if (verifiedData) {
+      for (let i in verifiedData) {
+        arr.push(verifiedData[i]);
       }
-      /* Sort the array by bedspace and make sure the data conforms
-    to the bedLayout */
-      try {
-        const mergedData = mergeWithBedLayout(arr, settings.bedLayout);
-        const sortedArrayData = sortByBed(mergedData);
-        setGridData(sortedArrayData);
-        setGridDataJson(getJsonObjectFromSortedArray(sortedArrayData));
-      } catch (error) {
-        console.error(
-          `Error updating grid in GridStateProvider: ${error.message}`
-        );
-      }
-    },
-    [settings.bedLayout]
-  );
+    }
+    // If bedLayout parameter is empty, just conform bedLayout to the data
+    let bl = [];
+    if (bedLayout == null || bedLayout.length < 1) {
+      arr.forEach((element) => {
+        bl.push(element.bed);
+      });
+    } else {
+      bl = bedLayout;
+    }
+
+    /* Sort the array by bedspace and make sure the data merges with the bedLayout */
+    try {
+      const mergedData = mergeWithBedLayout(arr, bl);
+      const sortedArrayData = sortByBed(mergedData);
+      setGridData(sortedArrayData);
+      setGridDataJson(getJsonObjectFromSortedArray(sortedArrayData));
+      setBedLayout(bl);
+    } catch (error) {
+      console.error(
+        `Error updating grid in GridStateProvider: ${error.message}`
+      );
+    }
+  }, []);
 
   /* Try to get data from localStorage,
   if not, initialize the grid data with an empty array by passing null */
   useEffect(() => {
+    let data;
     try {
       const localStorageGridData = JSON.parse(localStorage.getItem("gridData"));
       if (localStorageGridData != null && localStorageGridData !== "") {
-        updateGridData(localStorageGridData);
+        data = localStorageGridData;
         console.log("Initialing gridData with localStorage data.");
       } else {
         throw new Error("Could not load localStorage gridData or it is null.");
       }
     } catch (err) {
       console.log(err.message);
-      updateGridData(null);
+      data = null;
       console.log("Initialing gridData with empty array data.");
+    } finally {
+      updateGridData(data);
     }
   }, [updateGridData]);
 
@@ -115,7 +126,7 @@ export default function GridStateProvider({ children, Firebase }) {
 
   return (
     <GridStateContext.Provider
-      value={{ gridData, gridDataJson, updateGridData }}
+      value={{ bedLayout, gridData, gridDataJson, updateGridData }}
     >
       {children}
     </GridStateContext.Provider>

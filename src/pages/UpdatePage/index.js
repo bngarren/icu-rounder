@@ -26,10 +26,6 @@ import DemoBox from "../../components/DemoBox";
 import BedspaceEditor from "../../components/BedspaceEditor";
 import { useDialog } from "../../components/Dialog";
 
-// Utility
-import sampleData from "../../data/data.json";
-import { sortByBed } from "../../utils/Utility";
-
 // Firebase
 import { useAuthStateContext } from "../../context/AuthState";
 import { useGridStateContext } from "../../context/GridState";
@@ -131,7 +127,6 @@ const useStyles = makeStyles({
   },
 });
 
-const BED_CENSUS = 30;
 const ROWS_PER_PAGE = 15;
 
 const UpdatePage = () => {
@@ -158,7 +153,7 @@ const UpdatePage = () => {
  the BedspaceEditor into view after clicking the edit icon on smaller screens */
   const refToBedspaceEditorDiv = useRef(null);
 
-  //! Load data from GridStateContext
+  // Load data from GridStateContext
   useEffect(() => {
     setData(gridData);
   }, [gridData]);

@@ -1,7 +1,10 @@
 export const sortByBed = (arr) => {
-  if (!arr || arr.length < 1 || typeof arr === "undefined") {
+  if (arr == null) {
     throw new Error(`Cannot sortByBed, invalid input array.`);
   }
+
+  if (arr === "") return "";
+
   // sorts by bed number in ascending order
   return arr.sort((el1, el2) => {
     let bed1 = el1.bed;

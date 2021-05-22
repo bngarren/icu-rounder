@@ -28,8 +28,8 @@ Font.registerHyphenationCallback((word) => [word]);
 const pdfStyles = StyleSheet.create({
   page: {
     backgroundColor: "white",
-    marginTop: "5pt",
     paddingHorizontal: "2pt",
+    paddingTop: "25pt",
   },
   header: {
     fontSize: "13pt",
@@ -108,9 +108,29 @@ const pdfStyles = StyleSheet.create({
   },
   gridBoxBody: {
     fontSize: "7pt",
-    padding: "1pt",
+    padding: "2pt 5pt 5pt 2pt",
   },
 });
+
+/* Hard coded Pt sizes for Letter size PDF document
+depending on number of columns per page (the key) */
+export const WIDTH_MAP = {
+  1: 608,
+  2: 304,
+  3: 202.4,
+  4: 152,
+  5: 121.7,
+};
+
+export const getWidth = (colsPerPage, factor = 1) => {
+  let res = "";
+  if (colsPerPage) {
+    res = WIDTH_MAP[colsPerPage] * factor;
+  } else {
+    res = WIDTH_MAP[4] * factor;
+  }
+  return res.toString() + "pt";
+};
 
 const MyDocument = ({ bedLayout, title, colsPerPage, data }) => {
   const beds = bedLayout.length;
@@ -152,6 +172,7 @@ const MyDocument = ({ bedLayout, title, colsPerPage, data }) => {
                     <GridBox
                       bedspaceData={objIndex >= 0 ? data[objIndex] : null}
                       box={box}
+                      width={getWidth(colsPerPage)}
                       removeLeftBorder={cIndex !== 0}
                       key={`grid-${cIndex}-${box}`}
                     />
@@ -166,13 +187,17 @@ const MyDocument = ({ bedLayout, title, colsPerPage, data }) => {
   );
 };
 
-const GridBox = ({ bedspaceData, box, removeLeftBorder }) => {
+const GridBox = ({ bedspaceData, box, width, removeLeftBorder }) => {
   if (bedspaceData) {
     return (
       <View
         style={[
           pdfStyles.gridBoxRoot,
           removeLeftBorder && pdfStyles.removeLeftBorder,
+          {
+            minWidth: width,
+            maxWidth: width,
+          },
         ]}
       >
         <View style={pdfStyles.gridBoxHeader}>

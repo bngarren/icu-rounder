@@ -5,7 +5,7 @@ const SettingsContext = createContext();
 const INITIAL_STATE = {
   document_cols_per_page: 4,
   document_title: "",
-  bedLayout: Array.from(new Array(30), (x, i) => i + 1), // default 30 bed unit
+  export_filename: "grid",
 };
 
 const settingsReducer = (state, action) => {

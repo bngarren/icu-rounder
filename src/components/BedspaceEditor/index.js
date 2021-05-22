@@ -105,7 +105,7 @@ const CustomTextField = ({
         },
         disableUnderline: true,
         inputProps: {
-          style: { fontSize: "11pt" },
+          style: { fontSize: "10pt" },
         },
       }}
       InputLabelProps={{
