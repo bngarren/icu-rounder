@@ -55,9 +55,9 @@ const useStyles = makeStyles({
     marginBottom: "2px",
   },
   demoBoxBodyContingencyItem: {
-    border: "1pt solid #dbdbdb",
+    border: "1pt solid #9a9a9a",
     borderRadius: "2pt",
-    padding: "0 1px 1px 2px",
+    padding: "0 2px 0px 2px",
     marginTop: "1pt",
     marginRight: "2pt",
   },

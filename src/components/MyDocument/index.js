@@ -47,7 +47,7 @@ const pdfStyles = StyleSheet.create({
     justifyContent: "space-evenly",
   },
   gridBoxRoot: {
-    fontSize: "9pt",
+    fontSize: "8pt",
     display: "flex",
     flexBasis: "0",
     flex: "1",
@@ -73,10 +73,12 @@ const pdfStyles = StyleSheet.create({
     paddingLeft: "3pt",
     paddingRight: "3pt",
     borderRight: "1pt solid black",
+    fontSize: "8.5pt",
     fontWeight: "bold",
   },
   gridBoxHeaderName: {
     flexGrow: "4",
+    alignSelf: "center",
   },
   gridBoxHeaderTeam: {
     marginLeft: "2pt",
@@ -84,6 +86,8 @@ const pdfStyles = StyleSheet.create({
     paddingRight: "3pt",
     borderLeft: "1pt solid black",
     minWidth: "11pt",
+    alignSelf: "center",
+    fontSize: "8.5pt",
   },
   gridBoxBodyOneLiner: {
     marginBottom: "1.5pt",
@@ -99,10 +103,9 @@ const pdfStyles = StyleSheet.create({
     marginBottom: "1.5pt",
   },
   gridBoxBodyContingencyItem: {
-    border: "1pt solid #dbdbdb",
+    border: "1pt solid #9a9a9a",
     borderRadius: "2pt",
-    paddingLeft: "2pt",
-    paddingTop: "1pt",
+    padding: "1.5pt 0.5pt 0pt 2pt",
     marginTop: "0.5pt",
     marginRight: "2pt",
   },
