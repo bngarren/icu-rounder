@@ -14,6 +14,7 @@ import ContingencyInput from "../ContingencyInput";
 const useStyles = makeStyles({
   editorRoot: {
     padding: "10px",
+    backgroundColor: "transparent",
   },
   form: {},
   textFieldRoot: {
@@ -28,6 +29,7 @@ const useStyles = makeStyles({
       backgroundColor: "#fff",
       borderColor: "#b7d100",
     },
+    paddingBottom: "2px",
   },
   textFieldFocused: {},
   textFieldInputLabelRoot: {

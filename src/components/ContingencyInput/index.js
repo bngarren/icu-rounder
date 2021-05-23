@@ -80,7 +80,6 @@ const ContingencyInput = ({
       fullWidth
       multiple
       freeSolo
-      autoHighlight
       disableCloseOnSelect
       id="contingencies"
       options={customOptions}

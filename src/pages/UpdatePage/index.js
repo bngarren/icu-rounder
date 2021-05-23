@@ -16,7 +16,7 @@ import {
   Toolbar,
   IconButton,
   Typography,
-  Switch
+  Switch,
 } from "@material-ui/core";
 
 import EditIcon from "@material-ui/icons/Edit";
@@ -125,6 +125,13 @@ const useStyles = makeStyles({
   },
   resetButtonDisabled: {
     backgroundColor: "#f4f4f466",
+  },
+  bedspaceEditorGridItem: {
+    background: "white",
+  },
+  bedspaceEditorGridItemNeedsSave: {
+    background:
+      "repeating-linear-gradient( -45deg, #e9ff4c2e, #f9ffcfc9 5px, #fff 5px, #f7ffbd1f 25px )",
   },
 });
 
@@ -494,11 +501,16 @@ const UpdatePage = () => {
             {selectedKey != null && (
               <Grid container>
                 <Grid item xs={12}>
-                        <Switch
-        checked={!demoBoxCollapsed}
-        onChange={() => setDemoBoxCollapsed((prevValue) => !prevValue)}
-      />
-                  <DemoBox data={bedspaceEditorData} collapsed={demoBoxCollapsed}/>
+                  <Switch
+                    checked={!demoBoxCollapsed}
+                    onChange={() =>
+                      setDemoBoxCollapsed((prevValue) => !prevValue)
+                    }
+                  />
+                  <DemoBox
+                    data={bedspaceEditorData}
+                    collapsed={demoBoxCollapsed}
+                  />
                 </Grid>
                 <Grid item xs={12}>
                   <Toolbar
@@ -535,7 +547,15 @@ const UpdatePage = () => {
                     </Button>
                   </Toolbar>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid
+                  item
+                  xs={12}
+                  className={
+                    needsSave
+                      ? classes.bedspaceEditorGridItemNeedsSave
+                      : classes.bedspaceEditorGridItem
+                  }
+                >
                   <BedspaceEditor
                     data={bedspaceEditorData}
                     defaultValues={data[selectedKey]}
