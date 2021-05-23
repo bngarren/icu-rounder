@@ -163,6 +163,9 @@ const BedspaceEditor = ({
   when default values need to be populated or the reset button is clicked */
   const forcedValues = useRef(getForcedValues(defaultValues));
 
+  /* Ref to last name input field, so we can focus() here when a bed is selected */
+  const lastNameInputRef = useRef();
+
   // Popover - using a hook from material-ui-popup-state package
   const popupState = usePopupState({ variant: "popover", popupId: "demoMenu" });
 
@@ -189,6 +192,11 @@ const BedspaceEditor = ({
     forcedValues.current = getForcedValues(defaultValues);
     toggleForceValue();
   }, [defaultValues, reset]);
+
+  /* When a new bedspace is selected, focus() on the last name input */
+  useEffect(() => {
+    if (lastNameInputRef?.current) lastNameInputRef.current.focus();
+  }, [defaultValues]);
 
   /* Since we don't want to run the onEditorDataChange function
   every time a keystroke is entered, we debounce it using lodash */
@@ -319,6 +327,8 @@ const BedspaceEditor = ({
               sendInputChange={handleInputChange}
               size="small"
               customStyle={classes}
+              autoFocus
+              inputRef={lastNameInputRef}
             ></CustomTextField>
             <CustomTextField
               id="firstName"

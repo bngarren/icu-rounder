@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Paper, makeStyles, Collapse, Switch } from "@material-ui/core";
+import { Paper, makeStyles, Collapse } from "@material-ui/core";
 
 import { useSettings } from "../../context/Settings";
 
@@ -64,11 +64,10 @@ const useStyles = makeStyles({
 });
 
 /* The demo grid box */
-const DemoBox = ({ data: propsData }) => {
+const DemoBox = ({ data: propsData, collapsed }) => {
   const classes = useStyles();
   const [data, setData] = useState({});
   const { settings } = useSettings();
-  const [collapsed, setCollapsed] = useState(true);
 
   useEffect(() => {
     setData(propsData);
@@ -84,10 +83,6 @@ const DemoBox = ({ data: propsData }) => {
 
   return (
     <>
-      <Switch
-        checked={!collapsed}
-        onChange={() => setCollapsed((prevValue) => !prevValue)}
-      />
       <Collapse in={!collapsed}>
         <Paper
           className={classes.demoBox}

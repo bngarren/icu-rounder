@@ -29,7 +29,7 @@ const pdfStyles = StyleSheet.create({
   page: {
     backgroundColor: "white",
     paddingHorizontal: "2pt",
-    paddingTop: "25pt",
+    paddingTop: "2pt",
   },
   header: {
     fontSize: "13pt",
@@ -39,7 +39,7 @@ const pdfStyles = StyleSheet.create({
     display: "flex",
     alignItems: "stretch",
     flexDirection: "column",
-    marginTop: "5pt",
+    marginTop: "2pt",
   },
   gridListRow: {
     display: "flex",

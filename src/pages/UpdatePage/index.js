@@ -16,6 +16,7 @@ import {
   Toolbar,
   IconButton,
   Typography,
+  Switch
 } from "@material-ui/core";
 
 import EditIcon from "@material-ui/icons/Edit";
@@ -144,6 +145,10 @@ const UpdatePage = () => {
   const [resetBedspaceEditor, setResetBedspaceEditor] = useState(false); // value not important, just using it to trigger re-render
 
   const { dialogIsOpen, dialog, showYesNoDialog } = useDialog();
+
+  /* Track the toggle state of DemoBox collapsed variable,
+  helpful for setting debounce interval in BedspaceEditor */
+  const [demoBoxCollapsed, setDemoBoxCollapsed] = useState(true);
 
   // table pagination
   const [page, setPage] = useState(0);
@@ -489,7 +494,11 @@ const UpdatePage = () => {
             {selectedKey != null && (
               <Grid container>
                 <Grid item xs={12}>
-                  <DemoBox data={bedspaceEditorData} />
+                        <Switch
+        checked={!demoBoxCollapsed}
+        onChange={() => setDemoBoxCollapsed((prevValue) => !prevValue)}
+      />
+                  <DemoBox data={bedspaceEditorData} collapsed={demoBoxCollapsed}/>
                 </Grid>
                 <Grid item xs={12}>
                   <Toolbar
@@ -532,6 +541,7 @@ const UpdatePage = () => {
                     defaultValues={data[selectedKey]}
                     onEditorDataChange={handleOnEditorDataChange}
                     reset={resetBedspaceEditor}
+                    debounceInterval={demoBoxCollapsed ? 700 : 300}
                   />
                 </Grid>
               </Grid>
