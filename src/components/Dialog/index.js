@@ -31,7 +31,8 @@ export const useDialog = () => {
     cb();
   };
 
-  const showYesNoDialog = (
+  const showDialog = (
+    type,
     content = "",
     onSubmit = () => console.log("Dialog sumbit."),
     onCancel = () => console.log("Dialog cancel."),
@@ -45,31 +46,86 @@ export const useDialog = () => {
 
     setOpen(true);
 
+    const DialogType = () => {
+      switch (type) {
+        case "YesNoDialog":
+          return (
+            <YesNoDialog
+              content={content}
+              onSubmit={() => handleOnAction(onSubmit)}
+              onCancel={() => handleOnAction(onCancel)}
+              buttonLabels={buttonLabels}
+            />
+          );
+        case "RequiredInputDialog":
+          return (
+            <RequiredInputDialog
+              content={content}
+              onSubmit={() => handleOnAction(onSubmit)}
+              onCancel={() => handleOnAction(onCancel)}
+              buttonLabels={buttonLabels}
+            />
+          );
+        default:
+          throw new Error("No dialog type provided.");
+      }
+    };
+
     setDialog(
       <Dialog
         classes={{ paper: classes.paper }}
         open={true}
         onClose={handleOnClose}
         transitionDuration={TRANSITION_DURATION}
-      >
-        <DialogContent>
-          <DialogContentText>{content}</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => handleOnAction(onSubmit)}>
-            {buttonLabels.yes}
-          </Button>
-          <Button onClick={() => handleOnAction(onCancel)} autoFocus>
-            {buttonLabels.no}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      ></Dialog>
     );
   };
 
   return {
     dialogIsOpen: open,
     dialog,
-    showYesNoDialog,
+    showDialog,
   };
+};
+
+const YesNoDialog = ({
+  content,
+  onSubmit = (f) => f,
+  onCancel = (f) => f,
+  buttonLabels,
+}) => {
+  return (
+    <>
+      <DialogContent>
+        <DialogContentText>{content}</DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onSubmit}>{buttonLabels.yes}</Button>
+        <Button onClick={onCancel} autoFocus>
+          {buttonLabels.no}
+        </Button>
+      </DialogActions>
+    </>
+  );
+};
+
+const RequiredInputDialog = ({
+  content,
+  onSubmit = (f) => f,
+  onCancel = (f) => f,
+  buttonLabels,
+}) => {
+  return (
+    <>
+      <DialogContent>
+        <DialogContentText>{content}</DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onSubmit}>{buttonLabels.yes}</Button>
+        <Button onClick={onCancel} autoFocus>
+          {buttonLabels.no}
+        </Button>
+      </DialogActions>
+    </>
+  );
 };

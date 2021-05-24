@@ -247,9 +247,8 @@ const MyTableBody = ({ classes, data, page, rowsPerPage, selectedKey }) => {
 };
 
 const BedActions = ({ classes, isSelected, bedKey, emptyBed }) => {
-  const keyForActionsMenu = useRef();
-
-  const { bedActionEdit, bedActionDelete } = useContext(BedActionsContext);
+  const { bedActionEdit, bedActionMoveTo, bedActionDelete } =
+    useContext(BedActionsContext);
 
   // Popover - using a hook from material-ui-popup-state package
   const popupState = usePopupState({
@@ -258,7 +257,6 @@ const BedActions = ({ classes, isSelected, bedKey, emptyBed }) => {
   });
 
   const handleOnClickMenu = (e, key) => {
-    keyForActionsMenu.current = key;
     popupState.open(e);
   };
 
@@ -295,9 +293,10 @@ const BedActions = ({ classes, isSelected, bedKey, emptyBed }) => {
       }
       <TableBedListPopover
         popupState={popupState}
-        key={keyForActionsMenu.current}
+        key={bedKey}
         emptyBed={emptyBed}
         onSelectDelete={() => bedActionDelete(bedKey)}
+        onSelectMoveTo={() => bedActionMoveTo(bedKey)}
       />
     </div>
   );

@@ -64,6 +64,7 @@ const useStyles = makeStyles({
   },
 });
 
+/* This holds the functions we pass way down to the TableBedList's buttons */
 export const BedActionsContext = createContext();
 
 const UpdatePage = () => {
@@ -74,15 +75,18 @@ const UpdatePage = () => {
   const { gridData, updateGridData } = useGridStateContext();
   const { authState, userIsLoggedIn } = useAuthStateContext();
 
-  const [data, setData] = useState(null); // i.e. "Truth" data
+  /* This "data" should match the gridData 
+  TODO Should be able to just use gridData from the context without creating a local state variable */
+  const [data, setData] = useState(null);
   const [bedspaceEditorData, setBedspaceEditorData] = useState(); // i.e. "Working" data
   const [selectedKey, setSelectedKey] = useState();
   const [needsSave, setNeedsSave] = useState(false);
   const [resetBedspaceEditor, setResetBedspaceEditor] = useState(false); // value not important, just using it to trigger re-render
 
-  const { dialogIsOpen, dialog, showYesNoDialog } = useDialog();
+  /* Hook for our Dialog modal */
+  const { dialogIsOpen, dialog, showDialog } = useDialog();
 
-  /* Track the toggle state of DemoBox collapsed variable,
+  /* Track the toggle state of DemoBox collapsed status,
   helpful for setting debounce interval in BedspaceEditor 
   i.e., if demobox is not visible, the debounce interval can be higher */
   const [demoBoxCollapsed, setDemoBoxCollapsed] = useState(true);
@@ -117,22 +121,28 @@ const UpdatePage = () => {
     };
 
     if (needsSave) {
-      // Show the warning dialog if there is data that isn't saved
+      // Show a warning dialog if there is data that isn't saved
 
       // Construct the message for the Dialog
-      let arr = [
-        "There are unsaved changes for this bedspace. Continue without saving?",
-        `Bed: ${data[selectedKey].bed}`,
-      ];
-      arr.push(
-        data[selectedKey].lastName
-          ? `Patient: ${data[selectedKey].lastName}`
-          : ""
+      const content = (
+        <div>
+          <p>
+            There are unsaved changes for this bedspace. Continue <i>without</i>{" "}
+            saving?
+          </p>
+          <p>
+            Bed: {data[selectedKey].bed}
+            <br />
+            {data[selectedKey].lastName
+              ? `Patient: ${data[selectedKey].lastName}`
+              : ""}
+          </p>
+        </div>
       );
-      const warningMessage = arr.join("\n");
 
-      showYesNoDialog(
-        warningMessage,
+      showDialog(
+        "YesNoDialog",
+        content,
         () => {
           // chose to continue without saving
           doAction();
@@ -148,25 +158,50 @@ const UpdatePage = () => {
     }
   };
 
-  const handleBedActionDelete = (key) => {
-    // Construct the delete message for the Dialog
-    let arr = [
-      "Are you sure you want to REMOVE this bed? You will lose all bed data.",
-      `Bed: ${data[key].bed}`,
-    ];
-    arr.push(data[key].lastName ? `Patient: ${data[key].lastName}` : "");
-    const deleteMessage = arr.join("\n");
+  const handleBedActionMoveTo = (key) => {
+    const content = <div>Move to...</div>;
 
     // Show the confirmation dialog before deleting
-    showYesNoDialog(
-      deleteMessage,
+    showDialog(
+      "YesNoDialog",
+      content,
+      () => {
+        //should move callback
+      },
+      () => {
+        //should cancel callback
+        return false;
+      }
+    );
+  };
+
+  const handleBedActionDelete = (key) => {
+    // Construct the delete message for the Dialog
+    // Construct the message for the Dialog
+    const content = (
+      <div>
+        <p>
+          Are you sure you want to <b>REMOVE</b> this bedspace and it's data?
+        </p>
+        <p>
+          Bed: {data[key].bed}
+          <br />
+          {data[key].lastName ? `Patient: ${data[key].lastName}` : ""}
+        </p>
+      </div>
+    );
+
+    // Show the confirmation dialog before deleting
+    showDialog(
+      "YesNoDialog",
+      content,
       () => {
         //should delete callback
         let updatedData = [...data];
         let deleted = updatedData.splice(key, 1);
         console.log(`Removed bedspace: ${JSON.stringify(deleted)}`);
         updateGridData(updatedData); //send new data to GridStateContext (handles truth data)
-        setBedspaceEditorData(updatedData[selectedKey]); // should clear the bedspaceEditor data
+        setBedspaceEditorData(updatedData[key]); // should clear the bedspaceEditor data
         setNeedsSave(false);
       },
       () => {
@@ -234,6 +269,7 @@ const UpdatePage = () => {
             <BedActionsContext.Provider
               value={{
                 bedActionEdit: handleBedActionEdit,
+                bedActionMoveTo: handleBedActionMoveTo,
                 bedActionDelete: handleBedActionDelete,
               }}
             >
