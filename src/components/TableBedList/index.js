@@ -247,7 +247,7 @@ const MyTableBody = ({ classes, data, page, rowsPerPage, selectedKey }) => {
 };
 
 const BedActions = ({ classes, isSelected, bedKey, emptyBed }) => {
-  const { bedActionEdit, bedActionMoveTo, bedActionDelete } =
+  const { bedActionEdit, bedActionClear, bedActionDelete } =
     useContext(BedActionsContext);
 
   // Popover - using a hook from material-ui-popup-state package
@@ -287,7 +287,11 @@ const BedActions = ({ classes, isSelected, bedKey, emptyBed }) => {
             onClick={(e) => handleOnClickMenu(e, bedKey)}
             disabled={emptyBed}
           >
-            <MenuIcon fontSize="small" />
+            {popupState.isOpen ? (
+              <MenuOpenIcon fontSize="small" />
+            ) : (
+              <MenuIcon fontSize="small" />
+            )}
           </IconButton>
         </Tooltip>
       }
@@ -296,7 +300,7 @@ const BedActions = ({ classes, isSelected, bedKey, emptyBed }) => {
         key={bedKey}
         emptyBed={emptyBed}
         onSelectDelete={() => bedActionDelete(bedKey)}
-        onSelectMoveTo={() => bedActionMoveTo(bedKey)}
+        onSelectClear={() => bedActionClear(bedKey)}
       />
     </div>
   );

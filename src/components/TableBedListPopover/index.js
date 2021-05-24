@@ -8,7 +8,7 @@ const useStyles = makeStyles({});
 const TableBedListPopover = ({
   popupState,
   onSelectDelete = (f) => f,
-  onSelectMoveTo = (f) => f,
+  onSelectClear = (f) => f,
 }) => {
   const classes = useStyles();
 
@@ -16,9 +16,9 @@ const TableBedListPopover = ({
     popupState.close();
     onSelectDelete();
   };
-  const handleSelectMoveTo = () => {
+  const handleSelectClear = () => {
     popupState.close();
-    onSelectMoveTo();
+    onSelectClear();
   };
 
   return (
@@ -29,7 +29,7 @@ const TableBedListPopover = ({
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         transformOrigin={{ vertical: "top", horizontal: "left" }}
       >
-        <MenuItem onClick={handleSelectMoveTo}>Move to...</MenuItem>
+        <MenuItem onClick={handleSelectClear}>Clear</MenuItem>
         <Divider />
         <MenuItem onClick={handleSelectDelete}>Remove bed</MenuItem>
       </Menu>

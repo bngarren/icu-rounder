@@ -84,7 +84,7 @@ const UpdatePage = () => {
   const [resetBedspaceEditor, setResetBedspaceEditor] = useState(false); // value not important, just using it to trigger re-render
 
   /* Hook for our Dialog modal */
-  const { dialogIsOpen, dialog, showDialog } = useDialog();
+  const { dialogIsOpen, dialog, showYesNoDialog } = useDialog();
 
   /* Track the toggle state of DemoBox collapsed status,
   helpful for setting debounce interval in BedspaceEditor 
@@ -140,8 +140,7 @@ const UpdatePage = () => {
         </div>
       );
 
-      showDialog(
-        "YesNoDialog",
+      showYesNoDialog(
         content,
         () => {
           // chose to continue without saving
@@ -158,15 +157,34 @@ const UpdatePage = () => {
     }
   };
 
-  const handleBedActionMoveTo = (key) => {
-    const content = <div>Move to...</div>;
+  const handleBedActionClear = (key) => {
+    // Construct the message for the Dialog
+    const content = (
+      <div>
+        <p>
+          Are you sure you want to <b>CLEAR</b> the data in this bedspace?
+          <br />
+          <i>(The bedspace will remain.)</i>
+        </p>
+        <p>
+          Bed: {data[key].bed}
+          <br />
+          {data[key].lastName ? `Patient: ${data[key].lastName}` : ""}
+        </p>
+      </div>
+    );
 
-    // Show the confirmation dialog before deleting
-    showDialog(
-      "YesNoDialog",
+    // Show the confirmation dialog before clearing
+    showYesNoDialog(
       content,
       () => {
-        //should move callback
+        //should delete callback
+        let updatedData = [...data];
+        updatedData[key] = { bed: updatedData[key].bed };
+        console.log(`Cleared bedspace: ${updatedData[key].bed}`);
+        updateGridData(updatedData); //send new data to GridStateContext (handles truth data)
+        setBedspaceEditorData(updatedData[key]); // should clear the bedspaceEditor data
+        setNeedsSave(false);
       },
       () => {
         //should cancel callback
@@ -192,8 +210,7 @@ const UpdatePage = () => {
     );
 
     // Show the confirmation dialog before deleting
-    showDialog(
-      "YesNoDialog",
+    showYesNoDialog(
       content,
       () => {
         //should delete callback
@@ -269,7 +286,7 @@ const UpdatePage = () => {
             <BedActionsContext.Provider
               value={{
                 bedActionEdit: handleBedActionEdit,
-                bedActionMoveTo: handleBedActionMoveTo,
+                bedActionClear: handleBedActionClear,
                 bedActionDelete: handleBedActionDelete,
               }}
             >
