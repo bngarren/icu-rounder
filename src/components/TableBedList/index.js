@@ -282,18 +282,16 @@ const BedActions = ({ classes, isSelected, bedKey, emptyBed }) => {
         </Tooltip>
       }
       {
-        <Tooltip title="Actions">
-          <IconButton
-            onClick={(e) => handleOnClickMenu(e, bedKey)}
-            disabled={emptyBed}
-          >
-            {popupState.isOpen ? (
-              <MenuOpenIcon fontSize="small" />
-            ) : (
-              <MenuIcon fontSize="small" />
-            )}
-          </IconButton>
-        </Tooltip>
+        <IconButton
+          onClick={(e) => handleOnClickMenu(e, bedKey)}
+          disabled={emptyBed}
+        >
+          {popupState.isOpen ? (
+            <MenuOpenIcon fontSize="small" />
+          ) : (
+            <MenuIcon fontSize="small" />
+          )}
+        </IconButton>
       }
       <TableBedListPopover
         popupState={popupState}

@@ -40,6 +40,10 @@ const useStyles = makeStyles({
     },
   },
   textFieldInputLabelFocused: {},
+  textFieldBed: {
+    margin: "2px",
+    width: "75px",
+  },
   textFieldLastNameFirstName: {
     margin: "2px",
   },
@@ -152,6 +156,7 @@ const BedspaceEditor = ({
   const getForcedValues = (data) => {
     return (
       data && {
+        bed: data.bed ? data.bed : "",
         lastName: data.lastName ? data.lastName : "",
         firstName: data.firstName ? data.firstName : "",
         teamNumber: data.teamNumber ? data.teamNumber : "",
@@ -320,6 +325,17 @@ const BedspaceEditor = ({
       <Paper className={classes.editorRoot}>
         <form className={classes.form} autoComplete="off" spellCheck="false">
           <div>
+            <CustomTextField
+              id="bed"
+              className={classes.textFieldBed}
+              label="Bed"
+              variant="filled"
+              reset={forceValue.current}
+              forcedValue={forcedValues.current.bed}
+              sendInputChange={handleInputChange}
+              size="small"
+              customStyle={classes}
+            ></CustomTextField>
             <CustomTextField
               id="lastName"
               className={classes.textFieldLastNameFirstName}

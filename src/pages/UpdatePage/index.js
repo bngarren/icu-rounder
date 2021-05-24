@@ -235,29 +235,74 @@ const UpdatePage = () => {
     setNeedsSave(true);
   };
 
-  /* This handles data for a single bedspace (currently stored in bedspaceEditorData)
-  that needs to be merged with the rest of the grid prior to sending
-  a new data object to GridStateContext to update the truth gridData */
+  /* This handles the save action before trying to merge this new bedspace data with
+  the overall GridDataContext. Specifically, we check to see if there has been a
+  new bedspace (bed number) entered, i.e. we will warn the user that this may
+  overwrite any data in that target bedspace */
   const handleOnSave = (e) => {
     e.preventDefault();
+
     const updatedData = [...data];
 
+    // See if bedspaceEditorData has changed the bed number for this patient
+    if (bedspaceEditorData.bed !== data[selectedKey].bed) {
+      // create the warning message
+      const content = (
+        <div>
+          <p>
+            You are changing the bedspace for this patient? <b>WARNING: </b>This
+            may overwrite any current data in this bedspace.
+          </p>
+          <p>
+            Current Bed: {data[selectedKey].bed}
+            <br />
+            New Bed: {bedspaceEditorData.bed}
+          </p>
+        </div>
+      );
+
+      // Show the confirmation dialog before changing bedspace
+      showYesNoDialog(
+        content,
+        () => {
+          //should change bed
+          // delete old bedspace data since we changed to a different bedspace
+          updatedData.splice(selectedKey, 1);
+          // commit the save action
+          saveBedspaceEditorData(updatedData);
+          // since the selectedKey is now different, just null it so incorrect data isn't displayed
+          setSelectedKey(null);
+        },
+        () => {
+          //should cancel callback
+          return false;
+        }
+      );
+    } else {
+      // Not changing the bedspace, just other patient data
+
+      // Commit the save action
+      saveBedspaceEditorData(updatedData);
+    }
+  };
+
+  /* The actual save action that merges this new bedspaceEditorData with
+  the truth data in GridDataContext */
+  const saveBedspaceEditorData = (dataToSave) => {
     /* For each object in data array, see if there is a bed number
-    matching the bed currently being stored in bedspaceEditordata.
-    If so, return the index of this object in the array */
-    const objIndex = updatedData.findIndex(
+    that matches that has been edited in bedspaceEditorData. */
+    const objIndex = dataToSave.findIndex(
       (obj) => obj.bed === bedspaceEditorData.bed
     );
-
+    /* If so, return the index of this object in the array */
     if (objIndex >= 0) {
-      updatedData[objIndex] = bedspaceEditorData;
+      dataToSave[objIndex] = bedspaceEditorData;
     } else {
       // If bed doesn't exist, add new one
-      updatedData.push(bedspaceEditorData);
+      dataToSave.push(bedspaceEditorData);
     }
-
     // send updated data to GridStateContext
-    updateGridData(updatedData);
+    updateGridData(dataToSave);
     setNeedsSave(false);
   };
 

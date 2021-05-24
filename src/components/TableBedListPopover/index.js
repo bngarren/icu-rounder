@@ -3,7 +3,11 @@ import { Menu, MenuItem, Divider } from "@material-ui/core";
 
 import { bindMenu } from "material-ui-popup-state/hooks";
 
-const useStyles = makeStyles({});
+const useStyles = makeStyles({
+  menuItem: {
+    fontSize: "10pt",
+  },
+});
 
 const TableBedListPopover = ({
   popupState,
@@ -26,12 +30,24 @@ const TableBedListPopover = ({
       <Menu
         {...bindMenu(popupState)}
         getContentAnchorEl={null}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        anchorOrigin={{ vertical: "center", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "left" }}
       >
-        <MenuItem onClick={handleSelectClear}>Clear</MenuItem>
+        <MenuItem
+          className={classes.menuItem}
+          onClick={handleSelectClear}
+          key="clear"
+        >
+          Clear
+        </MenuItem>
         <Divider />
-        <MenuItem onClick={handleSelectDelete}>Remove bed</MenuItem>
+        <MenuItem
+          className={classes.menuItem}
+          onClick={handleSelectDelete}
+          key="delete"
+        >
+          Remove bed
+        </MenuItem>
       </Menu>
     </div>
   );
