@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, createContext, useRef } from "react";
 import {
   makeStyles,
   useMediaQuery,
@@ -64,6 +64,8 @@ const useStyles = makeStyles({
   },
 });
 
+export const BedActionsContext = createContext();
+
 const UpdatePage = () => {
   const classes = useStyles();
   const media_atleast_lg = useMediaQuery("(min-width:1280px)");
@@ -94,7 +96,7 @@ const UpdatePage = () => {
     setData(gridData);
   }, [gridData]);
 
-  const handleEditIconClick = (key) => {
+  const handleBedActionEdit = (key) => {
     const doAction = () => {
       if (selectedKey === key) {
         // re-clicked on the same bedspace
@@ -146,10 +148,10 @@ const UpdatePage = () => {
     }
   };
 
-  const handleDeleteIconClick = (key) => {
+  const handleBedActionDelete = (key) => {
     // Construct the delete message for the Dialog
     let arr = [
-      "Are you sure you want to empty this bed?",
+      "Are you sure you want to REMOVE this bed? You will lose all bed data.",
       `Bed: ${data[key].bed}`,
     ];
     arr.push(data[key].lastName ? `Patient: ${data[key].lastName}` : "");
@@ -229,12 +231,14 @@ const UpdatePage = () => {
             xs={12}
             style={{ padding: "0 6px", marginBottom: "8px" }}
           >
-            <TableBedList
-              data={data}
-              selectedKey={selectedKey}
-              onClickEdit={handleEditIconClick}
-              onClickDelete={handleDeleteIconClick}
-            />
+            <BedActionsContext.Provider
+              value={{
+                bedActionEdit: handleBedActionEdit,
+                bedActionDelete: handleBedActionDelete,
+              }}
+            >
+              <TableBedList data={data} selectedKey={selectedKey} />
+            </BedActionsContext.Provider>
           </Grid>
           <Grid item lg md={8} sm={12} xs={12} ref={refToBedspaceEditorDiv}>
             {selectedKey != null && (
@@ -300,7 +304,7 @@ const UpdatePage = () => {
                     defaultValues={data[selectedKey]}
                     onEditorDataChange={handleOnEditorDataChange}
                     reset={resetBedspaceEditor}
-                    debounceInterval={demoBoxCollapsed ? 700 : 300}
+                    debounceInterval={demoBoxCollapsed ? 500 : 300}
                   />
                 </Grid>
               </Grid>

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useContext } from "react";
 import {
   TableContainer,
   Table,
@@ -14,9 +14,16 @@ import {
   useMediaQuery,
 } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
-import DeleteIcon from "@material-ui/icons/Delete";
+import MenuIcon from "@material-ui/icons/Menu";
+import MenuOpenIcon from "@material-ui/icons/MenuOpen";
 
 import { makeStyles } from "@material-ui/styles";
+
+// Popover
+import { usePopupState, bindTrigger } from "material-ui-popup-state/hooks";
+import TableBedListPopover from "../TableBedListPopover";
+
+import { BedActionsContext } from "../../pages/UpdatePage";
 
 const useStyles = makeStyles({
   tableContainer: {},
@@ -82,12 +89,7 @@ const useStyles = makeStyles({
 
 const ROWS_PER_PAGE = 15;
 
-const TableBedList = ({
-  data,
-  selectedKey,
-  onClickEdit = (f) => f,
-  onClickDelete = (f) => f,
-}) => {
+const TableBedList = ({ data, selectedKey }) => {
   const classes = useStyles();
   const media_atleast_lg = useMediaQuery("(min-width:1280px)");
 
@@ -103,22 +105,7 @@ const TableBedList = ({
     setPage(newPage);
   };
 
-  /* Helpful for determining if delete icon should be shown or not */
-  const isBedEmpty = useCallback((bedData) => {
-    let result = true;
-    for (const [key, value] of Object.entries(bedData)) {
-      if (key !== "bed" && value) {
-        // if any value but bed is non-empty
-        result = false;
-      }
-    }
-    return result;
-  }, []);
-
-  const tableCellClasses = [
-    classes.tableCellDefault,
-    !media_atleast_lg && classes.tableCellSmall,
-  ].join(" ");
+  //
 
   return (
     <TableContainer component={Paper} className={classes.tableContainer}>
@@ -146,87 +133,13 @@ const TableBedList = ({
             />
           </TableRow>
         </TableHead>
-        <TableBody>
-          {data
-            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map((value, key) => {
-              let adjustedKey = key + page * rowsPerPage; // the key resets to index 0 for every pagination page
-              let isSelected = adjustedKey === selectedKey;
-              const emptyBed = isBedEmpty(value);
-              return (
-                <TableRow
-                  className={classes.tableRow}
-                  key={value.bed}
-                  hover
-                  selected={isSelected}
-                >
-                  <TableCell
-                    component="th"
-                    scope="row"
-                    align="left"
-                    className={tableCellClasses}
-                  >
-                    <Typography
-                      variant="h5"
-                      className={classes.tableHeaderBedNumber}
-                    >
-                      {value.bed}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="left" className={tableCellClasses}>
-                    <span>
-                      {value["lastName"]}
-                      {value["lastName"] && value["firstName"] && ", "}
-                      {value["firstName"]}
-                    </span>
-                  </TableCell>
-                  <TableCell align="center" className={tableCellClasses}>
-                    <span>{value["teamNumber"]}</span>
-                  </TableCell>
-                  <TableCell className={tableCellClasses}>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-around",
-                      }}
-                    >
-                      {
-                        <Tooltip title="Edit">
-                          <IconButton onClick={() => onClickEdit(adjustedKey)}>
-                            <EditIcon
-                              fontSize="small"
-                              className={[
-                                classes.tableEditButton,
-                                isSelected && classes.tableEditButtonSelected,
-                              ].join(" ")}
-                            />
-                          </IconButton>
-                        </Tooltip>
-                      }
-                      {
-                        <Tooltip title={!emptyBed ? "Clear" : ""}>
-                          <IconButton
-                            onClick={() => onClickDelete(adjustedKey)}
-                            disabled={emptyBed}
-                          >
-                            <DeleteIcon
-                              fontSize="small"
-                              className={
-                                emptyBed
-                                  ? classes.transparent
-                                  : classes.tableDeleteButton
-                              }
-                            />
-                          </IconButton>
-                        </Tooltip>
-                      }
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-        </TableBody>
+        <MyTableBody
+          classes={classes}
+          data={data}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          selectedKey={selectedKey}
+        />
       </Table>
       <TablePagination
         classes={{
@@ -255,6 +168,138 @@ const TableBedList = ({
         onChangeRowsPerPage={handleChangeRowsPerPage}
       />
     </TableContainer>
+  );
+};
+
+const MyTableBody = ({ classes, data, page, rowsPerPage, selectedKey }) => {
+  const media_atleast_lg = useMediaQuery("(min-width:1280px)");
+
+  const tableCellClasses = [
+    classes.tableCellDefault,
+    !media_atleast_lg && classes.tableCellSmall,
+  ].join(" ");
+
+  /* Helpful for determining if delete icon should be shown or not */
+  const isBedEmpty = useCallback((bedData) => {
+    let result = true;
+    for (const [key, value] of Object.entries(bedData)) {
+      if (key !== "bed" && value) {
+        // if any value but bed is non-empty
+        result = false;
+      }
+    }
+    return result;
+  }, []);
+
+  return (
+    <>
+      <TableBody>
+        {data
+          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+          .map((value, key) => {
+            let adjustedKey = key + page * rowsPerPage; // the key resets to index 0 for every pagination page
+            let isSelected = adjustedKey === selectedKey;
+            const emptyBed = isBedEmpty(value);
+            return (
+              <TableRow
+                className={classes.tableRow}
+                key={value.bed}
+                hover
+                selected={isSelected}
+              >
+                <TableCell
+                  component="th"
+                  scope="row"
+                  align="left"
+                  className={tableCellClasses}
+                >
+                  <Typography
+                    variant="h5"
+                    className={classes.tableHeaderBedNumber}
+                  >
+                    {value.bed}
+                  </Typography>
+                </TableCell>
+                <TableCell align="left" className={tableCellClasses}>
+                  <span>
+                    {value["lastName"]}
+                    {value["lastName"] && value["firstName"] && ", "}
+                    {value["firstName"]}
+                  </span>
+                </TableCell>
+                <TableCell align="center" className={tableCellClasses}>
+                  <span>{value["teamNumber"]}</span>
+                </TableCell>
+                <TableCell className={tableCellClasses}>
+                  <BedActions
+                    classes={classes}
+                    isSelected={isSelected}
+                    bedKey={adjustedKey}
+                    emptyBed={emptyBed}
+                  />
+                </TableCell>
+              </TableRow>
+            );
+          })}
+      </TableBody>
+    </>
+  );
+};
+
+const BedActions = ({ classes, isSelected, bedKey, emptyBed }) => {
+  const keyForActionsMenu = useRef();
+
+  const { bedActionEdit, bedActionDelete } = useContext(BedActionsContext);
+
+  // Popover - using a hook from material-ui-popup-state package
+  const popupState = usePopupState({
+    variant: "popover",
+    popupId: "actionsMenu",
+  });
+
+  const handleOnClickMenu = (e, key) => {
+    keyForActionsMenu.current = key;
+    popupState.open(e);
+  };
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-around",
+      }}
+    >
+      {
+        <Tooltip title="Edit">
+          <IconButton onClick={() => bedActionEdit(bedKey)}>
+            <EditIcon
+              fontSize="small"
+              className={[
+                classes.tableEditButton,
+                isSelected && classes.tableEditButtonSelected,
+              ].join(" ")}
+            />
+          </IconButton>
+        </Tooltip>
+      }
+      {
+        <Tooltip title="Actions">
+          <IconButton
+            onClick={(e) => handleOnClickMenu(e, bedKey)}
+            disabled={emptyBed}
+          >
+            <MenuIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      }
+      <TableBedListPopover
+        popupState={popupState}
+        key={keyForActionsMenu.current}
+        emptyBed={emptyBed}
+        onSelectDelete={() => bedActionDelete(bedKey)}
+      />
+    </div>
   );
 };
 

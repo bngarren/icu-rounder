@@ -127,6 +127,7 @@ const BedspaceEditor = ({
   defaultValues,
   reset,
   onEditorDataChange = (f) => f,
+  debounceInterval,
 }) => {
   const classes = useStyles();
   const [editorData, _setEditorData] = useState();
@@ -209,7 +210,7 @@ const BedspaceEditor = ({
         ...editorDataRef.current, //* use ref here, otherwise stale closure
         [target]: value || "",
       });
-    }, 300), // time interval before allowing onEditorChange to fire
+    }, debounceInterval), // time interval before allowing onEditorChange to fire
     [onEditorDataChange]
   );
 
