@@ -81,7 +81,8 @@ const UpdatePage = () => {
   const { dialogIsOpen, dialog, showYesNoDialog } = useDialog();
 
   /* Track the toggle state of DemoBox collapsed variable,
-  helpful for setting debounce interval in BedspaceEditor */
+  helpful for setting debounce interval in BedspaceEditor 
+  i.e., if demobox is not visible, the debounce interval can be higher */
   const [demoBoxCollapsed, setDemoBoxCollapsed] = useState(true);
 
   /* Used as a target for the scrollToElement(), in order to put
@@ -93,68 +94,55 @@ const UpdatePage = () => {
     setData(gridData);
   }, [gridData]);
 
-  // Load data (either from localStorage or sampleData file)
-
-  /* This is ONLY for development. In production, the persistence of the data would need a better method */
-  /*   useEffect(() => {
-    const getData = async () => {
-      // Try local storage first
-      const resultJsonFromLocal = localStorage.getItem("gridData");
-      if (resultJsonFromLocal != null) {
-        console.log(`Saved data available in localStorage.`);
-        const jsonFromLocal = JSON.parse(resultJsonFromLocal);
-        let arr = [];
-        for (let i in jsonFromLocal) {
-          arr.push(jsonFromLocal[i]);
-        }
-        const arraySortedByBed = sortByBed(arr);
-        setData(mergeWithBedCensus(arraySortedByBed, BED_CENSUS));
+  const handleEditIconClick = (key) => {
+    const doAction = () => {
+      if (selectedKey === key) {
+        // re-clicked on the same bedspace
+        setSelectedKey(null);
       } else {
-        console.log(
-          `NO data available in localStorage. Pulling data from sample file.`
-        );
-        const jsonFromSampleFile = await JSON.parse(JSON.stringify(sampleData));
-        let arr = [];
-        for (let i in jsonFromSampleFile) {
-          arr.push(jsonFromSampleFile[i]);
+        // This is the key of the data array that corresponds to this selected bedspace
+        setSelectedKey(key);
+        /* When a new bed is selected, copy the truth data's (data) JSON object for this
+    selected bedspace to the bedspaceEditorData */
+        setBedspaceEditorData(data[key]);
+
+        if (refToBedspaceEditorDiv && !media_atleast_md) {
+          setTimeout(() => {
+            refToBedspaceEditorDiv.current.scrollIntoView(false);
+          }, 200);
         }
-        const arraySortedByBed = sortByBed(arr);
-        setData(mergeWithBedCensus(arraySortedByBed, BED_CENSUS));
       }
     };
-    getData();
-  }, []); */
 
-  // Each time data changes, save it to localStorage
+    if (needsSave) {
+      // Show the warning dialog if there is data that isn't saved
 
-  /* We save the data to the 'gridData' variable in the browser's localStorage.
-     Remember, since we pull the JSON data in and then immediately store it in our
-     program as an Array (for sorting), BEFORE saving we have to convert to back to the regular
-     JSON object of objects
-  */
-  /*   useEffect(() => {
-    if (data != null) {
-      const dataToSave = JSON.stringify(getJsonObjectFromSortedArray(data));
-      localStorage.setItem("gridData", dataToSave);
-      //console.log(`Saved data to localStorage: ${dataToSave}`);
-    }
-  }, [data]); */
+      // Construct the message for the Dialog
+      let arr = [
+        "There are unsaved changes for this bedspace. Continue without saving?",
+        `Bed: ${data[selectedKey].bed}`,
+      ];
+      arr.push(
+        data[selectedKey].lastName
+          ? `Patient: ${data[selectedKey].lastName}`
+          : ""
+      );
+      const warningMessage = arr.join("\n");
 
-  const handleEditIconClick = (key) => {
-    if (selectedKey === key) {
-      setSelectedKey(null);
+      showYesNoDialog(
+        warningMessage,
+        () => {
+          // chose to continue without saving
+          doAction();
+          setNeedsSave(false);
+        },
+        () => {
+          // chose to cancel
+          return;
+        }
+      );
     } else {
-      // This is the key of the data array that corresponds to this selected bedspace
-      setSelectedKey(key);
-      /* When a new bed is selected, copy the truth data's (data) JSON object for this
-    selected bedspace to the bedspaceEditorData */
-      setBedspaceEditorData(data[key]);
-
-      if (refToBedspaceEditorDiv && !media_atleast_md) {
-        setTimeout(() => {
-          refToBedspaceEditorDiv.current.scrollIntoView(false);
-        }, 200);
-      }
+      doAction();
     }
   };
 

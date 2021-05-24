@@ -13,8 +13,8 @@ import {
   Paper,
   useMediaQuery,
 } from "@material-ui/core";
-import { EditIcon } from "@material-ui/icons";
-import { DeleteIcon } from "@material-ui/icons";
+import EditIcon from "@material-ui/icons/Edit";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 import { makeStyles } from "@material-ui/styles";
 
