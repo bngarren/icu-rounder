@@ -15,7 +15,7 @@ import {
   Select,
   MenuItem,
   InputLabel,
-  TextField,
+  InputBase,
   Divider,
   Button,
 } from "@material-ui/core";
@@ -37,7 +37,11 @@ const useStyles = makeStyles({
     justifyContent: "space-between",
   },
   title: {
-    marginBottom: 10,
+    marginBottom: 15,
+  },
+  sectionTitle: {
+    marginBottom: "10px",
+    fontWeight: "bold",
   },
   saveButton: {
     color: "#b7d100",
@@ -64,17 +68,11 @@ const useStyles = makeStyles({
     },
   },
   textFieldFocused: {},
-  textFieldInputLabelRoot: {
-    color: "#9caa3d",
-    fontSize: "11pt",
-    "&$textFieldInputLabelFocused": {
-      color: "#094D92",
-    },
-  },
-  textFieldInputLabelFocused: {},
-  selectInputLabel: {
-    width: "max-content",
-    fontSize: "13pt",
+  inputLabel: {
+    color: "#828181",
+    fontSize: "10.5pt",
+    marginBottom: "4px",
+    paddingLeft: "2px",
   },
   exportFilenameTextfieldInput: {
     textAlign: "right",
@@ -101,15 +99,7 @@ const useStyles = makeStyles({
   },
 });
 
-const CustomTextField = ({
-  id,
-  customStyle: classes,
-  InputProps,
-  inputProps,
-  ...props
-}) => {
-  return (
-    <TextField
+/* <TextField
       InputProps={{
         ...InputProps,
         classes: {
@@ -130,7 +120,36 @@ const CustomTextField = ({
       }}
       id={id}
       {...props}
-    />
+    /> */
+
+const CustomTextField = ({
+  id,
+  customStyle: classes,
+  inputProps,
+  label,
+  ...props
+}) => {
+  return (
+    <>
+      <InputLabel
+        classes={{
+          root: classes.inputLabel,
+        }}
+      >
+        {label}
+      </InputLabel>
+      <InputBase
+        classes={{
+          root: classes.textFieldRoot,
+          focused: classes.textFieldFocused,
+        }}
+        inputProps={{
+          ...inputProps,
+          style: { fontSize: "11pt" },
+        }}
+        {...props}
+      />
+    </>
   );
 };
 
@@ -312,73 +331,68 @@ const SettingsPage = () => {
         </Grid>
 
         <Grid container className={classes.inputsGridContainer}>
-          <Typography variant="h6">General</Typography>
+          <Typography className={classes.sectionTitle} variant="h6">
+            General
+          </Typography>
           <Grid item className={classes.inputsGridItem}>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                flexWrap: "nowrap",
-              }}
-            >
-              <CustomTextField
-                id="bedLayoutTextField"
-                customStyle={classes}
-                label="Bed Layout"
-                value={inputValues.bedLayout}
-                onChange={(e) => handleOnChange("bedLayout", e.target.value)}
-                fullWidth
-                multiline
-              />
-            </div>
+            <CustomTextField
+              id="bedLayoutTextField"
+              customStyle={classes}
+              label="Bed Layout"
+              value={inputValues.bedLayout}
+              onChange={(e) => handleOnChange("bedLayout", e.target.value)}
+              fullWidth
+              multiline
+            />
           </Grid>
-          <Typography variant="h6">Document</Typography>
+          <Typography className={classes.sectionTitle} variant="h6">
+            Document
+          </Typography>
           <Grid item className={classes.inputsGridItem}>
             <CustomTextField
               id="documentTitleTextField"
               customStyle={classes}
-              label="Document Title"
+              label="Title"
               value={inputValues.document_title}
               onChange={(e) => handleOnChange("document_title", e.target.value)}
               fullWidth
             />
           </Grid>
           <Grid item className={classes.inputsGridItem}>
-            <FormControl>
-              <InputLabel
-                className={classes.selectInputLabel}
-                shrink
-                id="document_cols_per_page_label"
-              >
-                Grids per row
-              </InputLabel>
-              <Select
-                labelId="document_cols_per_page_label"
-                id="document_cols_per_page"
-                value={inputValues.document_cols_per_page}
-                onChange={(e) =>
-                  handleOnChange("document_cols_per_page", e.target.value)
-                }
-              >
-                <MenuItem value={1}>1</MenuItem>
-                <MenuItem value={2}>2</MenuItem>
-                <MenuItem value={3}>3</MenuItem>
-                <MenuItem value={4}>4</MenuItem>
-                <MenuItem value={5}>5</MenuItem>
-              </Select>
-            </FormControl>
+            <InputLabel
+              className={classes.inputLabel}
+              id="document_cols_per_page_label"
+              shrink={false}
+            >
+              Grids per row
+            </InputLabel>
+            <Select
+              labelId="document_cols_per_page_label"
+              id="document_cols_per_page"
+              value={inputValues.document_cols_per_page}
+              onChange={(e) =>
+                handleOnChange("document_cols_per_page", e.target.value)
+              }
+            >
+              <MenuItem value={1}>1</MenuItem>
+              <MenuItem value={2}>2</MenuItem>
+              <MenuItem value={3}>3</MenuItem>
+              <MenuItem value={4}>4</MenuItem>
+              <MenuItem value={5}>5</MenuItem>
+            </Select>
           </Grid>
           <Divider />
           <Grid item className={classes.inputsGridItem}>
-            <Typography variant="h6">Export</Typography>
+            <Typography className={classes.sectionTitle} variant="h6">
+              Export
+            </Typography>
             <Typography variant="body2">
               Download the current grid as a .json file.
             </Typography>
             <div
               style={{
                 display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
+                flexDirection: "column",
               }}
             >
               <CustomTextField
@@ -389,13 +403,11 @@ const SettingsPage = () => {
                 onChange={(e) =>
                   handleOnChange("export_filename", e.target.value)
                 }
-                InputProps={{
-                  endAdornment: (
-                    <div className={classes.textEndAdornment}>
-                      <Typography variant="caption">.json</Typography>
-                    </div>
-                  ),
-                }}
+                endAdornment={
+                  <div className={classes.textEndAdornment}>
+                    <Typography variant="caption">.json</Typography>
+                  </div>
+                }
                 inputProps={{
                   className: classes.exportFilenameTextfieldInput,
                 }}
@@ -405,7 +417,9 @@ const SettingsPage = () => {
           </Grid>
           <Divider />
           <Grid item className={classes.inputsGridItem}>
-            <Typography variant="h6">Import</Typography>
+            <Typography className={classes.sectionTitle} variant="h6">
+              Import
+            </Typography>
             <Typography variant="body2">
               Upload a previously saved .json file to populate the grid.
             </Typography>
