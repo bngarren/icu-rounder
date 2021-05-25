@@ -23,9 +23,13 @@ import {
 // custom components
 import Exporter from "../../components/Exporter";
 import Importer from "../../components/Importer";
+import { useDialog } from "../../components/Dialog";
 
 // GridData context
 import { useGridStateContext } from "../../context/GridState";
+
+// Utility
+import { isBedEmpty, getDataForBed } from "../../utils/Utility";
 
 const useStyles = makeStyles({
   header: {
@@ -141,13 +145,18 @@ const SettingsPage = () => {
 
   const [inputValues, setInputValues] = useState(); // controlled inputs
 
-  /* Using the passed in Settings context, we can update the values
-  of all our controlled inputs */
+  /* Hook for our Dialog modal */
+  const { dialogIsOpen, dialog, showYesNoDialog } = useDialog();
+
+  /* Helper function to update our input fields with default values */
   const updateInputValuesFromStored = useCallback((stgs, bl) => {
     /* Since bedLayout is stored as an array, we use the
     reduce function to prettify it for the text input */
     let prettyBedLayout;
     if (bl && bl.length > 0) {
+      bl.sort((el1, el2) => {
+        return el1.localeCompare(el2, "en", { numeric: true });
+      });
       prettyBedLayout = bl.reduce((accum, current) => {
         return `${accum}, ${current}`;
       });
@@ -163,6 +172,8 @@ const SettingsPage = () => {
     });
   }, []);
 
+  /* Any time the saved/store settings changes, the values for
+  the inputs will update to reflect it */
   useEffect(() => {
     updateInputValuesFromStored(settings, bedLayout);
   }, [
@@ -174,6 +185,8 @@ const SettingsPage = () => {
     updateInputValuesFromStored,
   ]);
 
+  /* Helper function for taking the input bedLayout (CSV format) and 
+  converting it to a valid array */
   const getFormattedBedLayout = () => {
     let val = inputValues.bedLayout;
     let res = [];
@@ -193,9 +206,54 @@ const SettingsPage = () => {
     setNeedsSave(true);
   };
 
+  /* Save the new bedLayout
+  ! Need to check if beds with data will be dropped--if so alert user */
   const handleSaveBedLayout = () => {
     const formattedBedLayout = getFormattedBedLayout();
-    updateGridData(gridData, formattedBedLayout);
+
+    /* Find the beds that differ between the current and new bedLayouts */
+    let difference = bedLayout.filter((x) => !formattedBedLayout.includes(x));
+    /* Of these beds, if any, find which ones have patient data at risk of being deleted */
+    let riskBeds = [];
+    if (difference.length > 0) {
+      difference.forEach((i) => {
+        // Uses Utility function to get the bed's data and see if it's empty
+        if (!isBedEmpty(getDataForBed(gridData, i))) {
+          riskBeds.push(i);
+        }
+      });
+    }
+    // If there are bed(s) with data that are missing from new bedLayout
+    if (riskBeds.length > 0) {
+      // Construct the message for the Dialog
+      const content = (
+        <div>
+          <p>
+            This new bed layout will <b>NOT</b> include the following beds which
+            are non-empty:
+          </p>
+          <p>
+            {riskBeds.map((i) => {
+              return `| ${i} |     `;
+            })}
+          </p>
+        </div>
+      );
+      showYesNoDialog(
+        content,
+        () => {
+          // chose to continue
+          updateGridData(gridData, formattedBedLayout);
+        },
+        () => {
+          // chose to cancel
+          return;
+        },
+        { yes: "Continue", no: "Cancel" }
+      );
+    } else {
+      updateGridData(gridData, formattedBedLayout);
+    }
   };
 
   /* Handling saving of Settings */
@@ -397,6 +455,7 @@ const SettingsPage = () => {
             <Importer onNewDataSelected={handleNewDataImported} />
           </Grid>
         </Grid>
+        {dialogIsOpen && dialog}
       </Container>
     );
   } else {

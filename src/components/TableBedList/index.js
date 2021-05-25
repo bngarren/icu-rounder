@@ -19,10 +19,14 @@ import MenuOpenIcon from "@material-ui/icons/MenuOpen";
 
 import { makeStyles } from "@material-ui/styles";
 
+// Utility
+import { isBedEmpty } from "../../utils/Utility";
+
 // Popover
 import { usePopupState, bindTrigger } from "material-ui-popup-state/hooks";
 import TableBedListPopover from "../TableBedListPopover";
 
+// Context
 import { BedActionsContext } from "../../pages/UpdatePage";
 
 const useStyles = makeStyles({
@@ -179,18 +183,6 @@ const MyTableBody = ({ classes, data, page, rowsPerPage, selectedKey }) => {
     !media_atleast_lg && classes.tableCellSmall,
   ].join(" ");
 
-  /* Helpful for determining if delete icon should be shown or not */
-  const isBedEmpty = useCallback((bedData) => {
-    let result = true;
-    for (const [key, value] of Object.entries(bedData)) {
-      if (key !== "bed" && value) {
-        // if any value but bed is non-empty
-        result = false;
-      }
-    }
-    return result;
-  }, []);
-
   return (
     <>
       <TableBody>
@@ -282,10 +274,7 @@ const BedActions = ({ classes, isSelected, bedKey, emptyBed }) => {
         </Tooltip>
       }
       {
-        <IconButton
-          onClick={(e) => handleOnClickMenu(e, bedKey)}
-          disabled={emptyBed}
-        >
+        <IconButton onClick={(e) => handleOnClickMenu(e, bedKey)}>
           {popupState.isOpen ? (
             <MenuOpenIcon fontSize="small" />
           ) : (

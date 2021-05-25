@@ -10,7 +10,7 @@ import {
   Tooltip,
   Typography,
 } from "@material-ui/core";
-import DescriptionIcon from "@material-ui/icons/Description";
+import GetAppIcon from "@material-ui/icons/GetApp";
 import ViewListIcon from "@material-ui/icons/ViewList";
 import SettingsIcon from "@material-ui/icons/Settings";
 
@@ -78,7 +78,7 @@ const Header = () => {
                 onClick={getPdf}
                 className={classes.iconButtonDownload}
               >
-                <DescriptionIcon />
+                <GetAppIcon />
               </IconButton>
             </Tooltip>
             <Tooltip title="Edit">

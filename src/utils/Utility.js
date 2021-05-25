@@ -15,3 +15,23 @@ export const sortByBed = (arr) => {
     return bed1.localeCompare(bed2, "en", { numeric: true });
   });
 };
+
+/* Helpful for determining if delete icon should be shown or not */
+export const isBedEmpty = (bedData) => {
+  let result = true;
+  for (const [key, value] of Object.entries(bedData)) {
+    if (key !== "bed" && value) {
+      // if any value but bed is non-empty
+      result = false;
+    }
+  }
+  return result;
+};
+
+export const getDataForBed = (gridData, bed) => {
+  let res;
+  gridData.forEach((i) => {
+    if (i.bed === bed) res = i;
+  });
+  return res;
+};
