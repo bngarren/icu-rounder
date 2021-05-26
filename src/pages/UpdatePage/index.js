@@ -24,6 +24,11 @@ const useStyles = makeStyles({
     padding: "0 1vw",
     justifyContent: "center",
   },
+  switchPrimaryColor: {
+    ".Mui-checked": {
+      color: "#3ed5ee",
+    },
+  },
   bedspaceEditorToolbar: {
     borderBottom: "2px solid #f6f8fa",
   },
@@ -347,6 +352,10 @@ const UpdatePage = () => {
                     onChange={() =>
                       setDemoBoxCollapsed((prevValue) => !prevValue)
                     }
+                    color="primary"
+                    classes={{
+                      colorPrimary: classes.switchPrimaryColor,
+                    }}
                   />
                   <DemoBox
                     data={bedspaceEditorData}

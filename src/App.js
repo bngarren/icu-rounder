@@ -4,6 +4,7 @@ import { Router } from "wouter";
 import { SettingsProvider } from "./context/Settings";
 
 import Header from "./components/Header";
+import Footer from "./components/Footer";
 
 // Where all of our pages come from
 import PageRouter from "./components/PageRouter";
@@ -25,6 +26,7 @@ function App() {
             <Router>
               <Header />
               <PageRouter />
+              <Footer />
             </Router>
           </GridStateProvider>
         </AuthStateProvider>

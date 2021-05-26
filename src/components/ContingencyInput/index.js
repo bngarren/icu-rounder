@@ -33,6 +33,7 @@ const useStyles = makeStyles({
     '&[data-focus="true"]': {},
   },
   checkboxRoot: {
+    padding: "3px",
     "&:hover": {
       backgroundColor: "rgba(196, 196, 196, 0.18)",
     },
@@ -70,7 +71,7 @@ const ContingencyInput = ({
 
   return (
     <Autocomplete
-      debug={true}
+      debug={false}
       classes={{
         popper: classes.popper,
         option: classes.option,
@@ -78,6 +79,7 @@ const ContingencyInput = ({
       }}
       size="small"
       fullWidth
+      limitTags={5}
       multiple
       freeSolo
       disableCloseOnSelect
@@ -115,7 +117,7 @@ const ContingencyInput = ({
         );
       }}
       renderOption={(option, { selected }) => (
-        <>
+        <div key={option}>
           <Checkbox
             classes={{
               root: classes.checkboxRoot,
@@ -127,7 +129,7 @@ const ContingencyInput = ({
             checked={selected}
           />
           {option}
-        </>
+        </div>
       )}
     />
   );

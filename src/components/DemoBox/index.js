@@ -105,7 +105,7 @@ const DemoBox = ({ data: propsData, collapsed }) => {
                   return (
                     <div
                       className={classes.demoBoxBodyContingencyItem}
-                      key={`-`}
+                      key={`${item}-${index}`}
                     >
                       {item}
                     </div>
