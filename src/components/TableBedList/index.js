@@ -17,7 +17,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import MenuIcon from "@material-ui/icons/Menu";
 import MenuOpenIcon from "@material-ui/icons/MenuOpen";
 
-import { makeStyles } from "@material-ui/styles";
+import { makeStyles, useTheme } from "@material-ui/styles";
 
 // Utility
 import { isBedEmpty } from "../../utils/Utility";
@@ -29,15 +29,15 @@ import TableBedListPopover from "../TableBedListPopover";
 // Context
 import { BedActionsContext } from "../../pages/UpdatePage";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   tableContainer: {},
   table: {},
   tableRow: {
     "&.Mui-selected": {
-      backgroundColor: "#b7d10033",
+      background: `linear-gradient(90deg, ${theme.palette.secondary.main} 1%, rgba(0,212,255,0) 1%)`,
     },
     "&.Mui-selected:hover": {
-      backgroundColor: "#b7d10059",
+      background: `linear-gradient(90deg, ${theme.palette.secondary.light} 1%, rgba(0,212,255,0) 1%)`,
     },
   },
   tableHeader: {
@@ -55,7 +55,7 @@ const useStyles = makeStyles({
     fontSize: "22px",
   },
   tableEditButtonSelected: {
-    color: "#b7d100",
+    color: theme.palette.secondary.main,
   },
   tableDeleteButton: {
     cursor: "pointer",
@@ -89,12 +89,13 @@ const useStyles = makeStyles({
   tablePaginationButton: {
     padding: "6px",
   },
-});
+}));
 
 const ROWS_PER_PAGE = 15;
 
 const TableBedList = ({ data, selectedKey }) => {
-  const classes = useStyles();
+  const theme = useTheme();
+  const classes = useStyles(theme);
   const media_atleast_lg = useMediaQuery("(min-width:1280px)");
 
   // table pagination

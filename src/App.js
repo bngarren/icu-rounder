@@ -1,8 +1,14 @@
 import "./App.css";
 import { Router } from "wouter";
 
+// Theme
+import { ThemeProvider } from "@material-ui/core/styles";
+import { theme } from "./Theme";
+
+// Settings
 import { SettingsProvider } from "./context/Settings";
 
+// Components
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
@@ -21,15 +27,17 @@ function App() {
   return (
     <div className="app">
       <SettingsProvider>
-        <AuthStateProvider Firebase={fb}>
-          <GridStateProvider Firebase={fb}>
-            <Router>
-              <Header />
-              <PageRouter />
-              <Footer />
-            </Router>
-          </GridStateProvider>
-        </AuthStateProvider>
+        <ThemeProvider theme={theme}>
+          <AuthStateProvider Firebase={fb}>
+            <GridStateProvider Firebase={fb}>
+              <Router>
+                <Header />
+                <PageRouter />
+                <Footer />
+              </Router>
+            </GridStateProvider>
+          </AuthStateProvider>
+        </ThemeProvider>
       </SettingsProvider>
     </div>
   );

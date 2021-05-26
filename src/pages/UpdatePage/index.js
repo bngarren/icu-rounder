@@ -1,6 +1,5 @@
 import { useState, useEffect, createContext, useRef } from "react";
 import {
-  makeStyles,
   useMediaQuery,
   Grid,
   Button,
@@ -8,6 +7,7 @@ import {
   Typography,
   Switch,
 } from "@material-ui/core";
+import { makeStyles, useTheme } from "@material-ui/styles";
 
 // Components
 import TableBedList from "../../components/TableBedList";
@@ -19,15 +19,10 @@ import { useDialog } from "../../components/Dialog";
 import { useAuthStateContext } from "../../context/AuthState";
 import { useGridStateContext } from "../../context/GridState";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   root: {
     padding: "0 1vw",
     justifyContent: "center",
-  },
-  switchPrimaryColor: {
-    ".Mui-checked": {
-      color: "#3ed5ee",
-    },
   },
   bedspaceEditorToolbar: {
     borderBottom: "2px solid #f6f8fa",
@@ -67,13 +62,14 @@ const useStyles = makeStyles({
     background:
       "repeating-linear-gradient( -45deg, #e9ff4c2e, #f9ffcfc9 5px, #fff 5px, #f7ffbd1f 25px )",
   },
-});
+}));
 
 /* This holds the functions we pass way down to the TableBedList's buttons */
 export const BedActionsContext = createContext();
 
 const UpdatePage = () => {
-  const classes = useStyles();
+  const theme = useTheme();
+  const classes = useStyles(theme);
   const media_atleast_lg = useMediaQuery("(min-width:1280px)");
   const media_atleast_md = useMediaQuery("(min-width:960px)");
 
@@ -225,6 +221,7 @@ const UpdatePage = () => {
         updateGridData(updatedData); //send new data to GridStateContext (handles truth data)
         setBedspaceEditorData(updatedData[key]); // should clear the bedspaceEditor data
         setNeedsSave(false);
+        setSelectedKey(null);
       },
       () => {
         //should cancel callback
@@ -352,10 +349,7 @@ const UpdatePage = () => {
                     onChange={() =>
                       setDemoBoxCollapsed((prevValue) => !prevValue)
                     }
-                    color="primary"
-                    classes={{
-                      colorPrimary: classes.switchPrimaryColor,
-                    }}
+                    color="secondary"
                   />
                   <DemoBox
                     data={bedspaceEditorData}
