@@ -304,7 +304,6 @@ const BedspaceEditor = ({
           let pos = getCursorPos(element);
           lastCursorPos.current = { pos, element };
 
-          // This will be the anchor for the popper
           popupState.open(element);
         }
       }

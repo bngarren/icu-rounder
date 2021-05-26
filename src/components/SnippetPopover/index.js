@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
@@ -11,41 +11,55 @@ import Popper from "@material-ui/core/Popper";
 import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 import { bindPopper } from "material-ui-popup-state/hooks";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   root: {},
   popper: {
     border: "1px solid rgba(27,31,35,.15)",
-    boxShadow: "0 3px 12px rgba(27,31,35,.15)",
+    boxShadow: "0 3px 12px rgba(27, 31, 35, 0.33)",
     borderRadius: 3,
     width: 300,
     zIndex: 1,
     fontSize: 13,
     color: "#586069",
-    backgroundColor: "#f6f8fa",
   },
   header: {
     borderBottom: "1px solid #e1e4e8",
     padding: "8px 10px",
     fontWeight: 600,
+    backgroundColor: theme.palette.secondary.main,
+    color: theme.palette.secondary.contrastText,
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 4,
   },
   closeButton: {
     padding: "2px",
+    color: theme.palette.secondary.contrastText,
   },
   autocompletePaper: {
     boxShadow: "none",
     margin: 0,
     color: "#586069",
     fontSize: 14,
+    backgroundColor: "#f6f8fa",
+    borderTopLeftRadius: "0",
+    borderTopRightRadius: "0",
+    borderBottomLeftRadius: "4px",
+    borderBottomRightRadius: "4px",
+  },
+  listbox: {
+    padding: "0px 4px",
   },
   option: {
     minHeight: "auto",
     alignItems: "flex-start",
-    padding: 3,
+    padding: "3px 3px 3px 8px",
+    borderRadius: "4px",
     '&[aria-selected="true"]': {
       backgroundColor: "transparent",
     },
     '&[data-focus="true"]': {
-      backgroundColor: "#b7d100",
+      backgroundColor: theme.palette.primary.main,
+      color: theme.palette.primary.contrastText,
     },
     fontSize: 12,
   },
@@ -56,19 +70,17 @@ const useStyles = makeStyles({
   textFieldRoot: {
     overflow: "hidden",
     width: "100%",
-    borderRadius: 1,
     backgroundColor: "white",
+    borderRadius: 0,
     "&:hover": {
       backgroundColor: "white",
     },
+    borderBottom: "1px solid #dcdcdc",
     "&$textFieldFocused": {
-      backgroundColor: "#fff",
-      borderColor: "#b7d100",
-      borderRight: 0,
-      borderLeft: 0,
+      backgroundColor: "white",
     },
     "& .MuiFilledInput-input": {
-      padding: "5px",
+      padding: "5px 5px 5px 8px",
     },
   },
   textFieldFocused: {},
@@ -80,10 +92,11 @@ const useStyles = makeStyles({
     },
   },
   textFieldInputLabelFocused: {},
-});
+}));
 
 const SnippetPopover = ({ popupState, onSelect = (f) => f }) => {
-  const classes = useStyles();
+  const theme = useTheme();
+  const classes = useStyles(theme);
   const snippets = useRef(null);
 
   useEffect(() => {
@@ -107,10 +120,10 @@ const SnippetPopover = ({ popupState, onSelect = (f) => f }) => {
           {...bindPopper(popupState)}
           className={classes.popper}
           transition
-          placement={"top-start"}
+          placement={"top"}
         >
           {({ TransitionProps }) => (
-            <Fade {...TransitionProps} timeout={{ enter: 350, exit: 50 }}>
+            <Fade {...TransitionProps} timeout={{ enter: 350, exit: 0 }}>
               <div>
                 <Grid
                   container
@@ -128,7 +141,7 @@ const SnippetPopover = ({ popupState, onSelect = (f) => f }) => {
                   </IconButton>
                 </Grid>
                 <Autocomplete
-                  debug={false}
+                  debug={true}
                   id="search"
                   classes={{
                     option: classes.option,
@@ -146,6 +159,9 @@ const SnippetPopover = ({ popupState, onSelect = (f) => f }) => {
                   size="small"
                   onChange={(e, newValue) => handleSelect(newValue.content)}
                   onClose={(e, reason) => console.log(reason)}
+                  ListboxProps={{
+                    className: classes.listbox,
+                  }}
                   renderInput={(params) => (
                     <TextField
                       variant="filled"
