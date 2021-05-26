@@ -4,7 +4,7 @@ import { saveAs } from "file-saver";
 
 import { useGridStateContext } from "../../context/GridState";
 
-const Exporter = ({ filename }) => {
+const Exporter = ({ filename, onExported = (f) => f }) => {
   const [data, setData] = useState(); // local data in the Exporter component
   const { gridDataJson } = useGridStateContext();
 
@@ -18,13 +18,10 @@ const Exporter = ({ filename }) => {
       type: "application/json",
     });
     saveAs(blob, `${filename}.json`);
+    onExported();
   };
 
-  return (
-    <div>
-      <Button onClick={handleExport}>Export grid</Button>
-    </div>
-  );
+  return <Button onClick={handleExport}>Export grid</Button>;
 };
 
 export default Exporter;

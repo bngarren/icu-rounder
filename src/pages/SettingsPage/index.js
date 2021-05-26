@@ -4,6 +4,7 @@ import { useSettings } from "../../context/Settings";
 import { makeStyles } from "@material-ui/core/styles";
 import SaveIcon from "@material-ui/icons/Save";
 import WarningIcon from "@material-ui/icons/Warning";
+import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import {
   Container,
   Grid,
@@ -11,7 +12,6 @@ import {
   Tooltip,
   Zoom,
   Typography,
-  FormControl,
   Select,
   MenuItem,
   InputLabel,
@@ -40,6 +40,7 @@ const useStyles = makeStyles({
     marginBottom: 15,
   },
   sectionTitle: {
+    marginTop: "5px",
     marginBottom: "10px",
     fontWeight: "bold",
   },
@@ -85,7 +86,7 @@ const useStyles = makeStyles({
     flexDirection: "column",
     justifyContent: "center",
     alignContent: "center",
-    padding: "0 3px",
+    padding: "6px 3px",
   },
   confirmImportButton: {
     color: "white",
@@ -96,6 +97,12 @@ const useStyles = makeStyles({
   },
   followingImportText: {
     color: "#b7d100",
+    fontSize: "11pt",
+  },
+  followingImportIcon: {
+    color: "#b7d100",
+    fontSize: "13pt",
+    marginRight: "2px",
   },
 });
 
@@ -130,7 +137,7 @@ const CustomTextField = ({
   ...props
 }) => {
   return (
-    <>
+    <div>
       <InputLabel
         classes={{
           root: classes.inputLabel,
@@ -149,7 +156,7 @@ const CustomTextField = ({
         }}
         {...props}
       />
-    </>
+    </div>
   );
 };
 
@@ -282,10 +289,8 @@ const SettingsPage = () => {
     dispatchSettings({
       type: "UPDATE",
       payload: {
-        // TODO Can we just map through the inputValues here?
         document_cols_per_page: inputValues.document_cols_per_page,
         document_title: inputValues.document_title,
-        export_filename: inputValues.export_filename,
       },
     });
     handleSaveBedLayout();
@@ -305,6 +310,15 @@ const SettingsPage = () => {
     updateGridData(data);
     setPendingDataImport(null);
     setConfirmedDataImport(true);
+  };
+
+  const handleOnExport = () => {
+    dispatchSettings({
+      type: "UPDATE",
+      payload: {
+        export_filename: inputValues.export_filename,
+      },
+    });
   };
 
   if (inputValues) {
@@ -345,6 +359,7 @@ const SettingsPage = () => {
               multiline
             />
           </Grid>
+          <Divider />
           <Typography className={classes.sectionTitle} variant="h6">
             Document
           </Typography>
@@ -389,15 +404,19 @@ const SettingsPage = () => {
             <Typography variant="body2">
               Download the current grid as a .json file.
             </Typography>
+            <br />
             <div
               style={{
                 display: "flex",
-                flexDirection: "column",
+                flexDirection: "row",
+                justifyContent: "flex-start",
+                alignItems: "flex-end",
               }}
             >
               <CustomTextField
                 id="exportFilenameTextField"
                 customStyle={classes}
+                style={{ maxWidth: "300px", minWidth: "100px" }}
                 label="Filename"
                 value={inputValues.export_filename}
                 onChange={(e) =>
@@ -412,7 +431,10 @@ const SettingsPage = () => {
                   className: classes.exportFilenameTextfieldInput,
                 }}
               />
-              <Exporter filename={inputValues.export_filename} />
+              <Exporter
+                filename={inputValues.export_filename}
+                onExported={handleOnExport}
+              />
             </div>
           </Grid>
           <Divider />
@@ -455,12 +477,17 @@ const SettingsPage = () => {
               ) : (
                 <div>
                   {confirmedDataImport && (
-                    <Typography
-                      variant="caption"
-                      className={classes.followingImportText}
+                    <div
+                      style={{ display: "inline-flex", alignItems: "center" }}
                     >
-                      Successfully imported.
-                    </Typography>
+                      <CheckBoxIcon className={classes.followingImportIcon} />
+                      <Typography
+                        variant="caption"
+                        className={classes.followingImportText}
+                      >
+                        Successfully imported.
+                      </Typography>
+                    </div>
                   )}
                 </div>
               )}
