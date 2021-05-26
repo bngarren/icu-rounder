@@ -28,15 +28,15 @@ const useStyles = makeStyles((theme) => ({
     borderBottom: "2px solid #f6f8fa",
   },
   bedspaceEditorToolbarBedNumber: {
-    marginRight: 5,
+    marginRight: 10,
     color: "#8c888821",
   },
   saveButton: {
-    backgroundColor: "#b7d100",
-    color: "#000000ab",
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
     "&:hover": {
-      backgroundColor: "#b7d100a3",
-      color: "black",
+      backgroundColor: theme.palette.primary.light,
+      color: theme.palette.primary.contrastText,
     },
     marginRight: "3px",
   },
@@ -44,11 +44,11 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#f4f4f466",
   },
   resetButton: {
-    backgroundColor: "rgba(110, 214, 247, 0.30)",
-    color: "#000000ab",
+    backgroundColor: theme.palette.secondary.main,
+    color: theme.palette.secondary.contrastText,
     "&:hover": {
-      backgroundColor: "rgba(110, 214, 247, 0.5)",
-      color: "black",
+      backgroundColor: theme.palette.secondary.light,
+      color: theme.palette.secondary.contrastText,
     },
     marginRight: "3px",
   },
@@ -60,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
   },
   bedspaceEditorGridItemNeedsSave: {
     background:
-      "repeating-linear-gradient( -45deg, #e9ff4c2e, #f9ffcfc9 5px, #fff 5px, #f7ffbd1f 25px )",
+      "repeating-linear-gradient( -45deg, #017c820a, #017c820a 10px, #fff0 5px, #0000 20px )",
   },
 }));
 
@@ -126,19 +126,20 @@ const UpdatePage = () => {
 
       // Construct the message for the Dialog
       const content = (
-        <div>
-          <p>
-            There are unsaved changes for this bedspace. Continue <i>without</i>{" "}
-            saving?
-          </p>
-          <p>
+        <>
+          <div>
+            There are{" "}
+            <span style={{ color: theme.palette.warning.main }}>unsaved </span>
+            changes for this bedspace. Continue <i>without</i> saving?
+          </div>
+          <div>
             Bed: {data[selectedKey].bed}
             <br />
             {data[selectedKey].lastName
               ? `Patient: ${data[selectedKey].lastName}`
               : ""}
-          </p>
-        </div>
+          </div>
+        </>
       );
 
       showYesNoDialog(
@@ -161,18 +162,22 @@ const UpdatePage = () => {
   const handleBedActionClear = (key) => {
     // Construct the message for the Dialog
     const content = (
-      <div>
-        <p>
-          Are you sure you want to <b>CLEAR</b> the data in this bedspace?
+      <>
+        <div>
+          Are you sure you want to{" "}
+          <b>
+            <span style={{ color: theme.palette.warning.main }}>CLEAR</span>
+          </b>{" "}
+          the data in this bedspace?
           <br />
           <i>(The bedspace will remain.)</i>
-        </p>
-        <p>
+        </div>
+        <div>
           Bed: {data[key].bed}
           <br />
           {data[key].lastName ? `Patient: ${data[key].lastName}` : ""}
-        </p>
-      </div>
+        </div>
+      </>
     );
 
     // Show the confirmation dialog before clearing
@@ -198,16 +203,20 @@ const UpdatePage = () => {
     // Construct the delete message for the Dialog
     // Construct the message for the Dialog
     const content = (
-      <div>
-        <p>
-          Are you sure you want to <b>REMOVE</b> this bedspace and it's data?
-        </p>
-        <p>
+      <>
+        <div>
+          Are you sure you want to{" "}
+          <b>
+            <span style={{ color: theme.palette.warning.main }}>REMOVE</span>
+          </b>{" "}
+          this bedspace and it's data?
+        </div>
+        <div>
           Bed: {data[key].bed}
           <br />
           {data[key].lastName ? `Patient: ${data[key].lastName}` : ""}
-        </p>
-      </div>
+        </div>
+      </>
     );
 
     // Show the confirmation dialog before deleting
@@ -250,17 +259,22 @@ const UpdatePage = () => {
     if (bedspaceEditorData.bed !== data[selectedKey].bed) {
       // create the warning message
       const content = (
-        <div>
-          <p>
-            You are changing the bedspace for this patient? <b>WARNING: </b>This
-            may overwrite any current data in this bedspace.
-          </p>
-          <p>
+        <>
+          <div>
+            You are changing the bedspace for this patient.{" "}
+            <b>
+              <span style={{ color: theme.palette.warning.main }}>
+                WARNING:{" "}
+              </span>
+            </b>
+            This may overwrite any data already present in the new bedspace.
+          </div>
+          <div>
             Current Bed: {data[selectedKey].bed}
             <br />
             New Bed: {bedspaceEditorData.bed}
-          </p>
-        </div>
+          </div>
+        </>
       );
 
       // Show the confirmation dialog before changing bedspace

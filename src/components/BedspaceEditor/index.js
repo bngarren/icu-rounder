@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { debounce } from "lodash";
 
-import { Grid, TextField, Paper } from "@material-ui/core";
-import { makeStyles, fade } from "@material-ui/core/styles";
+import { TextField, Paper } from "@material-ui/core";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 
 import { getCursorPos, setCursorPos } from "../../utils/CursorPos";
 
@@ -11,7 +11,7 @@ import SnippetPopover from "../SnippetPopover";
 
 import ContingencyInput from "../ContingencyInput";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   editorRoot: {
     padding: "10px",
     backgroundColor: "transparent",
@@ -27,16 +27,16 @@ const useStyles = makeStyles({
     },
     "&$textFieldFocused": {
       backgroundColor: "#fff",
-      borderColor: "#b7d100",
+      borderColor: theme.palette.secondary.light,
     },
     paddingBottom: "2px",
   },
   textFieldFocused: {},
   textFieldInputLabelRoot: {
-    color: "#9caa3d",
+    color: theme.palette.secondary.main,
     fontSize: "11pt",
     "&$textFieldInputLabelFocused": {
-      color: "#094D92",
+      color: theme.palette.secondary.light,
     },
   },
   textFieldInputLabelFocused: {},
@@ -76,7 +76,7 @@ const useStyles = makeStyles({
     borderBottom: "1px solid gray",
     marginRight: "2px",
   },
-});
+}));
 
 const CustomTextField = ({
   id,
@@ -133,7 +133,8 @@ const BedspaceEditor = ({
   onEditorDataChange = (f) => f,
   debounceInterval,
 }) => {
-  const classes = useStyles();
+  const theme = useTheme();
+  const classes = useStyles(theme);
   const [editorData, _setEditorData] = useState();
 
   /* Create a ref and updater function to fix stale closure problem
