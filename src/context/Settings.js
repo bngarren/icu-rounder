@@ -6,6 +6,18 @@ const INITIAL_STATE = {
   document_cols_per_page: 4,
   document_title: "",
   export_filename: "grid",
+  contingencyOptions: [
+    "Critical Airway",
+    "Critical Brain",
+    "Difficult Airway",
+    "ORL STAT",
+    "Anesthesia STAT",
+    "No ECMO",
+    "DNR/DNI",
+    "Modified DNR",
+    "Comfort measures only",
+    "Pulm HTN",
+  ],
 };
 
 const settingsReducer = (state, action) => {

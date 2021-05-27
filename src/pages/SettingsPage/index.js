@@ -106,29 +106,6 @@ const useStyles = makeStyles({
   },
 });
 
-/* <TextField
-      InputProps={{
-        ...InputProps,
-        classes: {
-          root: classes.textFieldRoot,
-          focused: classes.textFieldFocused,
-        },
-        disableUnderline: true,
-        inputProps: {
-          ...inputProps,
-          style: { fontSize: "11pt" },
-        },
-      }}
-      InputLabelProps={{
-        classes: {
-          root: classes.textFieldInputLabelRoot,
-          focused: classes.textFieldInputLabelFocused,
-        },
-      }}
-      id={id}
-      {...props}
-    /> */
-
 const CustomTextField = ({
   id,
   customStyle: classes,
@@ -195,6 +172,7 @@ const SettingsPage = () => {
       document_title: stgs.document_title,
       bedLayout: prettyBedLayout,
       export_filename: stgs.export_filename,
+      contingencyOptions: stgs.contingencyOptions,
     });
   }, []);
 
@@ -206,6 +184,7 @@ const SettingsPage = () => {
     settings.document_cols_per_page,
     settings.document_title,
     settings.export_filename,
+    settings.contingencyOptions,
     settings,
     bedLayout,
     updateInputValuesFromStored,
@@ -291,6 +270,7 @@ const SettingsPage = () => {
       payload: {
         document_cols_per_page: inputValues.document_cols_per_page,
         document_title: inputValues.document_title,
+        contingencyOptions: inputValues.contingencyOptions,
       },
     });
     handleSaveBedLayout();
@@ -494,6 +474,20 @@ const SettingsPage = () => {
             </div>
 
             <Importer onNewDataSelected={handleNewDataImported} />
+          </Grid>
+          <Divider />
+          <Grid item className={classes.inputsGridItem}>
+            <Typography className={classes.sectionTitle} variant="h6">
+              Contingencies
+            </Typography>
+            <Typography variant="body2">
+              Save your custom contingencies for later use.
+            </Typography>
+            <ul>
+              {inputValues.contingencyOptions.map((value, index) => {
+                return <li key={`${value}-${index}`}>{value}</li>;
+              })}
+            </ul>
           </Grid>
         </Grid>
         {dialogIsOpen && dialog}
