@@ -23,6 +23,7 @@ import {
 // custom components
 import Exporter from "../../components/Exporter";
 import Importer from "../../components/Importer";
+import ContingencyOptionsEditor from "../../components/ContingencyOptionsEditor";
 import { useDialog } from "../../components/Dialog";
 
 // GridData context
@@ -301,6 +302,26 @@ const SettingsPage = () => {
     });
   };
 
+  const handleNewContingencyOption = (val) => {
+    dispatchSettings({
+      type: "UPDATE",
+      payload: {
+        contingencyOptions: [...inputValues.contingencyOptions, val],
+      },
+    });
+  };
+
+  const handleRemoveContingenyOption = (i) => {
+    let newArray = [...inputValues.contingencyOptions];
+    newArray.splice(i, 1);
+    dispatchSettings({
+      type: "UPDATE",
+      payload: {
+        contingencyOptions: newArray,
+      },
+    });
+  };
+
   if (inputValues) {
     return (
       <Container maxWidth="sm">
@@ -483,11 +504,11 @@ const SettingsPage = () => {
             <Typography variant="body2">
               Save your custom contingencies for later use.
             </Typography>
-            <ul>
-              {inputValues.contingencyOptions.map((value, index) => {
-                return <li key={`${value}-${index}`}>{value}</li>;
-              })}
-            </ul>
+            <ContingencyOptionsEditor
+              data={inputValues.contingencyOptions}
+              onSubmit={handleNewContingencyOption}
+              onRemove={handleRemoveContingenyOption}
+            />
           </Grid>
         </Grid>
         {dialogIsOpen && dialog}
