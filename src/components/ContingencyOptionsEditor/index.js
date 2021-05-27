@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Grid,
   List,
   ListItem,
   ListItemText,
@@ -11,13 +12,21 @@ import { makeStyles, useTheme } from "@material-ui/styles";
 import ClearIcon from "@material-ui/icons/Clear";
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  input: {
+    borderBottom: "1px solid #dcdcdc",
+  },
   list: {
     maxHeight: "200px",
     overflowY: "auto",
     maxWidth: "300px",
+    padding: "12px 0px",
   },
   listItem: {
-    padding: "2px 0px",
+    padding: "2px 0px 2px 5px",
     marginBottom: 1,
     width: "max-content",
   },
@@ -54,41 +63,49 @@ const ContingencyOptionsEditor = ({
   });
 
   return (
-    <div>
-      <InputBase
-        placeholder={"Add new..."}
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        onKeyDown={handleInputKeyDown}
-      />
-      <List className={classes.list}>
-        {sortedData != null &&
-          sortedData.length > 0 &&
-          sortedData.map((value, index) => {
-            return (
-              <ListItem className={classes.listItem} key={`${value}-${index}`}>
-                <ListItemText
-                  primaryTypographyProps={{
-                    classes: {
-                      root: classes.listItemText,
-                    },
-                  }}
+    <Grid container className={classes.root}>
+      <Grid item xs={12} md={6}>
+        <InputBase
+          className={classes.input}
+          placeholder={"Add new..."}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleInputKeyDown}
+        />
+      </Grid>
+      <Grid item xs md>
+        <List className={classes.list}>
+          {sortedData != null &&
+            sortedData.length > 0 &&
+            sortedData.map((value, index) => {
+              return (
+                <ListItem
+                  className={classes.listItem}
+                  key={`${value}-${index}`}
                 >
-                  {value}
-                </ListItemText>
-                <ListItemSecondaryAction>
-                  <IconButton
-                    className={classes.clearIconButton}
-                    onClick={() => onRemove(index)}
+                  <ListItemText
+                    primaryTypographyProps={{
+                      classes: {
+                        root: classes.listItemText,
+                      },
+                    }}
                   >
-                    <ClearIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-            );
-          })}
-      </List>
-    </div>
+                    {value}
+                  </ListItemText>
+                  <ListItemSecondaryAction>
+                    <IconButton
+                      className={classes.clearIconButton}
+                      onClick={() => onRemove(index)}
+                    >
+                      <ClearIcon />
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </ListItem>
+              );
+            })}
+        </List>
+      </Grid>
+    </Grid>
   );
 };
 

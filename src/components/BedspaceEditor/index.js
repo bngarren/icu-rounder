@@ -10,6 +10,10 @@ import { usePopupState } from "material-ui-popup-state/hooks";
 import SnippetPopover from "../SnippetPopover";
 
 import ContingencyInput from "../ContingencyInput";
+import { Settings } from "@material-ui/icons";
+
+// Settings context
+import { useSettings } from "../../context/Settings";
 
 const useStyles = makeStyles((theme) => ({
   editorRoot: {
@@ -135,6 +139,7 @@ const BedspaceEditor = ({
 }) => {
   const theme = useTheme();
   const classes = useStyles(theme);
+  const { settings } = useSettings();
   const [editorData, _setEditorData] = useState();
 
   /* Create a ref and updater function to fix stale closure problem
@@ -229,10 +234,6 @@ const BedspaceEditor = ({
     },
     [debouncedOnEditorChange]
   );
-
-  const addContingency = (value) => {
-    debouncedOnEditorChange("contingencies", value);
-  };
 
   /* The user has selected a snippet to insert */
   const onSnippetSelected = (snippet) => {
@@ -392,6 +393,7 @@ const BedspaceEditor = ({
                   reset={forceValue.current}
                   forcedValue={forcedValues.current.contingencies}
                   sendInputChange={handleInputChange}
+                  options={settings.contingencyOptions}
                 />
               }
             </div>

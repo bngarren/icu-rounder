@@ -53,6 +53,7 @@ const ContingencyInput = ({
   reset = false,
   forcedValue: initialItems,
   sendInputChange = (f) => f,
+  options,
 }) => {
   const classes = useStyles();
   const [currentItems, setCurrentItems] = useState(
@@ -84,7 +85,7 @@ const ContingencyInput = ({
       freeSolo
       disableCloseOnSelect
       id="contingencies"
-      options={customOptions}
+      options={options}
       value={currentItems}
       onChange={handleOnChange}
       renderInput={(params) => {
@@ -134,18 +135,5 @@ const ContingencyInput = ({
     />
   );
 };
-
-const customOptions = [
-  "Critical Airway",
-  "Critical Brain",
-  "Difficult Airway",
-  "ORL STAT",
-  "Anesthesia STAT",
-  "No ECMO",
-  "DNR/DNI",
-  "Modified DNR",
-  "Comfort measures only",
-  "Pulm HTN",
-];
 
 export default ContingencyInput;
