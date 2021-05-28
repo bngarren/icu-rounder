@@ -6,8 +6,11 @@ import {
   Toolbar,
   Typography,
   Switch,
+  IconButton,
 } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/styles";
+import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
+import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 
 // Components
 import TableBedList from "../../components/TableBedList";
@@ -28,8 +31,19 @@ const useStyles = makeStyles((theme) => ({
     borderBottom: "2px solid #f6f8fa",
   },
   bedspaceEditorToolbarBedNumber: {
-    marginRight: 10,
     color: "#8c888821",
+  },
+  navigateIconButton: {
+    color: theme.palette.secondary.veryLight,
+    padding: 5,
+    "&:hover": {
+      color: theme.palette.secondary.light,
+      cursor: "pointer",
+      backgroundColor: "transparent",
+    },
+  },
+  navigateIcon: {
+    fontSize: "50px",
   },
   saveButton: {
     backgroundColor: theme.palette.primary.main,
@@ -80,8 +94,8 @@ const UpdatePage = () => {
   TODO Should be able to just use gridData from the context without creating a local state variable */
   const [data, setData] = useState(null);
   const [bedspaceEditorData, setBedspaceEditorData] = useState(); // i.e. "Working" data
-  const [selectedKey, setSelectedKey] = useState();
-  const [needsSave, setNeedsSave] = useState(false);
+  const [selectedKey, setSelectedKey] = useState(); // index of the bedspace being "edited"
+  const [needsSave, setNeedsSave] = useState(false); // true, if an unsaved changed has occurred in bedspaceEditor
   const [resetBedspaceEditor, setResetBedspaceEditor] = useState(false); // value not important, just using it to trigger re-render
 
   /* Hook for our Dialog modal */
@@ -101,17 +115,21 @@ const UpdatePage = () => {
     setData(gridData);
   }, [gridData]);
 
+  const setCurrentBed = (key) => {
+    // This is the key of the data array that corresponds to this selected bedspace
+    setSelectedKey(key);
+    /* When a new bed is selected, copy the truth data's (data) JSON object for this
+    selected bedspace to the bedspaceEditorData */
+    setBedspaceEditorData(data[key]);
+  };
+
   const handleBedActionEdit = (key) => {
     const doAction = () => {
       if (selectedKey === key) {
         // re-clicked on the same bedspace
         setSelectedKey(null);
       } else {
-        // This is the key of the data array that corresponds to this selected bedspace
-        setSelectedKey(key);
-        /* When a new bed is selected, copy the truth data's (data) JSON object for this
-    selected bedspace to the bedspaceEditorData */
-        setBedspaceEditorData(data[key]);
+        setCurrentBed(key);
 
         if (refToBedspaceEditorDiv && !media_atleast_md) {
           setTimeout(() => {
@@ -159,6 +177,10 @@ const UpdatePage = () => {
     }
   };
 
+  /**
+   *
+   * @param {number} key Index of the bedspace to clear the data
+   */
   const handleBedActionClear = (key) => {
     // Construct the message for the Dialog
     const content = (
@@ -241,6 +263,11 @@ const UpdatePage = () => {
 
   /* When a change in the BedspaceEditor's data occurs, it
   sends the new bedspace JSON object here.  */
+  /**
+   *
+   * @param {object} newBedspaceData Given an object containing the data for a single bedspace,
+   * will update the state in UpdatePage and toggle the needsSave boolean
+   */
   const handleOnEditorDataChange = (newBedspaceData) => {
     setBedspaceEditorData(newBedspaceData);
     setNeedsSave(true);
@@ -332,6 +359,16 @@ const UpdatePage = () => {
     setNeedsSave(false);
   };
 
+  /* Handles the < and > buttons for selecting the previous or next bedspace.
+  Calls setCurrentBed which updates the selectedKey and BedspaceEditorData */
+  /**
+   *
+   * @param {boolean} reverse If true, move backwards a bedspace. If false, move forwards.
+   */
+  const handleNextBedspaceButton = (reverse) => {
+    setCurrentBed(getNextBedspace(data, selectedKey, reverse));
+  };
+
   /* - - - - - RETURN - - - - - */
   if (data != null) {
     return (
@@ -375,12 +412,28 @@ const UpdatePage = () => {
                     variant="dense"
                     className={classes.bedspaceEditorToolbar}
                   >
+                    <IconButton
+                      disabled={needsSave}
+                      className={classes.navigateIconButton}
+                      disableRipple
+                      onClick={() => handleNextBedspaceButton(true)}
+                    >
+                      <NavigateBeforeIcon className={classes.navigateIcon} />
+                    </IconButton>
                     <Typography
                       variant="h1"
                       className={classes.bedspaceEditorToolbarBedNumber}
                     >
                       {data[selectedKey].bed}
                     </Typography>
+                    <IconButton
+                      disabled={needsSave}
+                      className={classes.navigateIconButton}
+                      disableRipple
+                      onClick={() => handleNextBedspaceButton(false)}
+                    >
+                      <NavigateNextIcon className={classes.navigateIcon} />
+                    </IconButton>
                     <Button
                       classes={{
                         root: classes.saveButton,
@@ -416,6 +469,7 @@ const UpdatePage = () => {
                 >
                   <BedspaceEditor
                     data={bedspaceEditorData}
+                    bedKey={selectedKey}
                     defaultValues={data[selectedKey]}
                     onEditorDataChange={handleOnEditorDataChange}
                     reset={resetBedspaceEditor}
@@ -432,6 +486,26 @@ const UpdatePage = () => {
   } else {
     return <>Loading...</>;
   }
+};
+
+/* Helper function for finding next or previous index in given array, or 
+cycles to the end. */
+/**
+ *
+ * @param {array} arr Array of bedspace data, e.g. each index is a bedspace
+ * @param {number} currentIndex Starting index, i.e. current bedspace in the editor
+ * @param {boolean} reverse  If true, will go back a bedspace. If false, will go forward
+ * @returns {number} The new index
+ */
+const getNextBedspace = (arr, currentIndex, reverse = false) => {
+  const newIndex = reverse ? currentIndex - 1 : currentIndex + 1;
+  if (newIndex < 0) {
+    return arr.length - 1;
+  }
+  if (newIndex > arr.length - 1) {
+    return 0;
+  }
+  return newIndex;
 };
 
 export default UpdatePage;
