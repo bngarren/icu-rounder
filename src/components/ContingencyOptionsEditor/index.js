@@ -17,13 +17,21 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
   },
   input: {
-    borderBottom: "1px solid #dcdcdc",
+    borderBottom: "3px solid #dcdcdc40",
   },
   list: {
     maxHeight: "200px",
     overflowY: "auto",
     maxWidth: "300px",
     padding: "12px 0px",
+  },
+  listItemContainer: {
+    "&:hover": {
+      borderLeft: "5px solid #dcdcdc40",
+    },
+    "&:hover $listItemSecondaryAction": {
+      visibility: "inherit",
+    },
   },
   listItem: {
     padding: "2px 0px 2px 5px",
@@ -32,6 +40,10 @@ const useStyles = makeStyles((theme) => ({
   },
   listItemText: {
     fontSize: "10pt",
+    margin: 0,
+  },
+  listItemSecondaryAction: {
+    visibility: "hidden",
   },
   clearIconButton: {
     fontSize: "9pt",
@@ -80,19 +92,23 @@ const ContingencyOptionsEditor = ({
             sortedData.map((value, index) => {
               return (
                 <ListItem
-                  className={classes.listItem}
+                  classes={{
+                    container: classes.listItemContainer,
+                    root: classes.listItem,
+                  }}
                   key={`${value}-${index}`}
                 >
                   <ListItemText
+                    primary={value}
                     primaryTypographyProps={{
                       classes: {
                         root: classes.listItemText,
                       },
                     }}
+                  />
+                  <ListItemSecondaryAction
+                    className={classes.listItemSecondaryAction}
                   >
-                    {value}
-                  </ListItemText>
-                  <ListItemSecondaryAction>
                     <IconButton
                       className={classes.clearIconButton}
                       onClick={() => onRemove(index)}

@@ -76,6 +76,14 @@ const useStyles = makeStyles({
     marginBottom: "4px",
     paddingLeft: "2px",
   },
+  selectInputRoot: {
+    paddingLeft: "5px",
+  },
+  selectInputSelect: {
+    "&:focus": {
+      backgroundColor: "transparent",
+    },
+  },
   exportFilenameTextfieldInput: {
     textAlign: "right",
     paddingRight: "4px",
@@ -385,6 +393,10 @@ const SettingsPage = () => {
             <Select
               labelId="document_cols_per_page_label"
               id="document_cols_per_page"
+              classes={{
+                root: classes.selectInputRoot,
+                select: classes.selectInputSelect,
+              }}
               value={inputValues.document_cols_per_page}
               onChange={(e) =>
                 handleOnChange("document_cols_per_page", e.target.value)
