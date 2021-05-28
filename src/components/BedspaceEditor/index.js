@@ -19,6 +19,7 @@ const useStyles = makeStyles((theme) => ({
   editorRoot: {
     padding: "10px",
     backgroundColor: "transparent",
+    boxShadow: "none",
   },
   form: {},
   textFieldRoot: {
@@ -92,15 +93,22 @@ const CustomTextField = ({
 }) => {
   const [value, setValue] = useState("");
 
+  /* If the reset prop is toggled, reset this component's
+  state to the "forced value" or the default value we want
+  the input to display  */
   useEffect(() => {
     setValue(forcedValue);
   }, [forcedValue, reset]);
 
+  /**
+   *
+   * @param {object} e Event object
+   * @param {*} id This TextField's id, so that we can send callback to parent component
+   * that this specific TextField has changed its input value
+   */
   const handleInputChange = (e, id) => {
     const val = e.target.value;
-
     setValue(val);
-
     sendInputChange(id, val);
   };
 

@@ -7,6 +7,7 @@ import {
   Typography,
   Switch,
   IconButton,
+  Tooltip,
 } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/styles";
 import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
@@ -395,13 +396,18 @@ const UpdatePage = () => {
             {selectedKey != null && (
               <Grid container>
                 <Grid item xs={12}>
-                  <Switch
-                    checked={!demoBoxCollapsed}
-                    onChange={() =>
-                      setDemoBoxCollapsed((prevValue) => !prevValue)
-                    }
-                    color="secondary"
-                  />
+                  <Tooltip
+                    title={demoBoxCollapsed ? "Show example" : "Hide example"}
+                    enterDelay={300}
+                  >
+                    <Switch
+                      checked={!demoBoxCollapsed}
+                      onChange={() =>
+                        setDemoBoxCollapsed((prevValue) => !prevValue)
+                      }
+                      color="secondary"
+                    />
+                  </Tooltip>
                   <DemoBox
                     data={bedspaceEditorData}
                     collapsed={demoBoxCollapsed}

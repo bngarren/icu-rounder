@@ -67,11 +67,11 @@ const useStyles = makeStyles((theme) => ({
   },
   tableCellDefault: {
     padding: "3px 10px 3px 15px",
-    fontSize: "12pt",
+    fontSize: "11pt",
   },
   tableCellSmall: {
     padding: "2px 2px 2px 10px",
-    fontSize: "11pt",
+    fontSize: "10pt",
   },
   tablePaginationRoot: {
     overflow: "hidden",
