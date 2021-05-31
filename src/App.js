@@ -1,5 +1,4 @@
 import "./App.css";
-import { Router } from "wouter";
 
 // Theme
 import { ThemeProvider } from "@material-ui/core/styles";
@@ -13,6 +12,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 
 // Where all of our pages come from
+import { BrowserRouter as Router } from "react-router-dom";
 import PageRouter from "./components/PageRouter";
 
 // Firebase

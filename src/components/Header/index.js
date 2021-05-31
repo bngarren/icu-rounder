@@ -16,10 +16,12 @@ import GetAppIcon from "@material-ui/icons/GetApp";
 import ViewListIcon from "@material-ui/icons/ViewList";
 import SettingsIcon from "@material-ui/icons/Settings";
 
-import { useLocation } from "wouter";
+// React Router
+import { useHistory } from "react-router-dom";
 
+// Context
+import { useAuthStateContext } from "../../context/AuthState";
 import { useSettings } from "../../context/Settings";
-
 import { useGridStateContext } from "../../context/GridState";
 
 const useStyles = makeStyles((theme) => ({
@@ -78,8 +80,9 @@ const ElevationScroll = ({ children }) => {
 const Header = () => {
   const theme = useTheme();
   const classes = useStyles(theme);
+  const { userIsLoggedIn } = useAuthStateContext();
+  let history = useHistory(); // react router
 
-  const [location, setLocation] = useLocation();
   const { settings, dispatchSettings } = useSettings();
   const { bedLayout, gridData } = useGridStateContext();
 
@@ -110,39 +113,45 @@ const Header = () => {
               <Typography variant="overline">alpha</Typography>
             </div>
             <div className={classes.toolbarButtonsDiv}>
-              <Tooltip title="Download PDF">
-                <IconButton
-                  onClick={getPdf}
-                  className={classes.iconButtonDownload}
-                  classes={{
-                    root: classes.iconButtonDownloadRoot,
-                  }}
-                >
-                  <GetAppIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Edit">
-                <IconButton
-                  onClick={() => setLocation("/update")}
-                  className={classes.iconButtonOther}
-                  classes={{
-                    root: classes.iconButtonOtherRoot,
-                  }}
-                >
-                  <ViewListIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Settings">
-                <IconButton
-                  className={classes.iconButtonOther}
-                  classes={{
-                    root: classes.iconButtonOtherRoot,
-                  }}
-                  onClick={() => setLocation("/settings")}
-                >
-                  <SettingsIcon />
-                </IconButton>
-              </Tooltip>
+              {userIsLoggedIn ? (
+                <>
+                  <Tooltip title="Download PDF">
+                    <IconButton
+                      onClick={getPdf}
+                      className={classes.iconButtonDownload}
+                      classes={{
+                        root: classes.iconButtonDownloadRoot,
+                      }}
+                    >
+                      <GetAppIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Edit">
+                    <IconButton
+                      onClick={() => history.push("/update")}
+                      className={classes.iconButtonOther}
+                      classes={{
+                        root: classes.iconButtonOtherRoot,
+                      }}
+                    >
+                      <ViewListIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Settings">
+                    <IconButton
+                      className={classes.iconButtonOther}
+                      classes={{
+                        root: classes.iconButtonOtherRoot,
+                      }}
+                      onClick={() => history.push("/settings")}
+                    >
+                      <SettingsIcon />
+                    </IconButton>
+                  </Tooltip>
+                </>
+              ) : (
+                <>Login</>
+              )}
             </div>
           </Toolbar>
         </AppBar>

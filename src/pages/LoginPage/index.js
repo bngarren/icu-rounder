@@ -16,7 +16,6 @@ const LoginPage = () => {
         inputPassword,
         (user) => {
           // success
-          console.log(user);
         },
         (error) => {
           console.log(error);
