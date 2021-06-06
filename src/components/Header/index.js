@@ -75,6 +75,9 @@ const useStyles = makeStyles((theme) => ({
       color: theme.palette.secondary.light,
     },
   },
+  listItemText: {
+    fontSize: "10pt",
+  },
 }));
 
 /* Used to make the App Bar add elevation when the page is scrolled */
@@ -123,9 +126,9 @@ const Header = () => {
           <Toolbar variant="dense" className={classes.toolbarRoot}>
             <div className={classes.toolbarTitleDiv}>
               <Typography variant="h6" style={{ marginRight: "3px" }}>
-                Griddy
+                Grid
               </Typography>
-              <Typography variant="overline">alpha</Typography>
+              <Typography variant="overline">maker</Typography>
             </div>
             <div className={classes.toolbarButtonsDiv}>
               <HeaderMenu
@@ -140,6 +143,15 @@ const Header = () => {
       <Toolbar />
       {LoginDialog}
     </div>
+  );
+};
+
+const CustomListItemText = ({ children }) => {
+  const classes = useStyles();
+  return (
+    <ListItemText classes={{ primary: classes.listItemText }}>
+      {children}
+    </ListItemText>
   );
 };
 
@@ -189,49 +201,54 @@ const HeaderMenu = ({
   };
 
   const loggedInMenu = [
-    <MenuItem onClick={handleEdit} disabled={Boolean(useRouteMatch("/update"))}>
+    <MenuItem
+      onClick={handleEdit}
+      disabled={Boolean(useRouteMatch("/update"))}
+      key="menuItemEdit"
+    >
       <ListItemIcon>
         <ViewListIcon />
       </ListItemIcon>
-      <ListItemText>Edit Grid</ListItemText>
+      <CustomListItemText>Edit Grid</CustomListItemText>
     </MenuItem>,
     <MenuItem
       onClick={handleSettings}
       disabled={Boolean(useRouteMatch("/settings"))}
+      key="menuItemSettings"
     >
       <ListItemIcon>
         <SettingsIcon />
       </ListItemIcon>
-      <ListItemText>Settings</ListItemText>
+      <CustomListItemText>Settings</CustomListItemText>
     </MenuItem>,
-    <Divider />,
-    <MenuItem onClick={handleDownloadPdf}>
+    <Divider key="menuItemDivider1" />,
+    <MenuItem onClick={handleDownloadPdf} key="menuItemDownloadPdf">
       <ListItemIcon>
         <PictureAsPdfIcon />
       </ListItemIcon>
-      <ListItemText>Download PDF</ListItemText>
+      <CustomListItemText>Download PDF</CustomListItemText>
     </MenuItem>,
-    <MenuItem onClick={handleExportJson}>
+    <MenuItem onClick={handleExportJson} key="menuItemExportJson">
       <ListItemIcon>
         <GetAppIcon />
       </ListItemIcon>
-      <ListItemText>Export Grid</ListItemText>
+      <CustomListItemText>Export Grid</CustomListItemText>
     </MenuItem>,
-    <Divider />,
-    <MenuItem onClick={handleLogout}>
+    <Divider key="menuItemDivider2" />,
+    <MenuItem onClick={handleLogout} key="menuItemLogout">
       <ListItemIcon>
         <ExitToAppIcon />
       </ListItemIcon>
-      <ListItemText>Logout</ListItemText>
+      <CustomListItemText>Logout</CustomListItemText>
     </MenuItem>,
   ];
 
   const loggedOutMenu = [
-    <MenuItem onClick={handleLogin}>
+    <MenuItem onClick={handleLogin} key="menuItemLogin">
       <ListItemIcon>
         <AccountBoxIcon />
       </ListItemIcon>
-      <ListItemText>Login</ListItemText>
+      <CustomListItemText>Login</CustomListItemText>
     </MenuItem>,
   ];
 
@@ -249,6 +266,14 @@ const HeaderMenu = ({
       <Menu
         id="simple-menu"
         anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleClose}
