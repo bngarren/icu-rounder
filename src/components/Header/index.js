@@ -1,4 +1,4 @@
-import { cloneElement } from "react";
+import { useState, cloneElement } from "react";
 import MyDocument from "../MyDocument";
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
@@ -8,21 +8,32 @@ import {
   AppBar,
   Toolbar,
   IconButton,
-  Tooltip,
   Typography,
   useScrollTrigger,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
 } from "@material-ui/core";
+import AccountBoxIcon from "@material-ui/icons/AccountBox";
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
+import PictureAsPdfIcon from "@material-ui/icons/PictureAsPdf";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import ViewListIcon from "@material-ui/icons/ViewList";
 import SettingsIcon from "@material-ui/icons/Settings";
+import MenuIcon from "@material-ui/icons/Menu";
 
 // React Router
-import { useHistory } from "react-router-dom";
+import { useHistory, useRouteMatch } from "react-router-dom";
 
 // Context
 import { useAuthStateContext } from "../../context/AuthState";
 import { useSettings } from "../../context/Settings";
 import { useGridStateContext } from "../../context/GridState";
+
+// Login
+import { useLoginDialog } from "../../components/Login";
 
 const useStyles = makeStyles((theme) => ({
   navbar: {
@@ -80,11 +91,11 @@ const ElevationScroll = ({ children }) => {
 const Header = () => {
   const theme = useTheme();
   const classes = useStyles(theme);
-  const { userIsLoggedIn } = useAuthStateContext();
-  let history = useHistory(); // react router
 
-  const { settings, dispatchSettings } = useSettings();
+  const { settings } = useSettings();
   const { bedLayout, gridData } = useGridStateContext();
+
+  const { showLogin, LoginDialog } = useLoginDialog();
 
   const getPdf = async () => {
     await pdf(
@@ -101,6 +112,10 @@ const Header = () => {
       });
   };
 
+  const handleClickLogin = () => {
+    showLogin((prevValue) => !prevValue);
+  };
+
   return (
     <div>
       <ElevationScroll>
@@ -113,50 +128,135 @@ const Header = () => {
               <Typography variant="overline">alpha</Typography>
             </div>
             <div className={classes.toolbarButtonsDiv}>
-              {userIsLoggedIn ? (
-                <>
-                  <Tooltip title="Download PDF">
-                    <IconButton
-                      onClick={getPdf}
-                      className={classes.iconButtonDownload}
-                      classes={{
-                        root: classes.iconButtonDownloadRoot,
-                      }}
-                    >
-                      <GetAppIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Edit">
-                    <IconButton
-                      onClick={() => history.push("/update")}
-                      className={classes.iconButtonOther}
-                      classes={{
-                        root: classes.iconButtonOtherRoot,
-                      }}
-                    >
-                      <ViewListIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Settings">
-                    <IconButton
-                      className={classes.iconButtonOther}
-                      classes={{
-                        root: classes.iconButtonOtherRoot,
-                      }}
-                      onClick={() => history.push("/settings")}
-                    >
-                      <SettingsIcon />
-                    </IconButton>
-                  </Tooltip>
-                </>
-              ) : (
-                <>Login</>
-              )}
+              <HeaderMenu
+                customStyle={classes}
+                onClickLogin={handleClickLogin}
+                onDownloadPdf={getPdf}
+              />
             </div>
           </Toolbar>
         </AppBar>
       </ElevationScroll>
       <Toolbar />
+      {LoginDialog}
+    </div>
+  );
+};
+
+const HeaderMenu = ({
+  customStyle: classes,
+  onClickLogin = (f) => f,
+  onDownloadPdf = (f) => f,
+}) => {
+  const { userIsLoggedIn, signOut } = useAuthStateContext();
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  let history = useHistory(); // react router
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogin = () => {
+    onClickLogin();
+    handleClose();
+  };
+
+  const handleLogout = () => {
+    signOut();
+    handleClose();
+  };
+
+  const handleExportJson = () => {};
+
+  const handleDownloadPdf = () => {
+    onDownloadPdf();
+    handleClose();
+  };
+
+  const handleEdit = () => {
+    history.push("/update");
+    handleClose();
+  };
+
+  const handleSettings = () => {
+    history.push("/settings");
+    handleClose();
+  };
+
+  const loggedInMenu = [
+    <MenuItem onClick={handleEdit} disabled={Boolean(useRouteMatch("/update"))}>
+      <ListItemIcon>
+        <ViewListIcon />
+      </ListItemIcon>
+      <ListItemText>Edit Grid</ListItemText>
+    </MenuItem>,
+    <MenuItem
+      onClick={handleSettings}
+      disabled={Boolean(useRouteMatch("/settings"))}
+    >
+      <ListItemIcon>
+        <SettingsIcon />
+      </ListItemIcon>
+      <ListItemText>Settings</ListItemText>
+    </MenuItem>,
+    <Divider />,
+    <MenuItem onClick={handleDownloadPdf}>
+      <ListItemIcon>
+        <PictureAsPdfIcon />
+      </ListItemIcon>
+      <ListItemText>Download PDF</ListItemText>
+    </MenuItem>,
+    <MenuItem onClick={handleExportJson}>
+      <ListItemIcon>
+        <GetAppIcon />
+      </ListItemIcon>
+      <ListItemText>Export Grid</ListItemText>
+    </MenuItem>,
+    <Divider />,
+    <MenuItem onClick={handleLogout}>
+      <ListItemIcon>
+        <ExitToAppIcon />
+      </ListItemIcon>
+      <ListItemText>Logout</ListItemText>
+    </MenuItem>,
+  ];
+
+  const loggedOutMenu = [
+    <MenuItem onClick={handleLogin}>
+      <ListItemIcon>
+        <AccountBoxIcon />
+      </ListItemIcon>
+      <ListItemText>Login</ListItemText>
+    </MenuItem>,
+  ];
+
+  return (
+    <div>
+      <IconButton
+        className={classes.iconButtonOther}
+        classes={{
+          root: classes.iconButtonOtherRoot,
+        }}
+        onClick={handleClick}
+      >
+        <MenuIcon />
+      </IconButton>
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+        {userIsLoggedIn
+          ? loggedInMenu.map((i) => i)
+          : loggedOutMenu.map((i) => i)}
+      </Menu>
     </div>
   );
 };
