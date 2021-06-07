@@ -1,5 +1,4 @@
-import { Button } from "@material-ui/core";
-import { useEffect, useState } from "react";
+import { useEffect, useState, cloneElement } from "react";
 import { saveAs } from "file-saver";
 
 import { useGridStateContext } from "../../context/GridState";
@@ -11,7 +10,11 @@ const exportDataWithFilename = (data, filename) => {
   saveAs(blob, `${filename}.json`);
 };
 
-const Exporter = ({ filename, onExported = (f) => f }) => {
+/* This component will add an onClick function to its children component that
+will export the grid data to json. 
+E.g. If Exporter surrounds a Button component it will add onClick function
+*/
+const Exporter = ({ children, filename = "grid", onExported = (f) => f }) => {
   const [data, setData] = useState(); // local data in the Exporter component
   const { gridDataJson } = useGridStateContext();
 
@@ -25,7 +28,7 @@ const Exporter = ({ filename, onExported = (f) => f }) => {
     onExported();
   };
 
-  return <Button onClick={handleExport}>Export grid</Button>;
+  return cloneElement(children, { onClick: handleExport });
 };
 
 export default Exporter;

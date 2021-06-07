@@ -35,6 +35,9 @@ import { useGridStateContext } from "../../context/GridState";
 // Login
 import { useLoginDialog } from "../../components/Login";
 
+// Exporter
+import Exporter from "../../components/Exporter";
+
 const useStyles = makeStyles((theme) => ({
   navbar: {
     backgroundColor: "white",
@@ -161,6 +164,7 @@ const HeaderMenu = ({
   onDownloadPdf = (f) => f,
 }) => {
   const { userIsLoggedIn, signOut } = useAuthStateContext();
+  const { settings } = useSettings();
   const [anchorEl, setAnchorEl] = useState(null);
 
   let history = useHistory(); // react router
@@ -183,7 +187,9 @@ const HeaderMenu = ({
     handleClose();
   };
 
-  const handleExportJson = () => {};
+  const handleOnExported = () => {
+    handleClose();
+  };
 
   const handleDownloadPdf = () => {
     onDownloadPdf();
@@ -199,6 +205,10 @@ const HeaderMenu = ({
     history.push("/settings");
     handleClose();
   };
+
+  const exportFilename = settings.export_filename
+    ? settings.export_filename
+    : "grid";
 
   const loggedInMenu = [
     <MenuItem
@@ -228,12 +238,14 @@ const HeaderMenu = ({
       </ListItemIcon>
       <CustomListItemText>Download PDF</CustomListItemText>
     </MenuItem>,
-    <MenuItem onClick={handleExportJson} key="menuItemExportJson">
-      <ListItemIcon>
-        <GetAppIcon />
-      </ListItemIcon>
-      <CustomListItemText>Export Grid</CustomListItemText>
-    </MenuItem>,
+    <Exporter onExported={handleOnExported} filename={exportFilename}>
+      <MenuItem key="menuItemExportJson">
+        <ListItemIcon>
+          <GetAppIcon />
+        </ListItemIcon>
+        <CustomListItemText>Export Grid</CustomListItemText>
+      </MenuItem>
+    </Exporter>,
     <Divider key="menuItemDivider2" />,
     <MenuItem onClick={handleLogout} key="menuItemLogout">
       <ListItemIcon>
@@ -266,10 +278,6 @@ const HeaderMenu = ({
       <Menu
         id="simple-menu"
         anchorEl={anchorEl}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
         transformOrigin={{
           vertical: "top",
           horizontal: "left",

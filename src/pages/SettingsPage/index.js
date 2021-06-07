@@ -447,7 +447,9 @@ const SettingsPage = () => {
               <Exporter
                 filename={inputValues.export_filename}
                 onExported={handleOnExport}
-              />
+              >
+                <Button>Export Grid</Button>
+              </Exporter>
             </div>
           </Grid>
           <Divider />
