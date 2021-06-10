@@ -1,10 +1,17 @@
 import { useState, useEffect, cloneElement } from "react";
+import { Grid, IconButton, Zoom } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
+import SaveIcon from "@material-ui/icons/Save";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    display: "flex",
+    flexDirection: "row",
+  },
   unsaved: {
-    border: `1px solid ${theme.palette.primary.main}`,
+    display: "flex",
+    flexDirection: "row",
   },
 }));
 
@@ -27,12 +34,21 @@ const CustomFormControl = ({ initialValue, children }) => {
   };
 
   return (
-    <div className={clsx(classes.root, { [classes.unsaved]: diff })}>
-      {cloneElement(children, {
-        value: value,
-        onChange: (e) => handleOnChange(e.target.value),
-      })}
-    </div>
+    <Grid container className={clsx(classes.root, { [classes.unsaved]: diff })}>
+      <Zoom in={diff} disableStrictModeCompat={true} timeout={300}>
+        <Grid item alignSelf="center">
+          <IconButton color="primary">
+            <SaveIcon />
+          </IconButton>
+        </Grid>
+      </Zoom>
+      <Grid item>
+        {cloneElement(children, {
+          value: value,
+          onChange: (e) => handleOnChange(e.target.value),
+        })}
+      </Grid>
+    </Grid>
   );
 };
 
