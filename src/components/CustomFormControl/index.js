@@ -13,9 +13,23 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "row",
   },
+  gridForSaveButton: {
+    alignSelf: "center",
+  },
+  gridForInput: {
+    flexGrow: "1",
+  },
+  saveIconButton: {
+    padding: "5px",
+  },
 }));
 
-const CustomFormControl = ({ initialValue, children }) => {
+const CustomFormControl = ({
+  initialValue,
+  id,
+  onSave = (f) => f,
+  children,
+}) => {
   const classes = useStyles();
   const [value, setValue] = useState("");
   const [diff, setDiff] = useState(false);
@@ -33,16 +47,27 @@ const CustomFormControl = ({ initialValue, children }) => {
     setValue(val);
   };
 
+  const handleOnSave = () => {
+    if (id !== null) {
+      onSave(id, value);
+      setDiff(false);
+    }
+  };
+
   return (
     <Grid container className={clsx(classes.root, { [classes.unsaved]: diff })}>
       <Zoom in={diff} disableStrictModeCompat={true} timeout={300}>
-        <Grid item alignSelf="center">
-          <IconButton color="primary">
+        <Grid item className={classes.gridForSaveButton}>
+          <IconButton
+            onClick={handleOnSave}
+            color="primary"
+            className={classes.saveIconButton}
+          >
             <SaveIcon />
           </IconButton>
         </Grid>
       </Zoom>
-      <Grid item>
+      <Grid item className={classes.gridForInput}>
         {cloneElement(children, {
           value: value,
           onChange: (e) => handleOnChange(e.target.value),

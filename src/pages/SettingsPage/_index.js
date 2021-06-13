@@ -58,6 +58,7 @@ const useStyles = makeStyles({
   },
   inputsGridItem: {
     marginBottom: "20px",
+    width: "100%",
   },
   textFieldRoot: {
     border: "1px solid #e2e2e1",
@@ -139,6 +140,96 @@ const SettingsPage = () => {
   /* Hook for our Dialog modal */
   const { dialogIsOpen, dialog, showYesNoDialog } = useDialog();
 
+  /* 
+  **
+  Handles the saving of the Settings data by passing
+  new data to SettingsContext via dispatchSettings, or 
+  updating bedLayout variable of GridStateContext
+  **
+  */
+  const handleOnSave = (id, value) => {
+    if (id == null || value == null) {
+      throw new Error(
+        "Couldn't complete handleOnSave. Either the id or value is null/undefined"
+      );
+    }
+
+    if (id === "bedLayout") {
+      handleSaveBedLayout(value);
+    } else {
+      try {
+        dispatchSettings({
+          type: "UPDATE",
+          payload: {
+            [id]: value,
+          },
+        });
+      } catch (error) {
+        console.error(`Could not save [${id}].`);
+      }
+    }
+  };
+
+  /* 
+  **
+  Handles the saving of the bedLayout in GridStateContext. 
+  Importantly, this function checks new vs old bedlayout to alert user
+  if patient data might be overwritten.
+  **
+ */
+  /**
+   *
+   * @param {string} newBedLayout The "new" bedLayout string from user input
+   */
+  const handleSaveBedLayout = (newBedLayout) => {
+    /* Convert the inputted bedLayout string (CSV format) to an array */
+    const formattedBedLayout = getBedLayoutArrayFromCsv(newBedLayout);
+
+    /* Find the beds that differ between the current and new bedLayouts */
+    let difference = bedLayout.filter((x) => !formattedBedLayout.includes(x));
+    /* Of these beds, if any, find which ones have patient data at risk of being deleted */
+    let riskBeds = [];
+    if (difference.length > 0) {
+      difference.forEach((i) => {
+        // Uses Utility function to get the bed's data and see if it's empty
+        if (!isBedEmpty(getDataForBed(gridData, i))) {
+          riskBeds.push(i);
+        }
+      });
+    }
+    // If there are bed(s) with data that are missing from new bedLayout
+    if (riskBeds.length > 0) {
+      // Construct the message for the Dialog
+      const content = (
+        <div>
+          <p>
+            This new bed layout will <b>NOT</b> include the following beds which
+            are non-empty:
+          </p>
+          <p>
+            {riskBeds.map((i) => {
+              return `| ${i} |     `;
+            })}
+          </p>
+        </div>
+      );
+      showYesNoDialog(
+        content,
+        () => {
+          // chose to continue
+          updateGridData(gridData, formattedBedLayout);
+        },
+        () => {
+          // chose to cancel
+          return;
+        },
+        { yes: "Continue", no: "Cancel" }
+      );
+    } else {
+      updateGridData(gridData, formattedBedLayout);
+    }
+  };
+
   /* New data has been uploaded using the Importer component,
   now awaiting confirmation */
   const handleNewDataImported = useCallback((data) => {
@@ -191,7 +282,11 @@ const SettingsPage = () => {
           General
         </Typography>
         <Grid item className={classes.inputsGridItem}>
-          <CustomFormControl initialValue={getPrettyBedLayout(bedLayout)}>
+          <CustomFormControl
+            id="bedLayout"
+            initialValue={getPrettyBedLayout(bedLayout)}
+            onSave={handleOnSave}
+          >
             <CustomTextField
               id="bedLayoutTextField"
               customStyle={classes}
@@ -206,7 +301,11 @@ const SettingsPage = () => {
           Document
         </Typography>
         <Grid item className={classes.inputsGridItem}>
-          <CustomFormControl initialValue={settings.document_title}>
+          <CustomFormControl
+            id="document_title"
+            initialValue={settings.document_title}
+            onSave={handleOnSave}
+          >
             <CustomTextField
               id="documentTitleTextField"
               customStyle={classes}
@@ -223,7 +322,11 @@ const SettingsPage = () => {
           >
             Grids per row
           </InputLabel>
-          <CustomFormControl initialValue={settings.document_cols_per_page}>
+          <CustomFormControl
+            id="document_cols_per_page"
+            initialValue={settings.document_cols_per_page}
+            onSave={handleOnSave}
+          >
             <Select
               labelId="document_cols_per_page_label"
               id="document_cols_per_page"
@@ -257,7 +360,11 @@ const SettingsPage = () => {
               alignItems: "flex-end",
             }}
           >
-            <CustomFormControl initialValue={settings.export_filename}>
+            <CustomFormControl
+              id="export_filename"
+              initialValue={settings.export_filename}
+              onSave={handleOnSave}
+            >
               <CustomTextField
                 id="exportFilenameTextField"
                 customStyle={classes}
