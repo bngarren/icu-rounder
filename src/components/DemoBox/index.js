@@ -7,6 +7,7 @@ import { getWidth } from "../../components/MyDocument";
 
 const useStyles = makeStyles({
   demoBox: {
+    position: "relative",
     backgroundColor: "white",
     height: "250pt",
     margin: "auto",
@@ -61,6 +62,14 @@ const useStyles = makeStyles({
     marginTop: "1pt",
     marginRight: "2pt",
   },
+  demoBoxBottomText: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    textAlign: "right",
+    fontSize: "8pt",
+    padding: "2pt 4pt 2pt 2pt",
+  },
 });
 
 /* The demo grid box */
@@ -114,6 +123,7 @@ const DemoBox = ({ data: propsData, collapsed }) => {
             </div>
             {data.body}
           </div>
+          <div className={classes.demoBoxBottomText}>{data.bottomText}</div>
         </Paper>
       </Collapse>
     </>

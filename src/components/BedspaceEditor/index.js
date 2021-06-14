@@ -70,6 +70,11 @@ const useStyles = makeStyles((theme) => ({
     marginTop: "8px",
     width: "100%",
   },
+  textFieldBottomText: {
+    width: "100%",
+    margin: "2px",
+    marginTop: "8px",
+  },
   contingenciesRoot: {
     display: "flex",
     flexDirection: "row",
@@ -177,6 +182,7 @@ const BedspaceEditor = ({
         oneLiner: data.oneLiner ? data.oneLiner : "",
         contingencies: data.contingencies ? data.contingencies : [],
         body: data.body ? data.body : "",
+        bottomText: data.bottomText ? data.bottomText : "",
       }
     );
   };
@@ -415,6 +421,16 @@ const BedspaceEditor = ({
               sendInputChange={handleInputChange}
               multiline
               rows={10}
+              customStyle={classes}
+            ></CustomTextField>
+            <CustomTextField
+              id="bottomText"
+              className={classes.textFieldBottomText}
+              label="Bottom Text"
+              variant="filled"
+              reset={forceValue.current}
+              forcedValue={forcedValues.current.bottomText}
+              sendInputChange={handleInputChange}
               customStyle={classes}
             ></CustomTextField>
           </div>

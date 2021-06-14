@@ -47,6 +47,7 @@ const pdfStyles = StyleSheet.create({
     justifyContent: "space-evenly",
   },
   gridBoxRoot: {
+    position: "relative",
     fontSize: "8pt",
     display: "flex",
     flexBasis: "0",
@@ -112,6 +113,13 @@ const pdfStyles = StyleSheet.create({
   gridBoxBody: {
     fontSize: "7pt",
     padding: "2pt 5pt 5pt 2pt",
+  },
+  gridBoxBottomText: {
+    position: "absolute",
+    bottom: 0,
+    textAlign: "right",
+    fontSize: "7pt",
+    padding: "2pt 4pt 2pt 2pt",
   },
 });
 
@@ -233,6 +241,9 @@ const GridBox = ({ bedspaceData, box, width, removeLeftBorder }) => {
               })}
           </View>
           <Text>{bedspaceData.body}</Text>
+        </View>
+        <View style={pdfStyles.gridBoxBottomText}>
+          <Text>{bedspaceData.bottomText}</Text>
         </View>
       </View>
     );
