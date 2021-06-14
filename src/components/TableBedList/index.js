@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useContext } from "react";
+import { useState, useContext } from "react";
 import {
   TableContainer,
   Table,
@@ -21,10 +21,14 @@ import { makeStyles, useTheme } from "@material-ui/styles";
 
 // Utility
 import { isBedEmpty } from "../../utils/Utility";
+import clsx from "clsx";
 
 // Popover
-import { usePopupState, bindTrigger } from "material-ui-popup-state/hooks";
+import { usePopupState } from "material-ui-popup-state/hooks";
 import TableBedListPopover from "../TableBedListPopover";
+
+// Components
+import AddNewBedspaceForm from "./AddNewBedspaceForm";
 
 // Context
 import { BedActionsContext } from "../../pages/UpdatePage";
@@ -39,6 +43,10 @@ const useStyles = makeStyles((theme) => ({
     "&.Mui-selected:hover": {
       background: `linear-gradient(90deg, ${theme.palette.secondary.light} 1%, rgba(0,212,255,0) 1%)`,
     },
+  },
+  highlightRowIn: {
+    backgroundColor: theme.palette.secondary.veryLight,
+    transition: "background 0.5s",
   },
   tableHeader: {
     backgroundColor: "#f6f8fa",
@@ -184,6 +192,30 @@ const MyTableBody = ({ classes, data, page, rowsPerPage, selectedKey }) => {
     !media_atleast_lg && classes.tableCellSmall,
   ].join(" ");
 
+  const [highlight, setHighlight] = useState(false);
+
+  const handleNewBedspaceSubmitted = (bed) => {
+    const highlightKey = data.findIndex((element) => element.bed === bed);
+    setHighlight(highlightKey);
+    setTimeout(() => {
+      setHighlight(null);
+    }, 300);
+  };
+
+  const MyInputTableRow = (
+    <TableRow className={classes.myInputTableRow}>
+      <TableCell
+        component="th"
+        scope="row"
+        align="center"
+        colSpan={4}
+        className={tableCellClasses}
+      >
+        <AddNewBedspaceForm onSubmit={handleNewBedspaceSubmitted} />
+      </TableCell>
+    </TableRow>
+  );
+
   return (
     <>
       <TableBody>
@@ -195,7 +227,9 @@ const MyTableBody = ({ classes, data, page, rowsPerPage, selectedKey }) => {
             const emptyBed = isBedEmpty(value);
             return (
               <TableRow
-                className={classes.tableRow}
+                className={clsx(classes.tableRow, {
+                  [classes.highlightRowIn]: highlight === adjustedKey,
+                })}
                 key={value.bed}
                 hover
                 selected={isSelected}
@@ -234,6 +268,7 @@ const MyTableBody = ({ classes, data, page, rowsPerPage, selectedKey }) => {
               </TableRow>
             );
           })}
+        {MyInputTableRow}
       </TableBody>
     </>
   );

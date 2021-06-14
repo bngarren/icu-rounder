@@ -372,7 +372,9 @@ const UpdatePage = () => {
 
   /* - - - - - RETURN - - - - - */
 
-  const renderToolbar = (
+  /* Renders the Toolbar associated with the BedspaceEditor, includes
+  Navigation arrows, Save, and Reset buttons */
+  const renderToolbar = () => (
     <Toolbar variant="dense" className={classes.bedspaceEditorToolbar}>
       <IconButton
         disabled={needsSave}
@@ -463,7 +465,7 @@ const UpdatePage = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  {renderToolbar}
+                  {data && renderToolbar()}
                 </Grid>
                 <Grid
                   item
@@ -484,7 +486,7 @@ const UpdatePage = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  {renderToolbar}
+                  {data && renderToolbar()}
                 </Grid>
               </Grid>
             )}
