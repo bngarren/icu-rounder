@@ -430,7 +430,7 @@ const BedspaceEditor = ({
             <CustomTextField
               id="bottomText"
               className={classes.textFieldBottomText}
-              label="Bottom Text"
+              label="Bottom Right Text"
               variant="filled"
               reset={forceValue.current}
               forcedValue={forcedValues.current.bottomText}

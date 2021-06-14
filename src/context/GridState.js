@@ -64,7 +64,7 @@ export default function GridStateProvider({ children, Firebase }) {
    * @param {object} data Grid data in the form of JSON object (not array)
    * @param {array} bedLayout Array of bed names, e.g. ["1", "2", "2B",] etc.
    */
-  const updateGridData = useCallback((data, bedLayout) => {
+  const updateGridData = useCallback(async (data, bedLayout) => {
     // ..verify input data
     const verifiedData = data;
 
@@ -94,10 +94,12 @@ export default function GridStateProvider({ children, Firebase }) {
       setGridData(sortedArrayData);
       setGridDataJson(getJsonObjectFromSortedArray(sortedArrayData));
       setBedLayout(bl);
+      return sortedArrayData;
     } catch (error) {
       console.error(
         `Error updating grid in GridStateProvider: ${error.message}`
       );
+      return false;
     }
   }, []);
 

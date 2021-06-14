@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   highlightRowIn: {
-    backgroundColor: theme.palette.secondary.veryLight,
+    backgroundColor: theme.palette.secondary.veryVeryLight,
     transition: "background 0.5s",
   },
   tableHeader: {
@@ -194,12 +194,11 @@ const MyTableBody = ({ classes, data, page, rowsPerPage, selectedKey }) => {
 
   const [highlight, setHighlight] = useState(false);
 
-  const handleNewBedspaceSubmitted = (bed) => {
-    const highlightKey = data.findIndex((element) => element.bed === bed);
-    setHighlight(highlightKey);
+  const handleNewBedspaceSubmitted = (key) => {
+    setHighlight(key);
     setTimeout(() => {
       setHighlight(null);
-    }, 300);
+    }, 500);
   };
 
   const MyInputTableRow = (
@@ -207,7 +206,7 @@ const MyTableBody = ({ classes, data, page, rowsPerPage, selectedKey }) => {
       <TableCell
         component="th"
         scope="row"
-        align="center"
+        align="right"
         colSpan={4}
         className={tableCellClasses}
       >

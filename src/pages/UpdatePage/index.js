@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useRef } from "react";
+import { useState, useEffect, createContext, useRef, useCallback } from "react";
 import {
   useMediaQuery,
   Grid,
@@ -278,10 +278,28 @@ const UpdatePage = () => {
   the overall GridDataContext. Specifically, we check to see if there has been a
   new bedspace (bed number) entered, i.e. we will warn the user that this may
   overwrite any data in that target bedspace */
-  const handleOnSave = (e) => {
-    e.preventDefault();
-
+  const handleOnSave = useCallback(() => {
     const updatedData = [...data];
+
+    /* The actual save action that merges this new bedspaceEditorData with
+    the truth data in GridDataContext */
+    const saveBedspaceEditorData = (dataToSave) => {
+      /* For each object in data array, see if there is a bed number
+      that matches that has been edited in bedspaceEditorData. */
+      const objIndex = dataToSave.findIndex(
+        (obj) => obj.bed === bedspaceEditorData.bed
+      );
+      /* If so, return the index of this object in the array */
+      if (objIndex >= 0) {
+        dataToSave[objIndex] = bedspaceEditorData;
+      } else {
+        // If bed doesn't exist, add new one
+        dataToSave.push(bedspaceEditorData);
+      }
+      // send updated data to GridStateContext
+      updateGridData(dataToSave);
+      setNeedsSave(false);
+    };
 
     // See if bedspaceEditorData has changed the bed number for this patient
     if (bedspaceEditorData.bed !== data[selectedKey].bed) {
@@ -328,27 +346,14 @@ const UpdatePage = () => {
       // Commit the save action
       saveBedspaceEditorData(updatedData);
     }
-  };
-
-  /* The actual save action that merges this new bedspaceEditorData with
-  the truth data in GridDataContext */
-  const saveBedspaceEditorData = (dataToSave) => {
-    /* For each object in data array, see if there is a bed number
-    that matches that has been edited in bedspaceEditorData. */
-    const objIndex = dataToSave.findIndex(
-      (obj) => obj.bed === bedspaceEditorData.bed
-    );
-    /* If so, return the index of this object in the array */
-    if (objIndex >= 0) {
-      dataToSave[objIndex] = bedspaceEditorData;
-    } else {
-      // If bed doesn't exist, add new one
-      dataToSave.push(bedspaceEditorData);
-    }
-    // send updated data to GridStateContext
-    updateGridData(dataToSave);
-    setNeedsSave(false);
-  };
+  }, [
+    bedspaceEditorData,
+    data,
+    selectedKey,
+    showYesNoDialog,
+    theme.palette.warning.main,
+    updateGridData,
+  ]);
 
   /* Want to reset the data being used in the bedspaceEditor
   to the saved "truth" data, i.e. reset changes back to the 
@@ -369,6 +374,36 @@ const UpdatePage = () => {
   const handleNextBedspaceButton = (reverse) => {
     setCurrentBed(getNextBedspace(data, selectedKey, reverse));
   };
+
+  /* Using this to activate a SAVE action with CTRL + S */
+  const handleKeyDown = useCallback(
+    (event) => {
+      const key = event.key;
+      if (key === "Control") {
+        // do nothing when only Control key is pressed.
+        return;
+      }
+      const keyIsS = key === "s";
+
+      // this is the CTRL + S combination
+      if (keyIsS && event.ctrlKey) {
+        event.preventDefault(); // don't let the browser do the typical CTRL+S action
+        /* If there is data that needsSave, do the save function */
+        if (needsSave) {
+          handleOnSave();
+        }
+      }
+    },
+    [needsSave, handleOnSave]
+  );
+
+  /* Keydown listener */
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown, false);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleKeyDown]);
 
   /* - - - - - RETURN - - - - - */
 
@@ -405,7 +440,7 @@ const UpdatePage = () => {
         }}
         size="small"
         disabled={!needsSave}
-        onClick={(e) => handleOnSave(e)}
+        onClick={handleOnSave}
       >
         Save
       </Button>
