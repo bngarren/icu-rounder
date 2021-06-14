@@ -1,14 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, forwardRef } from "react";
 
-import SaveIcon from "@material-ui/icons/Save";
 import WarningIcon from "@material-ui/icons/Warning";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import {
   Container,
   Grid,
-  IconButton,
-  Tooltip,
-  Zoom,
   Typography,
   Select,
   MenuItem,
@@ -16,7 +12,6 @@ import {
   InputBase,
   Divider,
   Button,
-  createSvgIcon,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 
@@ -36,7 +31,7 @@ import { useGridStateContext } from "../../context/GridState";
 // Utility
 import { isBedEmpty, getDataForBed } from "../../utils/Utility";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -47,11 +42,6 @@ const useStyles = makeStyles({
   sectionTitle: {
     marginTop: "5px",
     marginBottom: "10px",
-    fontWeight: "bold",
-  },
-  saveButton: {
-    color: "#b7d100",
-    transform: "translateY(-5px)",
   },
   inputsGridContainer: {
     flexDirection: "column",
@@ -71,16 +61,10 @@ const useStyles = makeStyles({
     },
     "&$textFieldFocused": {
       backgroundColor: "#fff",
-      borderColor: "#b7d100",
+      borderColor: theme.palette.secondary.main,
     },
   },
   textFieldFocused: {},
-  inputLabel: {
-    color: "#828181",
-    fontSize: "10.5pt",
-    marginBottom: "4px",
-    paddingLeft: "2px",
-  },
   selectInputRoot: {
     paddingLeft: "5px",
   },
@@ -118,7 +102,7 @@ const useStyles = makeStyles({
     fontSize: "13pt",
     marginRight: "2px",
   },
-});
+}));
 
 const SettingsPage = () => {
   const classes = useStyles();
@@ -278,11 +262,12 @@ const SettingsPage = () => {
       </Grid>
 
       <Grid container className={classes.inputsGridContainer}>
-        <Typography className={classes.sectionTitle} variant="h6">
+        <Typography className={classes.sectionTitle} variant="h5">
           General
         </Typography>
         <Grid item className={classes.inputsGridItem}>
           <CustomFormControl
+            label="Bed Layout"
             id="bedLayout"
             initialValue={getPrettyBedLayout(bedLayout)}
             onSave={handleOnSave}
@@ -290,18 +275,18 @@ const SettingsPage = () => {
             <CustomTextField
               id="bedLayoutTextField"
               customStyle={classes}
-              label="Bed Layout"
               fullWidth
               multiline
             />
           </CustomFormControl>
         </Grid>
         <Divider />
-        <Typography className={classes.sectionTitle} variant="h6">
+        <Typography className={classes.sectionTitle} variant="h5">
           Document
         </Typography>
         <Grid item className={classes.inputsGridItem}>
           <CustomFormControl
+            label="Title"
             id="document_title"
             initialValue={settings.document_title}
             onSave={handleOnSave}
@@ -309,31 +294,24 @@ const SettingsPage = () => {
             <CustomTextField
               id="documentTitleTextField"
               customStyle={classes}
-              label="Title"
               fullWidth
             />
           </CustomFormControl>
         </Grid>
         <Grid item className={classes.inputsGridItem}>
-          <InputLabel
-            className={classes.inputLabel}
-            id="document_cols_per_page_label"
-            shrink={false}
-          >
-            Grids per row
-          </InputLabel>
           <CustomFormControl
+            label="Grids per Row"
             id="document_cols_per_page"
             initialValue={settings.document_cols_per_page}
             onSave={handleOnSave}
           >
             <Select
-              labelId="document_cols_per_page_label"
               id="document_cols_per_page"
               classes={{
                 root: classes.selectInputRoot,
                 select: classes.selectInputSelect,
               }}
+              disableUnderline={true}
             >
               <MenuItem value={1}>1</MenuItem>
               <MenuItem value={2}>2</MenuItem>
@@ -345,7 +323,7 @@ const SettingsPage = () => {
         </Grid>
         <Divider />
         <Grid item className={classes.inputsGridItem}>
-          <Typography className={classes.sectionTitle} variant="h6">
+          <Typography className={classes.sectionTitle} variant="h5">
             Export
           </Typography>
           <Typography variant="body2">
@@ -361,6 +339,7 @@ const SettingsPage = () => {
             }}
           >
             <CustomFormControl
+              label="Filename"
               id="export_filename"
               initialValue={settings.export_filename}
               onSave={handleOnSave}
@@ -369,7 +348,6 @@ const SettingsPage = () => {
                 id="exportFilenameTextField"
                 customStyle={classes}
                 style={{ maxWidth: "300px", minWidth: "100px" }}
-                label="Filename"
                 endAdornment={
                   <div className={classes.textEndAdornment}>
                     <Typography variant="caption">.json</Typography>
@@ -390,7 +368,7 @@ const SettingsPage = () => {
         </Grid>
         <Divider />
         <Grid item className={classes.inputsGridItem}>
-          <Typography className={classes.sectionTitle} variant="h6">
+          <Typography className={classes.sectionTitle} variant="h5">
             Import
           </Typography>
           <Typography variant="body2">
@@ -446,7 +424,7 @@ const SettingsPage = () => {
         </Grid>
         <Divider />
         <Grid item className={classes.inputsGridItem}>
-          <Typography className={classes.sectionTitle} variant="h6">
+          <Typography className={classes.sectionTitle} variant="h5">
             Contingencies
           </Typography>
           <Typography variant="body2">
@@ -464,23 +442,11 @@ const SettingsPage = () => {
   );
 };
 
-const CustomTextField = ({
-  id,
-  customStyle: classes,
-  inputProps,
-  label,
-  ...props
-}) => {
-  return (
-    <div>
-      <InputLabel
-        classes={{
-          root: classes.inputLabel,
-        }}
-      >
-        {label}
-      </InputLabel>
+const CustomTextField = forwardRef(
+  ({ customStyle: classes, inputProps, ...props }, ref) => {
+    return (
       <InputBase
+        inputRef={ref}
         classes={{
           root: classes.textFieldRoot,
           focused: classes.textFieldFocused,
@@ -491,9 +457,9 @@ const CustomTextField = ({
         }}
         {...props}
       />
-    </div>
-  );
-};
+    );
+  }
+);
 
 /* Helper function - Since bedLayout is stored as an array, we use the
     reduce function to prettify it for the text input */
