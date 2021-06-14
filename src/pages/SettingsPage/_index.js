@@ -8,7 +8,6 @@ import {
   Typography,
   Select,
   MenuItem,
-  InputLabel,
   InputBase,
   Divider,
   Button,
@@ -88,17 +87,17 @@ const useStyles = makeStyles((theme) => ({
   },
   confirmImportButton: {
     color: "white",
-    backgroundColor: "#ff4747",
+    backgroundColor: theme.palette.warning.main,
   },
   confirmImportText: {
-    color: "#ff4747",
+    color: theme.palette.warning.main,
   },
   followingImportText: {
-    color: "#b7d100",
+    color: theme.palette.primary.main,
     fontSize: "11pt",
   },
   followingImportIcon: {
-    color: "#b7d100",
+    color: theme.palette.primary.main,
     fontSize: "13pt",
     marginRight: "2px",
   },
@@ -330,41 +329,40 @@ const SettingsPage = () => {
             Download the current grid as a .json file.
           </Typography>
           <br />
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "flex-start",
-              alignItems: "flex-end",
-            }}
+          <CustomFormControl
+            label="Filename"
+            id="export_filename"
+            initialValue={settings.export_filename}
+            onSave={handleOnSave}
           >
-            <CustomFormControl
-              label="Filename"
-              id="export_filename"
-              initialValue={settings.export_filename}
-              onSave={handleOnSave}
+            <CustomTextField
+              id="exportFilenameTextField"
+              customStyle={classes}
+              style={{ maxWidth: "300px", minWidth: "100px" }}
+              endAdornment={
+                <div className={classes.textEndAdornment}>
+                  <Typography variant="caption">.json</Typography>
+                </div>
+              }
+              inputProps={{
+                className: classes.exportFilenameTextfieldInput,
+              }}
+            />
+          </CustomFormControl>
+          <br />
+          <Exporter
+            filename={settings.export_filename}
+            onExported={handleOnExport}
+          >
+            <Button
+              variant="contained"
+              color="secondary"
+              disableElevation
+              size="small"
             >
-              <CustomTextField
-                id="exportFilenameTextField"
-                customStyle={classes}
-                style={{ maxWidth: "300px", minWidth: "100px" }}
-                endAdornment={
-                  <div className={classes.textEndAdornment}>
-                    <Typography variant="caption">.json</Typography>
-                  </div>
-                }
-                inputProps={{
-                  className: classes.exportFilenameTextfieldInput,
-                }}
-              />
-            </CustomFormControl>
-            <Exporter
-              filename={settings.export_filename}
-              onExported={handleOnExport}
-            >
-              <Button>Export Grid</Button>
-            </Exporter>
-          </div>
+              Export Grid
+            </Button>
+          </Exporter>
         </Grid>
         <Divider />
         <Grid item className={classes.inputsGridItem}>
@@ -374,7 +372,8 @@ const SettingsPage = () => {
           <Typography variant="body2">
             Upload a previously saved .json file to populate the grid.
           </Typography>
-
+          <br />
+          <Importer onNewDataSelected={handleNewDataImported} />
           <div
             style={{
               display: "flex",
@@ -385,7 +384,7 @@ const SettingsPage = () => {
             }}
           >
             {pendingDataImport ? (
-              <div>
+              <div align="center">
                 <Button
                   className={classes.confirmImportButton}
                   variant="contained"
@@ -399,6 +398,7 @@ const SettingsPage = () => {
                   variant="caption"
                   className={classes.confirmImportText}
                 >
+                  <br />
                   (This will overwrite your current grid. Consider exporting it
                   first.)
                 </Typography>
@@ -419,8 +419,6 @@ const SettingsPage = () => {
               </div>
             )}
           </div>
-
-          <Importer onNewDataSelected={handleNewDataImported} />
         </Grid>
         <Divider />
         <Grid item className={classes.inputsGridItem}>

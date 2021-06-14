@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { TextField, InputBase } from "@material-ui/core";
+import { TextField, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles({
@@ -45,12 +45,25 @@ const Importer = ({ onNewDataSelected = (f) => f }) => {
 
   return (
     <div>
-      <InputBase
+      <input
+        id="inputFile"
         className={classes.inputFile}
         type="file"
         accept="application/json"
+        style={{ display: "none" }}
         onChange={handleImportAction}
       />
+      <label htmlFor="inputFile">
+        <Button
+          variant="contained"
+          color="secondary"
+          component="span"
+          size="small"
+        >
+          Upload
+        </Button>
+        {file && file.name}
+      </label>
       {data && (
         <div>
           <TextField
