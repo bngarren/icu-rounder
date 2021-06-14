@@ -230,12 +230,16 @@ const BedspaceEditor = ({
   every time a keystroke is entered, we debounce it using lodash */
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedOnEditorChange = useCallback(
-    debounce((target, value) => {
-      onEditorDataChange({
-        ...editorDataRef.current, //* use ref here, otherwise stale closure
-        [target]: value || "",
-      });
-    }, debounceInterval), // time interval before allowing onEditorChange to fire
+    debounce(
+      (target, value) => {
+        onEditorDataChange({
+          ...editorDataRef.current, //* use ref here, otherwise stale closure
+          [target]: value || "",
+        });
+      },
+      debounceInterval, // time interval before allowing onEditorChange to fire
+      { leading: true } // doesn't debounce the first time it's called
+    ),
     [onEditorDataChange]
   );
 

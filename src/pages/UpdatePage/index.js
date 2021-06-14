@@ -371,6 +371,55 @@ const UpdatePage = () => {
   };
 
   /* - - - - - RETURN - - - - - */
+
+  const renderToolbar = (
+    <Toolbar variant="dense" className={classes.bedspaceEditorToolbar}>
+      <IconButton
+        disabled={needsSave}
+        className={classes.navigateIconButton}
+        disableRipple
+        onClick={() => handleNextBedspaceButton(true)}
+      >
+        <NavigateBeforeIcon className={classes.navigateIcon} />
+      </IconButton>
+      <Typography
+        variant="h1"
+        className={classes.bedspaceEditorToolbarBedNumber}
+      >
+        {data[selectedKey].bed}
+      </Typography>
+      <IconButton
+        disabled={needsSave}
+        className={classes.navigateIconButton}
+        disableRipple
+        onClick={() => handleNextBedspaceButton(false)}
+      >
+        <NavigateNextIcon className={classes.navigateIcon} />
+      </IconButton>
+      <Button
+        classes={{
+          root: classes.saveButton,
+          disabled: classes.saveButtonDisabled,
+        }}
+        size="small"
+        disabled={!needsSave}
+        onClick={(e) => handleOnSave(e)}
+      >
+        Save
+      </Button>
+      <Button
+        classes={{
+          root: classes.resetButton,
+          disabled: classes.resetButtonDisabled,
+        }}
+        size="small"
+        disabled={!needsSave}
+        onClick={(e) => handleOnReset(e)}
+      >
+        Reset
+      </Button>
+    </Toolbar>
+  );
   if (data != null) {
     return (
       <div>
@@ -414,55 +463,7 @@ const UpdatePage = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <Toolbar
-                    variant="dense"
-                    className={classes.bedspaceEditorToolbar}
-                  >
-                    <IconButton
-                      disabled={needsSave}
-                      className={classes.navigateIconButton}
-                      disableRipple
-                      onClick={() => handleNextBedspaceButton(true)}
-                    >
-                      <NavigateBeforeIcon className={classes.navigateIcon} />
-                    </IconButton>
-                    <Typography
-                      variant="h1"
-                      className={classes.bedspaceEditorToolbarBedNumber}
-                    >
-                      {data[selectedKey].bed}
-                    </Typography>
-                    <IconButton
-                      disabled={needsSave}
-                      className={classes.navigateIconButton}
-                      disableRipple
-                      onClick={() => handleNextBedspaceButton(false)}
-                    >
-                      <NavigateNextIcon className={classes.navigateIcon} />
-                    </IconButton>
-                    <Button
-                      classes={{
-                        root: classes.saveButton,
-                        disabled: classes.saveButtonDisabled,
-                      }}
-                      size="small"
-                      disabled={!needsSave}
-                      onClick={(e) => handleOnSave(e)}
-                    >
-                      Save
-                    </Button>
-                    <Button
-                      classes={{
-                        root: classes.resetButton,
-                        disabled: classes.resetButtonDisabled,
-                      }}
-                      size="small"
-                      disabled={!needsSave}
-                      onClick={(e) => handleOnReset(e)}
-                    >
-                      Reset
-                    </Button>
-                  </Toolbar>
+                  {renderToolbar}
                 </Grid>
                 <Grid
                   item
@@ -481,6 +482,9 @@ const UpdatePage = () => {
                     reset={resetBedspaceEditor}
                     debounceInterval={demoBoxCollapsed ? 500 : 300}
                   />
+                </Grid>
+                <Grid item xs={12}>
+                  {renderToolbar}
                 </Grid>
               </Grid>
             )}
