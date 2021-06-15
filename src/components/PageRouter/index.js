@@ -1,7 +1,7 @@
 import { Switch, Route } from "react-router-dom";
 import HomePage from "../../pages/HomePage";
 import UpdatePage from "../../pages/UpdatePage";
-import SettingsPage from "../../pages/SettingsPage/_index.js";
+import SettingsPage from "../../pages/SettingsPage/index.js";
 import LoginPage from "../../pages/LoginPage";
 import DocumentPage from "../../pages/DocumentPage";
 

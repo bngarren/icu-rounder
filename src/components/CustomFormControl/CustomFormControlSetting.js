@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CustomFormControl = ({
+const CustomFormControlSetting = ({
   label,
   initialValue,
   id,
@@ -158,4 +158,4 @@ const CustomFormControl = ({
   ); */
 };
 
-export default CustomFormControl;
+export default CustomFormControlSetting;

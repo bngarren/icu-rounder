@@ -9,6 +9,8 @@ import { getCursorPos, setCursorPos } from "../../utils/CursorPos";
 import { usePopupState } from "material-ui-popup-state/hooks";
 import SnippetPopover from "../SnippetPopover";
 
+// Components
+import CustomFormControlEditor from "../../components/CustomFormControl/CustomFormControlEditor";
 import ContingencyInput from "../ContingencyInput";
 
 // Settings context
@@ -87,39 +89,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CustomTextField = ({
-  id,
-  customStyle: classes,
-  reset = false,
-  forcedValue = "",
-  sendInputChange = (f) => f,
-  ...props
-}) => {
-  const [value, setValue] = useState("");
-
-  /* If the reset prop is toggled, reset this component's
-  state to the "forced value" or the default value we want
-  the input to display  */
-  useEffect(() => {
-    setValue(forcedValue);
-  }, [forcedValue, reset]);
-
-  /**
-   *
-   * @param {object} e Event object
-   * @param {*} id This TextField's id, so that we can send callback to parent component
-   * that this specific TextField has changed its input value
-   */
-  const handleInputChange = (e, id) => {
-    const val = e.target.value;
-    setValue(val);
-    sendInputChange(id, val);
-  };
-
+const CustomTextField = ({ id, customStyle: classes, ...props }) => {
   return (
     <TextField
-      onChange={(e) => handleInputChange(e, id)}
-      value={value}
       InputProps={{
         classes: {
           root: classes.textFieldRoot,
@@ -162,34 +134,6 @@ const BedspaceEditor = ({
     _setEditorData(data);
   };
 
-  // Toggle this ref value to force a re-render in components with this passed as a prop
-  // ! yes it's hacky
-  const forceValue = useRef(false);
-  const toggleForceValue = () => {
-    forceValue.current = !forceValue.current;
-  };
-
-  /* Easily set all the forced values for our inputs with one function, passing in a 
-  data object that has a value for each input field */
-  const getForcedValues = (data) => {
-    return (
-      data && {
-        bed: data.bed ? data.bed : "",
-        lastName: data.lastName ? data.lastName : "",
-        firstName: data.firstName ? data.firstName : "",
-        teamNumber: data.teamNumber ? data.teamNumber : "",
-        oneLiner: data.oneLiner ? data.oneLiner : "",
-        contingencies: data.contingencies ? data.contingencies : [],
-        body: data.body ? data.body : "",
-        bottomText: data.bottomText ? data.bottomText : "",
-      }
-    );
-  };
-
-  /* These are the values we can reset our input fields to reflect, e.g,
-  when default values need to be populated or the reset button is clicked */
-  const forcedValues = useRef(getForcedValues(defaultValues));
-
   /* Ref to last name input field, so we can focus() here when a bed is selected */
   const lastNameInputRef = useRef();
 
@@ -207,18 +151,7 @@ const BedspaceEditor = ({
   useEffect(() => {
     // Update our editor's bedspace data (JSON object)
     setEditorData(propData);
-
-    // Force out input fields to match this new truth data
-    forcedValues.current = getForcedValues(propData);
   }, [propData]);
-
-  /* When a new bedspace is selected or the reset button is clicked,
-  the input fields need to be repopulated with the "default data" which is
-  just the "truth"/saved data from UpdatePage */
-  useEffect(() => {
-    forcedValues.current = getForcedValues(defaultValues);
-    toggleForceValue();
-  }, [defaultValues, reset]);
 
   /* When a new bedspace is selected, focus() on the last name input */
   useEffect(() => {
@@ -337,31 +270,34 @@ const BedspaceEditor = ({
     };
   }, [handleKeyDown]);
 
+  const onDiffChange = useCallback((id, diff) => {
+    console.log(`Input "${id}" diff=${diff}`);
+  }, []);
+
   /*  - - - - - RETURN - - - -  */
   if (editorData) {
     return (
       <Paper className={classes.editorRoot}>
         <form className={classes.form} autoComplete="off" spellCheck="false">
           <div>
-            <CustomTextField
+            <CustomFormControlEditor
               id="bed"
-              className={classes.textFieldBed}
-              label="Bed"
-              variant="filled"
-              reset={forceValue.current}
-              forcedValue={forcedValues.current.bed}
-              sendInputChange={handleInputChange}
-              size="small"
-              customStyle={classes}
-            ></CustomTextField>
+              initialValue={editorData.bed}
+              onDiffChange={onDiffChange}
+            >
+              <CustomTextField
+                className={classes.textFieldBed}
+                label="Bed"
+                variant="filled"
+                size="small"
+                customStyle={classes}
+              ></CustomTextField>
+            </CustomFormControlEditor>
             <CustomTextField
               id="lastName"
               className={classes.textFieldLastNameFirstName}
               label="Last Name"
               variant="filled"
-              reset={forceValue.current}
-              forcedValue={forcedValues.current.lastName}
-              sendInputChange={handleInputChange}
               size="small"
               customStyle={classes}
               autoFocus
@@ -372,9 +308,6 @@ const BedspaceEditor = ({
               className={classes.textFieldLastNameFirstName}
               label="First Name"
               variant="filled"
-              reset={forceValue.current}
-              forcedValue={forcedValues.current.firstName}
-              sendInputChange={handleInputChange}
               size="small"
               customStyle={classes}
             ></CustomTextField>
@@ -383,9 +316,6 @@ const BedspaceEditor = ({
               className={classes.textFieldTeam}
               label="Team"
               variant="filled"
-              reset={forceValue.current}
-              forcedValue={forcedValues.current.teamNumber}
-              sendInputChange={handleInputChange}
               size="small"
               customStyle={classes}
             ></CustomTextField>
@@ -396,9 +326,6 @@ const BedspaceEditor = ({
               className={classes.textFieldOneLiner}
               label="One Liner"
               variant="filled"
-              reset={forceValue.current}
-              forcedValue={forcedValues.current.oneLiner}
-              sendInputChange={handleInputChange}
               multiline
               rows={2}
               customStyle={classes}
@@ -407,9 +334,6 @@ const BedspaceEditor = ({
               {
                 <ContingencyInput
                   customStyle={classes}
-                  reset={forceValue.current}
-                  forcedValue={forcedValues.current.contingencies}
-                  sendInputChange={handleInputChange}
                   options={settings.contingencyOptions}
                 />
               }
@@ -419,9 +343,6 @@ const BedspaceEditor = ({
               className={classes.textFieldBody}
               label="Content"
               variant="filled"
-              reset={forceValue.current}
-              forcedValue={forcedValues.current.body}
-              sendInputChange={handleInputChange}
               multiline
               rows={10}
               customStyle={classes}
@@ -431,9 +352,6 @@ const BedspaceEditor = ({
               className={classes.textFieldBottomText}
               label="Bottom Right Text"
               variant="filled"
-              reset={forceValue.current}
-              forcedValue={forcedValues.current.bottomText}
-              sendInputChange={handleInputChange}
               customStyle={classes}
             ></CustomTextField>
           </div>

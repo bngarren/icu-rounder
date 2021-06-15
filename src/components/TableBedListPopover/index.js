@@ -43,7 +43,6 @@ const TableBedListPopover = ({
             Clear
           </MenuItem>
         )}
-        <Divider />
         <MenuItem
           className={classes.menuItem}
           onClick={handleSelectDelete}
