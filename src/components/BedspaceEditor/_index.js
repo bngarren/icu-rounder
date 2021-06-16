@@ -116,7 +116,8 @@ const CustomTextField = ({ id, customStyle: classes, ...props }) => {
 };
 
 const BedspaceEditor = ({
-  data: propData,
+  data,
+  dataRef,
   defaultValues,
   reset,
   onEditorDataChange = (f) => f,
@@ -128,16 +129,6 @@ const BedspaceEditor = ({
 
   const { settings } = useSettings();
 
-  const [editorData, _setEditorData] = useState();
-
-  /* Create a ref and updater function to fix stale closure problem
-  E.g., see debouncedOnEditorChange function  */
-  const editorDataRef = useRef(editorData);
-  const setEditorData = (data) => {
-    editorDataRef.current = data;
-    _setEditorData(data);
-  };
-
   /* For each input in the Editor, tracks whether it needs a save or not */
   const [unsavedData, _setUnsavedData] = useState([]);
 
@@ -147,8 +138,7 @@ const BedspaceEditor = ({
       if it doesn't already exist */
       _setUnsavedData((prevValue) => {
         if (prevValue.indexOf(id) === -1) {
-          prevValue.push(id);
-          return prevValue;
+          return prevValue.concat([id]);
         } else {
           return prevValue;
         }
@@ -163,10 +153,16 @@ const BedspaceEditor = ({
 
   const clearUnsavedData = () => _setUnsavedData([]);
 
+  /* Callback sent as prop to each CustomFormControlEditor component so
+  that this component knows when a change has occured that needs a save */
+  const onDiffChange = useCallback((id, diff) => {
+    setInputSavedStatus(id, diff);
+  }, []);
+
   /* If the Editor is aware of the unsavedData array changing, let the parent component know */
   useEffect(() => {
     setNeedsSave(unsavedData.length > 0);
-  }, [unsavedData.length]);
+  }, [unsavedData.length, setNeedsSave]);
 
   /* Ref to last name input field, so we can focus() here when a bed is selected */
   const lastNameInputRef = useRef();
@@ -178,14 +174,6 @@ const BedspaceEditor = ({
     pos: null,
     element: null,
   });
-
-  /* When a new bedspace is selected by the user (in UpdatePage) or
-   new bedspace data comes through as prop, update this component's
-   state */
-  useEffect(() => {
-    // Update our editor's bedspace data (JSON object)
-    setEditorData(propData);
-  }, [propData]);
 
   /* When a new bedspace is selected...*/
   useEffect(() => {
@@ -219,7 +207,7 @@ const BedspaceEditor = ({
   // the function we want to debounce
   debouncedOnEditorChangeFunction.current = (target, value) => {
     onEditorDataChange({
-      ...editorDataRef.current, //* use ref here, otherwise stale closure
+      ...dataRef.current, //* use ref here, otherwise stale closure
       [target]: value || "",
     });
   };
@@ -244,12 +232,6 @@ const BedspaceEditor = ({
     },
     [debouncedOnEditorChange]
   );
-
-  /* Callback sent as prop to each CustomFormControlEditor component so
-  that this component knows when a change has occured that needs a save */
-  const onDiffChange = useCallback((id, diff) => {
-    setInputSavedStatus(id, diff);
-  }, []);
 
   /* The user has selected a snippet to insert */
   const onSnippetSelected = (snippet) => {
@@ -337,7 +319,7 @@ const BedspaceEditor = ({
   }, [handleKeyDown]);
 
   /*  - - - - - RETURN - - - -  */
-  if (editorData) {
+  if (data) {
     return (
       <Paper className={classes.editorRoot}>
         <form className={classes.form} autoComplete="off" spellCheck="false">

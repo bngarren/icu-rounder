@@ -85,13 +85,20 @@ const DemoAndEditorController = ({
   /* Holds the Editor's own version of this bedspace's data
    - initialize it with the defaultBedData (e.g. a new bedspace has been selected)
   */
-  const [bedspaceEditorData, setBedspaceEditorData] = useState(defaultBedData); // i.e. "Working" data
+  const [bedspaceEditorData, _setBedspaceEditorData] = useState(defaultBedData); // i.e. "Working" data
+
+  const bedspaceEditorDataRef = useRef(bedspaceEditorData);
+
+  const setBedspaceEditorData = (data) => {
+    _setBedspaceEditorData(data);
+    bedspaceEditorDataRef.current = data;
+  };
 
   /* Keep the editor's data up to date with the truth data */
   useEffect(() => {
     setBedspaceEditorData(defaultBedData);
     setNeedsSave(false);
-  }, [defaultBedData]);
+  }, [defaultBedData, setNeedsSave]);
 
   /* When a change in the BedspaceEditor's data occurs, it
   sends the new bedspace JSON object here.  */
@@ -129,7 +136,7 @@ const DemoAndEditorController = ({
         event.preventDefault(); // don't let the browser do the typical CTRL+S action
         /* If there is data that needsSave, do the save function */
         if (needsSave) {
-          onSave(bedspaceEditorData);
+          onSave(bedspaceEditorDataRef.current);
         }
       }
     },
@@ -232,6 +239,7 @@ const DemoAndEditorController = ({
       >
         <BedspaceEditor
           data={bedspaceEditorData}
+          dataRef={bedspaceEditorDataRef}
           defaultValues={defaultBedData}
           onEditorDataChange={handleOnEditorDataChange}
           setNeedsSave={setNeedsSave}
