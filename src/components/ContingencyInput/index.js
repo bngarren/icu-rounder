@@ -51,13 +51,13 @@ const useStyles = makeStyles({
 const ContingencyInput = ({
   customStyle: textFieldClasses,
   options,
+  value,
   ...props
 }) => {
   const classes = useStyles();
 
   return (
     <Autocomplete
-      {...props}
       debug={false}
       classes={{
         popper: classes.popper,
@@ -115,6 +115,8 @@ const ContingencyInput = ({
           {option}
         </div>
       )}
+      {...props}
+      value={value ? value : []}
     />
   );
 };

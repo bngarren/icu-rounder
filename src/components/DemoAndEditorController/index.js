@@ -101,9 +101,9 @@ const DemoAndEditorController = ({
 
   /* When a change in the BedspaceEditor's data occurs, it
   sends the new bedspace JSON object here.  */
-  const handleOnEditorDataChange = (newBedspaceData) => {
+  const handleOnEditorDataChange = useCallback((newBedspaceData) => {
     setBedspaceEditorData(newBedspaceData);
-  };
+  }, []);
 
   /* Track the toggle state of DemoBox collapsed status,
   helpful for setting debounce interval in BedspaceEditor 

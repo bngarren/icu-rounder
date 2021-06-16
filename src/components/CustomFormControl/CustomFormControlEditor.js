@@ -38,19 +38,22 @@ const CustomFormControlEditor = ({
   Since some components differ in the parameters they send to their onChange callback, 
   i.e. Autocomplete, we receive all possible ...args here, and choose the one
   we want. HACKY, but works for now. */
-  const handleOnChange = (...args) => {
-    const val =
-      onChangeArgument === 0
-        ? args[onChangeArgument].target.value
-        : args[onChangeArgument];
+  const handleOnChange = useCallback(
+    (...args) => {
+      const val =
+        onChangeArgument === 0
+          ? args[onChangeArgument].target.value
+          : args[onChangeArgument];
 
-    setDiff(!(val === initialValue));
+      setDiff(!(val === initialValue));
 
-    setValue(val);
+      setValue(val);
 
-    // notify parent
-    onInputChange(id, val);
-  };
+      // notify parent
+      onInputChange(id, val);
+    },
+    [id, initialValue, onChangeArgument, onInputChange]
+  );
 
   const childElement = cloneElement(children, {
     value: value,
