@@ -23,8 +23,11 @@ const CustomFormControlEditor = ({
     id: id,
   });
 
+  /* Each time a default value comes through as a prop,
+  reset this component's value to that, and set diff to false */
   useEffect(() => {
     setValue(initialValue);
+    setDiff(false);
   }, [initialValue]);
 
   /* 

@@ -159,6 +159,8 @@ const BedspaceEditor = ({
     }
   };
 
+  const clearUnsavedData = () => _setUnsavedData([]);
+
   /* If the Editor is aware of the unsavedData array changing, let the parent component know */
   useEffect(() => {
     setNeedsSave(unsavedData.length > 0);
@@ -183,8 +185,12 @@ const BedspaceEditor = ({
     setEditorData(propData);
   }, [propData]);
 
-  /* When a new bedspace is selected, focus() on the last name input */
+  /* When a new bedspace is selected...*/
   useEffect(() => {
+    // Reset the unsavedData array because this new data shouldn't have any 'unsaved' status
+    clearUnsavedData();
+
+    // Focus on the lastName input
     if (lastNameInputRef?.current) lastNameInputRef.current.focus();
   }, [defaultValues]);
 

@@ -90,6 +90,7 @@ const DemoAndEditorController = ({
   /* Keep the editor's data up to date with the truth data */
   useEffect(() => {
     setBedspaceEditorData(defaultBedData);
+    setNeedsSave(false);
   }, [defaultBedData]);
 
   /* When a change in the BedspaceEditor's data occurs, it
