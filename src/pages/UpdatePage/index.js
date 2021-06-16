@@ -16,7 +16,7 @@ import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 // Components
 import TableBedList from "../../components/TableBedList";
 import DemoBox from "../../components/DemoBox";
-import BedspaceEditor from "../../components/BedspaceEditor";
+import BedspaceEditor from "../../components/BedspaceEditor/_index.js";
 import { useDialog } from "../../components/Dialog";
 
 // Firebase
@@ -270,6 +270,7 @@ const UpdatePage = () => {
    * will update the state in UpdatePage and toggle the needsSave boolean
    */
   const handleOnEditorDataChange = (newBedspaceData) => {
+    console.log(`handleOnEditorDataChange`);
     setBedspaceEditorData(newBedspaceData);
     setNeedsSave(true);
   };
@@ -517,7 +518,7 @@ const UpdatePage = () => {
                     defaultValues={data[selectedKey]}
                     onEditorDataChange={handleOnEditorDataChange}
                     reset={resetBedspaceEditor}
-                    debounceInterval={demoBoxCollapsed ? 500 : 300}
+                    debounceInterval={demoBoxCollapsed ? 600 : 400}
                   />
                 </Grid>
                 <Grid item xs={12}>

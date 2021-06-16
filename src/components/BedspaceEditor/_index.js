@@ -15,6 +15,7 @@ import ContingencyInput from "../ContingencyInput";
 
 // Settings context
 import { useSettings } from "../../context/Settings";
+import { ContactsOutlined } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   editorRoot: {
@@ -158,24 +159,46 @@ const BedspaceEditor = ({
     if (lastNameInputRef?.current) lastNameInputRef.current.focus();
   }, [defaultValues]);
 
-  /* Since we don't want to run the onEditorDataChange function
-  every time a keystroke is entered, we debounce it using lodash */
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  /* 
+  
+  Since we don't want to run the onEditorDataChange function
+  every time a keystroke is entered, we debounce it using lodash 
+  
+  We use a ref to memoize the debounced function so that the function is only created
+  once, but avoids stale data
+
+  This stores the current instance of the function to be debounced in a ref,
+  and updates it every render (preventing stale data). Instead of
+  debouncing that function directly, though, we debounce a wrapper function
+  that reads the current version from the ref and calls it.
+
+  https://stackoverflow.com/questions/59183495/cant-get-lodash-debounce-to-work-properly-executed-multiple-times-reac
+
+
+  */
+
+  const debouncedOnEditorChangeFunction = useRef();
+
+  // the function we want to debounce
+  debouncedOnEditorChangeFunction.current = (target, value) => {
+    onEditorDataChange({
+      ...editorDataRef.current, //* use ref here, otherwise stale closure
+      [target]: value || "",
+    });
+  };
+
+  // the debounced function
   const debouncedOnEditorChange = useCallback(
     debounce(
-      (target, value) => {
-        onEditorDataChange({
-          ...editorDataRef.current, //* use ref here, otherwise stale closure
-          [target]: value || "",
-        });
-      },
+      debouncedOnEditorChangeFunction.current,
       debounceInterval, // time interval before allowing onEditorChange to fire
       { leading: true } // doesn't debounce the first time it's called
     ),
-    [onEditorDataChange]
+    []
   );
 
-  /*  Handles the onChange callbacks for all these input fields */
+  /*  Handles the onInputChange callbacks for all the inputs, via a prop
+  passed through CustomFormControlEditor component which wraps the input */
   const handleInputChange = useCallback(
     (target, value) => {
       /* Will eventually send the data back to parent component (UpdatePage), but
@@ -184,6 +207,12 @@ const BedspaceEditor = ({
     },
     [debouncedOnEditorChange]
   );
+
+  /* Callback sent as prop to each CustomFormControlEditor component so
+  that this component knows when a change has occured that needs a save */
+  const onDiffChange = useCallback((id, diff) => {
+    console.log(`Input "${id}" diff=${diff}`);
+  }, []);
 
   /* The user has selected a snippet to insert */
   const onSnippetSelected = (snippet) => {
@@ -270,10 +299,6 @@ const BedspaceEditor = ({
     };
   }, [handleKeyDown]);
 
-  const onDiffChange = useCallback((id, diff) => {
-    console.log(`Input "${id}" diff=${diff}`);
-  }, []);
-
   /*  - - - - - RETURN - - - -  */
   if (editorData) {
     return (
@@ -282,7 +307,8 @@ const BedspaceEditor = ({
           <div>
             <CustomFormControlEditor
               id="bed"
-              initialValue={editorData.bed}
+              initialValue={defaultValues.bed || ""}
+              onInputChange={handleInputChange}
               onDiffChange={onDiffChange}
             >
               <CustomTextField
@@ -291,69 +317,103 @@ const BedspaceEditor = ({
                 variant="filled"
                 size="small"
                 customStyle={classes}
-              ></CustomTextField>
+              />
             </CustomFormControlEditor>
-            <CustomTextField
+            <CustomFormControlEditor
               id="lastName"
-              className={classes.textFieldLastNameFirstName}
-              label="Last Name"
-              variant="filled"
-              size="small"
-              customStyle={classes}
-              autoFocus
-              inputRef={lastNameInputRef}
-            ></CustomTextField>
-            <CustomTextField
+              initialValue={defaultValues.lastName || ""}
+              onInputChange={handleInputChange}
+              onDiffChange={onDiffChange}
+            >
+              <CustomTextField
+                className={classes.textFieldLastNameFirstName}
+                label="Last Name"
+                variant="filled"
+                size="small"
+                customStyle={classes}
+                autoFocus
+                inputRef={lastNameInputRef}
+              />
+            </CustomFormControlEditor>
+            <CustomFormControlEditor
               id="firstName"
-              className={classes.textFieldLastNameFirstName}
-              label="First Name"
-              variant="filled"
-              size="small"
-              customStyle={classes}
-            ></CustomTextField>
-            <CustomTextField
+              initialValue={defaultValues.firstName || ""}
+              onInputChange={handleInputChange}
+              onDiffChange={onDiffChange}
+            >
+              <CustomTextField
+                className={classes.textFieldLastNameFirstName}
+                label="First Name"
+                variant="filled"
+                size="small"
+                customStyle={classes}
+              />
+            </CustomFormControlEditor>
+            <CustomFormControlEditor
               id="teamNumber"
-              className={classes.textFieldTeam}
-              label="Team"
-              variant="filled"
-              size="small"
-              customStyle={classes}
-            ></CustomTextField>
+              initialValue={defaultValues.teamNumber || ""}
+              onInputChange={handleInputChange}
+              onDiffChange={onDiffChange}
+            >
+              <CustomTextField
+                className={classes.textFieldTeam}
+                label="Team"
+                variant="filled"
+                size="small"
+                customStyle={classes}
+              />
+            </CustomFormControlEditor>
           </div>
           <div>
-            <CustomTextField
+            <CustomFormControlEditor
               id="oneLiner"
-              className={classes.textFieldOneLiner}
-              label="One Liner"
-              variant="filled"
-              multiline
-              rows={2}
-              customStyle={classes}
-            ></CustomTextField>
+              initialValue={defaultValues.oneLiner || ""}
+              onInputChange={handleInputChange}
+              onDiffChange={onDiffChange}
+            >
+              <CustomTextField
+                className={classes.textFieldOneLiner}
+                label="One Liner"
+                variant="filled"
+                multiline
+                rows={2}
+                customStyle={classes}
+              />
+            </CustomFormControlEditor>
             <div className={classes.contingenciesRoot}>
-              {
-                <ContingencyInput
+              {/* <ContingencyInput
                   customStyle={classes}
                   options={settings.contingencyOptions}
-                />
-              }
+                /> */}
             </div>
-            <CustomTextField
+            <CustomFormControlEditor
               id="body"
-              className={classes.textFieldBody}
-              label="Content"
-              variant="filled"
-              multiline
-              rows={10}
-              customStyle={classes}
-            ></CustomTextField>
-            <CustomTextField
+              initialValue={defaultValues.body || ""}
+              onInputChange={handleInputChange}
+              onDiffChange={onDiffChange}
+            >
+              <CustomTextField
+                className={classes.textFieldBody}
+                label="Content"
+                variant="filled"
+                multiline
+                rows={10}
+                customStyle={classes}
+              />
+            </CustomFormControlEditor>
+            <CustomFormControlEditor
               id="bottomText"
-              className={classes.textFieldBottomText}
-              label="Bottom Right Text"
-              variant="filled"
-              customStyle={classes}
-            ></CustomTextField>
+              initialValue={defaultValues.bottomText || ""}
+              onInputChange={handleInputChange}
+              onDiffChange={onDiffChange}
+            >
+              <CustomTextField
+                className={classes.textFieldBottomText}
+                label="Bottom Right Text"
+                variant="filled"
+                customStyle={classes}
+              />
+            </CustomFormControlEditor>
           </div>
         </form>
         <SnippetPopover popupState={popupState} onSelect={onSnippetSelected} />

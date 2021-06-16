@@ -225,24 +225,46 @@ const BedspaceEditor = ({
     if (lastNameInputRef?.current) lastNameInputRef.current.focus();
   }, [defaultValues]);
 
-  /* Since we don't want to run the onEditorDataChange function
-  every time a keystroke is entered, we debounce it using lodash */
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  /* 
+  
+  Since we don't want to run the onEditorDataChange function
+  every time a keystroke is entered, we debounce it using lodash 
+  
+  We use a ref to memoize the debounced function so that the function is only created
+  once, but avoids stale data
+
+  This stores the current instance of the function to be debounced in a ref,
+  and updates it every render (preventing stale data). Instead of
+  debouncing that function directly, though, we debounce a wrapper function
+  that reads the current version from the ref and calls it.
+
+  https://stackoverflow.com/questions/59183495/cant-get-lodash-debounce-to-work-properly-executed-multiple-times-reac
+
+
+  */
+
+  const debouncedOnEditorChangeFunction = useRef();
+
+  // the function we want to debounce
+  debouncedOnEditorChangeFunction.current = (target, value) => {
+    onEditorDataChange({
+      ...editorDataRef.current, //* use ref here, otherwise stale closure
+      [target]: value || "",
+    });
+  };
+
+  // the debounced function
   const debouncedOnEditorChange = useCallback(
     debounce(
-      (target, value) => {
-        onEditorDataChange({
-          ...editorDataRef.current, //* use ref here, otherwise stale closure
-          [target]: value || "",
-        });
-      },
+      debouncedOnEditorChangeFunction.current,
       debounceInterval, // time interval before allowing onEditorChange to fire
       { leading: true } // doesn't debounce the first time it's called
     ),
-    [onEditorDataChange]
+    []
   );
 
-  /*  Handles the onChange callbacks for all these input fields */
+  /*  Handles the onInputChange callbacks for all the inputs, via a prop
+  passed through CustomFormControlEditor component which wraps the input */
   const handleInputChange = useCallback(
     (target, value) => {
       /* Will eventually send the data back to parent component (UpdatePage), but

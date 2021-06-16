@@ -1,11 +1,15 @@
-import { useState, useEffect, cloneElement } from "react";
+import { useState, useEffect, cloneElement, useCallback } from "react";
 import { makeStyles } from "@material-ui/styles";
+
+// lodash
+import { debounce } from "lodash";
 
 const useStyles = makeStyles((theme) => ({}));
 
 const CustomFormControlEditor = ({
   initialValue,
   id,
+  onInputChange = (f) => f,
   onDiffChange = (f) => f,
   children,
 }) => {
@@ -32,19 +36,19 @@ const CustomFormControlEditor = ({
   **
   */
   useEffect(() => {
-    onDiffChange(id, diff);
+    //onDiffChange(id, diff);
   }, [diff, id, onDiffChange]);
 
   const handleOnChange = (val) => {
-    if (val === initialValue) {
-      setDiff(false);
-    } else {
-      setDiff(true);
-    }
+    setDiff(!(val === initialValue));
+
     setValue(val);
+
+    // notify parent
+    onInputChange(id, val);
   };
 
-  return { childElement };
+  return <>{childElement}</>;
 };
 
 export default CustomFormControlEditor;
