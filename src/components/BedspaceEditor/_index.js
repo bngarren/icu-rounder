@@ -120,11 +120,12 @@ const BedspaceEditor = ({
   defaultValues,
   reset,
   onEditorDataChange = (f) => f,
+  setNeedsSave = (f) => f,
   debounceInterval,
 }) => {
   const theme = useTheme();
   const classes = useStyles(theme);
-  const { settings } = useSettings();
+
   const [editorData, _setEditorData] = useState();
 
   /* Create a ref and updater function to fix stale closure problem
@@ -134,6 +135,34 @@ const BedspaceEditor = ({
     editorDataRef.current = data;
     _setEditorData(data);
   };
+
+  /* For each input in the Editor, tracks whether it needs a save or not */
+  const [unsavedData, _setUnsavedData] = useState([]);
+
+  const setInputSavedStatus = (id, unsaved) => {
+    if (unsaved) {
+      /* If this input is now 'unsaved', add to the unsavedData array, only
+      if it doesn't already exist */
+      _setUnsavedData((prevValue) => {
+        if (prevValue.indexOf(id) === -1) {
+          prevValue.push(id);
+          return prevValue;
+        } else {
+          return prevValue;
+        }
+      });
+    } else {
+      /* If this input is now 'saved', remove it from the unsavedData array */
+      _setUnsavedData((prevValue) => {
+        return prevValue.filter((value) => value !== id);
+      });
+    }
+  };
+
+  /* If the Editor is aware of the unsavedData array changing, let the parent component know */
+  useEffect(() => {
+    setNeedsSave(unsavedData.length > 0);
+  }, [unsavedData.length]);
 
   /* Ref to last name input field, so we can focus() here when a bed is selected */
   const lastNameInputRef = useRef();
@@ -211,7 +240,7 @@ const BedspaceEditor = ({
   /* Callback sent as prop to each CustomFormControlEditor component so
   that this component knows when a change has occured that needs a save */
   const onDiffChange = useCallback((id, diff) => {
-    console.log(`Input "${id}" diff=${diff}`);
+    setInputSavedStatus(id, diff);
   }, []);
 
   /* The user has selected a snippet to insert */

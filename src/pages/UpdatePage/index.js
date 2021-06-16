@@ -15,97 +15,40 @@ import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 
 // Components
 import TableBedList from "../../components/TableBedList";
-import DemoBox from "../../components/DemoBox";
-import BedspaceEditor from "../../components/BedspaceEditor/_index.js";
+import DemoAndEditorController from "../../components/DemoAndEditorController";
 import { useDialog } from "../../components/Dialog";
 
 // Firebase
 import { useAuthStateContext } from "../../context/AuthState";
 import { useGridStateContext } from "../../context/GridState";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    padding: "0 1vw",
-    justifyContent: "center",
-  },
-  bedspaceEditorToolbar: {
-    borderBottom: "2px solid #f6f8fa",
-  },
-  bedspaceEditorToolbarBedNumber: {
-    color: "#8c888821",
-  },
-  navigateIconButton: {
-    color: theme.palette.secondary.veryLight,
-    padding: 5,
-    "&:hover": {
-      color: theme.palette.secondary.light,
-      cursor: "pointer",
-      backgroundColor: "transparent",
-    },
-  },
-  navigateIcon: {
-    fontSize: "50px",
-  },
-  saveButton: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText,
-    "&:hover": {
-      backgroundColor: theme.palette.primary.light,
-      color: theme.palette.primary.contrastText,
-    },
-    marginRight: "3px",
-  },
-  saveButtonDisabled: {
-    backgroundColor: "#f4f4f466",
-  },
-  resetButton: {
-    backgroundColor: theme.palette.secondary.main,
-    color: theme.palette.secondary.contrastText,
-    "&:hover": {
-      backgroundColor: theme.palette.secondary.light,
-      color: theme.palette.secondary.contrastText,
-    },
-    marginRight: "3px",
-  },
-  resetButtonDisabled: {
-    backgroundColor: "#f4f4f466",
-  },
-  bedspaceEditorGridItem: {
-    background: "white",
-  },
-  bedspaceEditorGridItemNeedsSave: {
-    background:
-      "repeating-linear-gradient( -45deg, #017c820a, #017c820a 10px, #fff0 5px, #0000 20px )",
-  },
-}));
+const useStyles = makeStyles((theme) => ({}));
 
 /* This holds the functions we pass way down to the TableBedList's buttons */
 export const BedActionsContext = createContext();
 
 const UpdatePage = () => {
   const theme = useTheme();
-  const classes = useStyles(theme);
+  const classes = useStyles();
+
+  // Media queries for CSS
   const media_atleast_lg = useMediaQuery("(min-width:1280px)");
   const media_atleast_md = useMediaQuery("(min-width:960px)");
 
+  // The truth GridState and gridData
   const { gridData, updateGridData } = useGridStateContext();
+
+  // Authentication
   const { authState, userIsLoggedIn } = useAuthStateContext();
 
   /* This "data" should match the gridData 
   TODO Should be able to just use gridData from the context without creating a local state variable */
   const [data, setData] = useState(null);
-  const [bedspaceEditorData, setBedspaceEditorData] = useState(); // i.e. "Working" data
   const [selectedKey, setSelectedKey] = useState(); // index of the bedspace being "edited"
   const [needsSave, setNeedsSave] = useState(false); // true, if an unsaved changed has occurred in bedspaceEditor
-  const [resetBedspaceEditor, setResetBedspaceEditor] = useState(false); // value not important, just using it to trigger re-render
 
   /* Hook for our Dialog modal */
   const { dialogIsOpen, dialog, showYesNoDialog } = useDialog();
-
-  /* Track the toggle state of DemoBox collapsed status,
-  helpful for setting debounce interval in BedspaceEditor 
-  i.e., if demobox is not visible, the debounce interval can be higher */
-  const [demoBoxCollapsed, setDemoBoxCollapsed] = useState(true);
 
   /* Used as a target for the scrollToElement(), in order to put
  the BedspaceEditor into view after clicking the edit icon on smaller screens */
@@ -119,9 +62,19 @@ const UpdatePage = () => {
   const setCurrentBed = (key) => {
     // This is the key of the data array that corresponds to this selected bedspace
     setSelectedKey(key);
-    /* When a new bed is selected, copy the truth data's (data) JSON object for this
-    selected bedspace to the bedspaceEditorData */
-    setBedspaceEditorData(data[key]);
+  };
+
+  /* 
+  - - - NAVIGATION - - -
+  
+  Handles the < and > buttons for selecting the previous or next bedspace.
+  Calls setCurrentBed which updates the selectedKey and BedspaceEditorData */
+  /**
+   *
+   * @param {boolean} reverse If true, move backwards a bedspace. If false, move forwards.
+   */
+  const navigateNextBedspace = (reverse) => {
+    setCurrentBed(getNextBedspace(data, selectedKey, reverse));
   };
 
   const handleBedActionEdit = (key) => {
@@ -212,7 +165,6 @@ const UpdatePage = () => {
         updatedData[key] = { bed: updatedData[key].bed };
         console.log(`Cleared bedspace: ${updatedData[key].bed}`);
         updateGridData(updatedData); //send new data to GridStateContext (handles truth data)
-        setBedspaceEditorData(updatedData[key]); // should clear the bedspaceEditor data
         setNeedsSave(false);
       },
       () => {
@@ -251,7 +203,6 @@ const UpdatePage = () => {
         let deleted = updatedData.splice(key, 1);
         console.log(`Removed bedspace: ${JSON.stringify(deleted)}`);
         updateGridData(updatedData); //send new data to GridStateContext (handles truth data)
-        setBedspaceEditorData(updatedData[key]); // should clear the bedspaceEditor data
         setNeedsSave(false);
         setSelectedKey(null);
       },
@@ -262,202 +213,91 @@ const UpdatePage = () => {
     );
   };
 
-  /* When a change in the BedspaceEditor's data occurs, it
-  sends the new bedspace JSON object here.  */
-  /**
-   *
-   * @param {object} newBedspaceData Given an object containing the data for a single bedspace,
-   * will update the state in UpdatePage and toggle the needsSave boolean
-   */
-  const handleOnEditorDataChange = (newBedspaceData) => {
-    console.log(`handleOnEditorDataChange`);
-    setBedspaceEditorData(newBedspaceData);
-    setNeedsSave(true);
-  };
-
   /* This handles the save action before trying to merge this new bedspace data with
   the overall GridDataContext. Specifically, we check to see if there has been a
   new bedspace (bed number) entered, i.e. we will warn the user that this may
   overwrite any data in that target bedspace */
-  const handleOnSave = useCallback(() => {
-    const updatedData = [...data];
+  const handleOnSave = useCallback(
+    (bedspaceEditorData) => {
+      const updatedData = [...data];
 
-    /* The actual save action that merges this new bedspaceEditorData with
+      /* The actual save action that merges this new bedspaceEditorData with
     the truth data in GridDataContext */
-    const saveBedspaceEditorData = (dataToSave) => {
-      /* For each object in data array, see if there is a bed number
+      const saveBedspaceEditorData = (dataToSave) => {
+        /* For each object in data array, see if there is a bed number
       that matches that has been edited in bedspaceEditorData. */
-      const objIndex = dataToSave.findIndex(
-        (obj) => obj.bed === bedspaceEditorData.bed
-      );
-      /* If so, return the index of this object in the array */
-      if (objIndex >= 0) {
-        dataToSave[objIndex] = bedspaceEditorData;
+        const objIndex = dataToSave.findIndex(
+          (obj) => obj.bed === bedspaceEditorData.bed
+        );
+        /* If so, return the index of this object in the array */
+        if (objIndex >= 0) {
+          dataToSave[objIndex] = bedspaceEditorData;
+        } else {
+          // If bed doesn't exist, add new one
+          dataToSave.push(bedspaceEditorData);
+        }
+        // send updated data to GridStateContext
+        updateGridData(dataToSave);
+        setNeedsSave(false);
+      };
+
+      // See if bedspaceEditorData has changed the bed number for this patient
+      if (bedspaceEditorData.bed !== data[selectedKey].bed) {
+        // create the warning message
+        const content = (
+          <>
+            <div>
+              You are changing the bedspace for this patient.{" "}
+              <b>
+                <span style={{ color: theme.palette.warning.main }}>
+                  WARNING:{" "}
+                </span>
+              </b>
+              This may overwrite any data already present in the new bedspace.
+            </div>
+            <div>
+              Current Bed: {data[selectedKey].bed}
+              <br />
+              New Bed: {bedspaceEditorData.bed}
+            </div>
+          </>
+        );
+
+        // Show the confirmation dialog before changing bedspace
+        showYesNoDialog(
+          content,
+          () => {
+            //should change bed
+            // delete old bedspace data since we changed to a different bedspace
+            updatedData.splice(selectedKey, 1);
+            // commit the save action
+            saveBedspaceEditorData(updatedData);
+            // since the selectedKey is now different, just null it so incorrect data isn't displayed
+            setSelectedKey(null);
+          },
+          () => {
+            //should cancel callback
+            return false;
+          }
+        );
       } else {
-        // If bed doesn't exist, add new one
-        dataToSave.push(bedspaceEditorData);
-      }
-      // send updated data to GridStateContext
-      updateGridData(dataToSave);
-      setNeedsSave(false);
-    };
+        // Not changing the bedspace, just other patient data
 
-    // See if bedspaceEditorData has changed the bed number for this patient
-    if (bedspaceEditorData.bed !== data[selectedKey].bed) {
-      // create the warning message
-      const content = (
-        <>
-          <div>
-            You are changing the bedspace for this patient.{" "}
-            <b>
-              <span style={{ color: theme.palette.warning.main }}>
-                WARNING:{" "}
-              </span>
-            </b>
-            This may overwrite any data already present in the new bedspace.
-          </div>
-          <div>
-            Current Bed: {data[selectedKey].bed}
-            <br />
-            New Bed: {bedspaceEditorData.bed}
-          </div>
-        </>
-      );
-
-      // Show the confirmation dialog before changing bedspace
-      showYesNoDialog(
-        content,
-        () => {
-          //should change bed
-          // delete old bedspace data since we changed to a different bedspace
-          updatedData.splice(selectedKey, 1);
-          // commit the save action
-          saveBedspaceEditorData(updatedData);
-          // since the selectedKey is now different, just null it so incorrect data isn't displayed
-          setSelectedKey(null);
-        },
-        () => {
-          //should cancel callback
-          return false;
-        }
-      );
-    } else {
-      // Not changing the bedspace, just other patient data
-
-      // Commit the save action
-      saveBedspaceEditorData(updatedData);
-    }
-  }, [
-    bedspaceEditorData,
-    data,
-    selectedKey,
-    showYesNoDialog,
-    theme.palette.warning.main,
-    updateGridData,
-  ]);
-
-  /* Want to reset the data being used in the bedspaceEditor
-  to the saved "truth" data, i.e. reset changes back to the 
-  last saved state */
-  const handleOnReset = (e) => {
-    e.preventDefault();
-    setBedspaceEditorData(data[selectedKey]);
-    setResetBedspaceEditor((prevValue) => !prevValue); // triggers re-render of BedspaceEditor
-    setNeedsSave(false);
-  };
-
-  /* Handles the < and > buttons for selecting the previous or next bedspace.
-  Calls setCurrentBed which updates the selectedKey and BedspaceEditorData */
-  /**
-   *
-   * @param {boolean} reverse If true, move backwards a bedspace. If false, move forwards.
-   */
-  const handleNextBedspaceButton = (reverse) => {
-    setCurrentBed(getNextBedspace(data, selectedKey, reverse));
-  };
-
-  /* Using this to activate a SAVE action with CTRL + S */
-  const handleKeyDown = useCallback(
-    (event) => {
-      const key = event.key;
-      if (key === "Control") {
-        // do nothing when only Control key is pressed.
-        return;
-      }
-      const keyIsS = key === "s";
-
-      // this is the CTRL + S combination
-      if (keyIsS && event.ctrlKey) {
-        event.preventDefault(); // don't let the browser do the typical CTRL+S action
-        /* If there is data that needsSave, do the save function */
-        if (needsSave) {
-          handleOnSave();
-        }
+        // Commit the save action
+        saveBedspaceEditorData(updatedData);
       }
     },
-    [needsSave, handleOnSave]
+    [
+      data,
+      selectedKey,
+      showYesNoDialog,
+      theme.palette.warning.main,
+      updateGridData,
+    ]
   );
-
-  /* Keydown listener */
-  useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown, false);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [handleKeyDown]);
 
   /* - - - - - RETURN - - - - - */
 
-  /* Renders the Toolbar associated with the BedspaceEditor, includes
-  Navigation arrows, Save, and Reset buttons */
-  const renderToolbar = () => (
-    <Toolbar variant="dense" className={classes.bedspaceEditorToolbar}>
-      <IconButton
-        disabled={needsSave}
-        className={classes.navigateIconButton}
-        disableRipple
-        onClick={() => handleNextBedspaceButton(true)}
-      >
-        <NavigateBeforeIcon className={classes.navigateIcon} />
-      </IconButton>
-      <Typography
-        variant="h1"
-        className={classes.bedspaceEditorToolbarBedNumber}
-      >
-        {data[selectedKey].bed}
-      </Typography>
-      <IconButton
-        disabled={needsSave}
-        className={classes.navigateIconButton}
-        disableRipple
-        onClick={() => handleNextBedspaceButton(false)}
-      >
-        <NavigateNextIcon className={classes.navigateIcon} />
-      </IconButton>
-      <Button
-        classes={{
-          root: classes.saveButton,
-          disabled: classes.saveButtonDisabled,
-        }}
-        size="small"
-        disabled={!needsSave}
-        onClick={handleOnSave}
-      >
-        Save
-      </Button>
-      <Button
-        classes={{
-          root: classes.resetButton,
-          disabled: classes.resetButtonDisabled,
-        }}
-        size="small"
-        disabled={!needsSave}
-        onClick={(e) => handleOnReset(e)}
-      >
-        Reset
-      </Button>
-    </Toolbar>
-  );
   if (data != null) {
     return (
       <div>
@@ -481,50 +321,13 @@ const UpdatePage = () => {
           </Grid>
           <Grid item lg md={8} sm={12} xs={12} ref={refToBedspaceEditorDiv}>
             {selectedKey != null && (
-              <Grid container>
-                <Grid item xs={12}>
-                  <Tooltip
-                    title={demoBoxCollapsed ? "Show example" : "Hide example"}
-                    enterDelay={300}
-                  >
-                    <Switch
-                      checked={!demoBoxCollapsed}
-                      onChange={() =>
-                        setDemoBoxCollapsed((prevValue) => !prevValue)
-                      }
-                      color="secondary"
-                    />
-                  </Tooltip>
-                  <DemoBox
-                    data={bedspaceEditorData}
-                    collapsed={demoBoxCollapsed}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  {data && renderToolbar()}
-                </Grid>
-                <Grid
-                  item
-                  xs={12}
-                  className={
-                    needsSave
-                      ? classes.bedspaceEditorGridItemNeedsSave
-                      : classes.bedspaceEditorGridItem
-                  }
-                >
-                  <BedspaceEditor
-                    data={bedspaceEditorData}
-                    bedKey={selectedKey}
-                    defaultValues={data[selectedKey]}
-                    onEditorDataChange={handleOnEditorDataChange}
-                    reset={resetBedspaceEditor}
-                    debounceInterval={demoBoxCollapsed ? 600 : 400}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  {data && renderToolbar()}
-                </Grid>
-              </Grid>
+              <DemoAndEditorController
+                defaultBedData={data[selectedKey]}
+                needsSave={needsSave}
+                setNeedsSave={setNeedsSave}
+                onNextBedspace={navigateNextBedspace}
+                onSave={handleOnSave}
+              />
             )}
           </Grid>
         </Grid>

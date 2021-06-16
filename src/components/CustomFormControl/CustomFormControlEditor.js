@@ -36,7 +36,7 @@ const CustomFormControlEditor = ({
   **
   */
   useEffect(() => {
-    //onDiffChange(id, diff);
+    onDiffChange(id, diff);
   }, [diff, id, onDiffChange]);
 
   const handleOnChange = (val) => {
