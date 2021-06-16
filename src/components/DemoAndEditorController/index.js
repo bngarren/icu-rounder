@@ -83,12 +83,11 @@ const DemoAndEditorController = ({
   const classes = useStyles();
 
   /* Holds the Editor's own version of this bedspace's data
-   - initialize it with the defaultBedData (e.g. a new bedspace has been selected)
-  */
-  const [bedspaceEditorData, _setBedspaceEditorData] = useState(defaultBedData); // i.e. "Working" data
+   */
+  const [bedspaceEditorData, _setBedspaceEditorData] = useState(); // i.e. "Working" data
 
+  /* Also keep a ref (for instances where a stale closure is a problem) */
   const bedspaceEditorDataRef = useRef(bedspaceEditorData);
-
   const setBedspaceEditorData = (data) => {
     _setBedspaceEditorData(data);
     bedspaceEditorDataRef.current = data;
@@ -118,6 +117,31 @@ const DemoAndEditorController = ({
   last saved state */
   const handleOnReset = (e) => {};
 
+  /* A ref to hold any debounced functions being used.
+  These will be flushed when necessary.
+  Example: When we try to save DURING a debounce, we first need to flush
+  to get the rest of the data in, before taking any actions */
+  const debouncedFunctions = useRef([]);
+
+  /* Give this to child components so they can add their debounced functions */
+  const addDebouncedFunction = useCallback((f) => {
+    debouncedFunctions.current.push(f);
+    console.log(debouncedFunctions.current);
+    return f;
+  }, []);
+
+  /* For each debounced function in the array, flush it--meaning
+  invoke it now without waiting for delay */
+  const flushDebouncedFunctions = () => {
+    debouncedFunctions.current.forEach((f) => {
+      try {
+        f.flush();
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  };
+
   /* 
   - - - HOTKEYS - - - 
   
@@ -136,6 +160,7 @@ const DemoAndEditorController = ({
         event.preventDefault(); // don't let the browser do the typical CTRL+S action
         /* If there is data that needsSave, do the save function */
         if (needsSave) {
+          flushDebouncedFunctions(); //ensure all debounced functions are finalized before saving
           onSave(bedspaceEditorDataRef.current);
         }
       }
@@ -210,48 +235,53 @@ const DemoAndEditorController = ({
     </Toolbar>
   );
 
-  return (
-    <Grid container>
-      <Grid item xs={12}>
-        <Tooltip
-          title={demoBoxCollapsed ? "Show example" : "Hide example"}
-          enterDelay={300}
+  if (bedspaceEditorData) {
+    return (
+      <Grid container>
+        <Grid item xs={12}>
+          <Tooltip
+            title={demoBoxCollapsed ? "Show example" : "Hide example"}
+            enterDelay={300}
+          >
+            <Switch
+              checked={!demoBoxCollapsed}
+              onChange={() => setDemoBoxCollapsed((prevValue) => !prevValue)}
+              color="secondary"
+            />
+          </Tooltip>
+          <DemoBox data={bedspaceEditorData} collapsed={demoBoxCollapsed} />
+        </Grid>
+        <Grid item xs={12}>
+          {bedspaceEditorData && renderToolbar()}
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          className={
+            needsSave
+              ? classes.bedspaceEditorGridItemNeedsSave
+              : classes.bedspaceEditorGridItem
+          }
         >
-          <Switch
-            checked={!demoBoxCollapsed}
-            onChange={() => setDemoBoxCollapsed((prevValue) => !prevValue)}
-            color="secondary"
+          <BedspaceEditor
+            data={bedspaceEditorData}
+            dataRef={bedspaceEditorDataRef}
+            defaultValues={defaultBedData}
+            onEditorDataChange={handleOnEditorDataChange}
+            setNeedsSave={setNeedsSave}
+            reset={resetBedspaceEditor}
+            addDebouncedFunction={addDebouncedFunction}
+            debounceInterval={demoBoxCollapsed ? 600 : 400}
           />
-        </Tooltip>
-        <DemoBox data={bedspaceEditorData} collapsed={demoBoxCollapsed} />
+        </Grid>
+        <Grid item xs={12}>
+          {bedspaceEditorData && renderToolbar()}
+        </Grid>
       </Grid>
-      <Grid item xs={12}>
-        {bedspaceEditorData && renderToolbar()}
-      </Grid>
-      <Grid
-        item
-        xs={12}
-        className={
-          needsSave
-            ? classes.bedspaceEditorGridItemNeedsSave
-            : classes.bedspaceEditorGridItem
-        }
-      >
-        <BedspaceEditor
-          data={bedspaceEditorData}
-          dataRef={bedspaceEditorDataRef}
-          defaultValues={defaultBedData}
-          onEditorDataChange={handleOnEditorDataChange}
-          setNeedsSave={setNeedsSave}
-          reset={resetBedspaceEditor}
-          debounceInterval={demoBoxCollapsed ? 600 : 400}
-        />
-      </Grid>
-      <Grid item xs={12}>
-        {bedspaceEditorData && renderToolbar()}
-      </Grid>
-    </Grid>
-  );
+    );
+  } else {
+    return <></>;
+  }
 };
 
 export default DemoAndEditorController;

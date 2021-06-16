@@ -122,6 +122,7 @@ const BedspaceEditor = ({
   reset,
   onEditorDataChange = (f) => f,
   setNeedsSave = (f) => f,
+  addDebouncedFunction = (f) => f,
   debounceInterval,
 }) => {
   const theme = useTheme();
@@ -213,14 +214,22 @@ const BedspaceEditor = ({
   };
 
   // the debounced function
-  const debouncedOnEditorChange = useCallback(
-    debounce(
-      debouncedOnEditorChangeFunction.current,
-      debounceInterval, // time interval before allowing onEditorChange to fire
-      { leading: true } // doesn't debounce the first time it's called
-    ),
-    []
-  );
+  const debouncedOnEditorChange =
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useCallback(
+      debounce(
+        debouncedOnEditorChangeFunction.current,
+        debounceInterval, // time interval before allowing onEditorChange to fire
+        { leading: true } // doesn't debounce the first time it's called
+      ),
+      []
+    );
+
+  /* Add this debounced function to an array held by DemoAndEditorController so that it
+    can be flushed/canceled if needed */
+  useEffect(() => {
+    addDebouncedFunction(debouncedOnEditorChange);
+  }, [addDebouncedFunction, debouncedOnEditorChange]);
 
   /*  Handles the onInputChange callbacks for all the inputs, via a prop
   passed through CustomFormControlEditor component which wraps the input */
