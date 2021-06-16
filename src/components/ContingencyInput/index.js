@@ -50,28 +50,14 @@ const useStyles = makeStyles({
 
 const ContingencyInput = ({
   customStyle: textFieldClasses,
-  reset = false,
-  forcedValue: initialItems,
-  sendInputChange = (f) => f,
   options,
+  ...props
 }) => {
   const classes = useStyles();
-  const [currentItems, setCurrentItems] = useState(
-    initialItems ? initialItems : null
-  );
-
-  useEffect(() => {
-    setCurrentItems(initialItems);
-  }, [initialItems, reset]);
-
-  const handleOnChange = (e, value) => {
-    setCurrentItems(value);
-
-    sendInputChange("contingencies", value);
-  };
 
   return (
     <Autocomplete
+      {...props}
       debug={false}
       classes={{
         popper: classes.popper,
@@ -84,10 +70,7 @@ const ContingencyInput = ({
       multiple
       freeSolo
       disableCloseOnSelect
-      id="contingencies"
       options={options}
-      value={currentItems}
-      onChange={handleOnChange}
       renderInput={(params) => {
         return (
           <TextField

@@ -1,9 +1,6 @@
 import { useState, useEffect, cloneElement, useCallback } from "react";
 import { makeStyles } from "@material-ui/styles";
 
-// lodash
-import { debounce } from "lodash";
-
 const useStyles = makeStyles((theme) => ({}));
 
 const CustomFormControlEditor = ({
@@ -11,17 +8,12 @@ const CustomFormControlEditor = ({
   id,
   onInputChange = (f) => f,
   onDiffChange = (f) => f,
+  onChangeArgument = 0,
   children,
 }) => {
   const classes = useStyles();
   const [value, setValue] = useState("");
   const [diff, setDiff] = useState(false);
-
-  const childElement = cloneElement(children, {
-    value: value,
-    onChange: (e) => handleOnChange(e.target.value),
-    id: id,
-  });
 
   /* Each time a default value comes through as a prop,
   reset this component's value to that, and set diff to false */
@@ -42,7 +34,16 @@ const CustomFormControlEditor = ({
     onDiffChange(id, diff);
   }, [diff, id, onDiffChange]);
 
-  const handleOnChange = (val) => {
+  /* Our custom onChange function that we inject into the child component.
+  Since some components differ in the parameters they send to their onChange callback, 
+  i.e. Autocomplete, we receive all possible ...args here, and choose the one
+  we want. HACKY, but works for now. */
+  const handleOnChange = (...args) => {
+    const val =
+      onChangeArgument === 0
+        ? args[onChangeArgument].target.value
+        : args[onChangeArgument];
+
     setDiff(!(val === initialValue));
 
     setValue(val);
@@ -50,6 +51,12 @@ const CustomFormControlEditor = ({
     // notify parent
     onInputChange(id, val);
   };
+
+  const childElement = cloneElement(children, {
+    value: value,
+    onChange: handleOnChange,
+    id: id,
+  });
 
   return <>{childElement}</>;
 };

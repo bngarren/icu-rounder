@@ -126,6 +126,8 @@ const BedspaceEditor = ({
   const theme = useTheme();
   const classes = useStyles(theme);
 
+  const { settings } = useSettings();
+
   const [editorData, _setEditorData] = useState();
 
   /* Create a ref and updater function to fix stale closure problem
@@ -416,10 +418,18 @@ const BedspaceEditor = ({
               />
             </CustomFormControlEditor>
             <div className={classes.contingenciesRoot}>
-              {/* <ContingencyInput
+              <CustomFormControlEditor
+                id="contingencies"
+                initialValue={defaultValues.contingencies || ""}
+                onInputChange={handleInputChange}
+                onDiffChange={onDiffChange}
+                onChangeArgument={1}
+              >
+                <ContingencyInput
                   customStyle={classes}
                   options={settings.contingencyOptions}
-                /> */}
+                />
+              </CustomFormControlEditor>
             </div>
             <CustomFormControlEditor
               id="body"
