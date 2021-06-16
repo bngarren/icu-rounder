@@ -8,6 +8,7 @@ const CustomFormControlEditor = ({
   id,
   onInputChange = (f) => f,
   onDiffChange = (f) => f,
+  onBlur = (f) => f,
   onChangeArgument = 0,
   children,
 }) => {
@@ -58,6 +59,7 @@ const CustomFormControlEditor = ({
   const childElement = cloneElement(children, {
     value: value,
     onChange: handleOnChange,
+    onBlur: onBlur,
     id: id,
   });
 

@@ -242,6 +242,10 @@ const BedspaceEditor = ({
     [debouncedOnEditorChange]
   );
 
+  const handleInputOnBlur = useCallback(() => {
+    debouncedOnEditorChange.flush();
+  }, [debouncedOnEditorChange]);
+
   /* The user has selected a snippet to insert */
   const onSnippetSelected = (snippet) => {
     // Insert the snippet at the position our caret was at when the snippet was chosen
@@ -338,6 +342,7 @@ const BedspaceEditor = ({
               initialValue={defaultValues.bed || ""}
               onInputChange={handleInputChange}
               onDiffChange={onDiffChange}
+              onBlur={handleInputOnBlur}
             >
               <CustomTextField
                 className={classes.textFieldBed}
@@ -352,6 +357,7 @@ const BedspaceEditor = ({
               initialValue={defaultValues.lastName || ""}
               onInputChange={handleInputChange}
               onDiffChange={onDiffChange}
+              onBlur={handleInputOnBlur}
             >
               <CustomTextField
                 className={classes.textFieldLastNameFirstName}
@@ -368,6 +374,7 @@ const BedspaceEditor = ({
               initialValue={defaultValues.firstName || ""}
               onInputChange={handleInputChange}
               onDiffChange={onDiffChange}
+              onBlur={handleInputOnBlur}
             >
               <CustomTextField
                 className={classes.textFieldLastNameFirstName}
@@ -382,6 +389,7 @@ const BedspaceEditor = ({
               initialValue={defaultValues.teamNumber || ""}
               onInputChange={handleInputChange}
               onDiffChange={onDiffChange}
+              onBlur={handleInputOnBlur}
             >
               <CustomTextField
                 className={classes.textFieldTeam}
@@ -398,6 +406,7 @@ const BedspaceEditor = ({
               initialValue={defaultValues.oneLiner || ""}
               onInputChange={handleInputChange}
               onDiffChange={onDiffChange}
+              onBlur={handleInputOnBlur}
             >
               <CustomTextField
                 className={classes.textFieldOneLiner}
@@ -414,6 +423,7 @@ const BedspaceEditor = ({
                 initialValue={defaultValues.contingencies || ""}
                 onInputChange={handleInputChange}
                 onDiffChange={onDiffChange}
+                onBlur={handleInputOnBlur}
                 onChangeArgument={1}
               >
                 <ContingencyInput
@@ -427,6 +437,7 @@ const BedspaceEditor = ({
               initialValue={defaultValues.body || ""}
               onInputChange={handleInputChange}
               onDiffChange={onDiffChange}
+              onBlur={handleInputOnBlur}
             >
               <CustomTextField
                 className={classes.textFieldBody}
@@ -442,6 +453,7 @@ const BedspaceEditor = ({
               initialValue={defaultValues.bottomText || ""}
               onInputChange={handleInputChange}
               onDiffChange={onDiffChange}
+              onBlur={handleInputOnBlur}
             >
               <CustomTextField
                 className={classes.textFieldBottomText}
