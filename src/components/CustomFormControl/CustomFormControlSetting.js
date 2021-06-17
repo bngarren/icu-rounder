@@ -73,8 +73,11 @@ const CustomFormControlSetting = ({
     onChange: (e) => handleOnChange(e.target.value),
   });
 
+  /* Each time a default value comes through as a prop,
+  reset this component's value to that, and set diff to false */
   useEffect(() => {
     setValue(initialValue);
+    setDiff(false);
   }, [initialValue]);
 
   const handleOnChange = (val) => {
@@ -94,7 +97,6 @@ const CustomFormControlSetting = ({
   const handleOnSave = () => {
     if (id !== null) {
       onSave(id, value);
-      setDiff(false);
     }
   };
 
@@ -133,29 +135,6 @@ const CustomFormControlSetting = ({
       </Grid>
     </Grid>
   );
-  /* return (
-    <Grid container className={clsx(classes.root, { [classes.unsaved]: diff })}>
-      <Zoom in={diff} disableStrictModeCompat={true} timeout={300}>
-        <Grid item className={classes.gridForSaveButton}>
-          <IconButton
-            onClick={handleOnSave}
-            color="primary"
-            className={classes.saveIconButton}
-          >
-            <SaveIcon />
-          </IconButton>
-        </Grid>
-      </Zoom>
-      <Grid item className={classes.gridForInput}>
-        {label}
-        {initialValue}
-        {cloneElement(children, {
-          value: value,
-          onChange: (e) => handleOnChange(e.target.value),
-        })}
-      </Grid>
-    </Grid>
-  ); */
 };
 
 export default CustomFormControlSetting;

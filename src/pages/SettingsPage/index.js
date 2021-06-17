@@ -112,11 +112,9 @@ const SettingsPage = () => {
   /* Get GridData and BedLayout from context */
   const { bedLayout, gridData, updateGridData } = useGridStateContext();
 
-  const [contingencyOptions, setContingencyOptions] = useState(
-    settings.contingencyOptions ? settings.contingencyOptions : null
-  );
+  const contingencyOptions = settings.contingencyOptions || [];
 
-  /* Import .json functionality */
+  /* Our import .json functionality */
   const [pendingDataImport, setPendingDataImport] = useState(null);
   const [confirmedDataImport, setConfirmedDataImport] = useState(false);
 
