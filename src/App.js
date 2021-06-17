@@ -12,7 +12,8 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 
 // Where all of our pages come from
-import { BrowserRouter as Router } from "react-router-dom";
+// ! Using HashRouter instead of BrowserRouter to work with GitHub pages deployment
+import { HashRouter as Router } from "react-router-dom";
 import PageRouter from "./components/PageRouter";
 
 // Firebase
