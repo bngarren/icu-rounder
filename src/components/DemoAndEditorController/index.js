@@ -12,6 +12,9 @@ import { makeStyles, useTheme } from "@material-ui/styles";
 import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 
+// Lodash
+import { uniqueId } from "lodash";
+
 // Components
 import DemoBox from "../../components/DemoBox";
 import BedspaceEditor from "../../components/BedspaceEditor";
@@ -110,12 +113,14 @@ const DemoAndEditorController = ({
   i.e., if demobox is not visible, the debounce interval can be higher */
   const [demoBoxCollapsed, setDemoBoxCollapsed] = useState(true);
 
-  const [resetBedspaceEditor, setResetBedspaceEditor] = useState(false); // value not important, just using it to trigger re-render
+  const [resetKey, setResetKey] = useState(uniqueId()); // value not important, just using it to trigger re-render
 
   /* Want to reset the data being used in the bedspaceEditor
   to the saved "truth" data, i.e. reset changes back to the 
   last saved state */
-  const handleOnReset = (e) => {};
+  const handleOnReset = (e) => {
+    setResetKey(uniqueId());
+  };
 
   /* A ref to hold any debounced functions being used.
   These will be flushed when necessary.
@@ -269,7 +274,7 @@ const DemoAndEditorController = ({
             defaultValues={defaultBedData}
             onEditorDataChange={handleOnEditorDataChange}
             setNeedsSave={setNeedsSave}
-            reset={resetBedspaceEditor}
+            resetKey={resetKey}
             addDebouncedFunction={addDebouncedFunction}
             debounceInterval={demoBoxCollapsed ? 600 : 400}
           />

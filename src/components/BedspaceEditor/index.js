@@ -132,7 +132,7 @@ const BedspaceEditor = ({
   data,
   dataRef,
   defaultValues,
-  reset,
+  resetKey,
   onEditorDataChange = (f) => f,
   setNeedsSave = (f) => f,
   addDebouncedFunction = (f) => f,
@@ -348,7 +348,12 @@ const BedspaceEditor = ({
   if (data) {
     return (
       <Paper className={classes.editorRoot}>
-        <form className={classes.form} autoComplete="off" spellCheck="false">
+        <form
+          className={classes.form}
+          autoComplete="off"
+          spellCheck="false"
+          key={resetKey}
+        >
           <div>
             <CustomFormControlEditor
               id="bed"
