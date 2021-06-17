@@ -1,17 +1,6 @@
-import { useState, useEffect, createContext, useRef, useCallback } from "react";
-import {
-  useMediaQuery,
-  Grid,
-  Button,
-  Toolbar,
-  Typography,
-  Switch,
-  IconButton,
-  Tooltip,
-} from "@material-ui/core";
+import { useState, createContext, useRef, useCallback } from "react";
+import { useMediaQuery, Grid } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/styles";
-import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
-import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 
 // Components
 import TableBedList from "../../components/TableBedList";
@@ -32,7 +21,6 @@ const UpdatePage = () => {
   const classes = useStyles();
 
   // Media queries for CSS
-  const media_atleast_lg = useMediaQuery("(min-width:1280px)");
   const media_atleast_md = useMediaQuery("(min-width:960px)");
 
   // The truth GridState and gridData
@@ -41,9 +29,6 @@ const UpdatePage = () => {
   // Authentication
   const { authState, userIsLoggedIn } = useAuthStateContext();
 
-  /* This "data" should match the gridData 
-  TODO Should be able to just use gridData from the context without creating a local state variable */
-  const [data, setData] = useState(null);
   const [selectedKey, setSelectedKey] = useState(); // index of the bedspace being "edited"
   const [needsSave, setNeedsSave] = useState(false); // true, if an unsaved changed has occurred in bedspaceEditor
 
@@ -53,11 +38,6 @@ const UpdatePage = () => {
   /* Used as a target for the scrollToElement(), in order to put
  the BedspaceEditor into view after clicking the edit icon on smaller screens */
   const refToBedspaceEditorDiv = useRef(null);
-
-  // Load data from GridStateContext
-  useEffect(() => {
-    setData(gridData);
-  }, [gridData]);
 
   const setCurrentBed = (key) => {
     // This is the key of the data array that corresponds to this selected bedspace
@@ -74,7 +54,7 @@ const UpdatePage = () => {
    * @param {boolean} reverse If true, move backwards a bedspace. If false, move forwards.
    */
   const navigateNextBedspace = (reverse) => {
-    setCurrentBed(getNextBedspace(data, selectedKey, reverse));
+    setCurrentBed(getNextBedspace(gridData, selectedKey, reverse));
   };
 
   const handleBedActionEdit = (key) => {
@@ -105,10 +85,10 @@ const UpdatePage = () => {
             changes for this bedspace. Continue <i>without</i> saving?
           </div>
           <div>
-            Bed: {data[selectedKey].bed}
+            Bed: {gridData[selectedKey].bed}
             <br />
-            {data[selectedKey].lastName
-              ? `Patient: ${data[selectedKey].lastName}`
+            {gridData[selectedKey].lastName
+              ? `Patient: ${gridData[selectedKey].lastName}`
               : ""}
           </div>
         </>
@@ -149,9 +129,9 @@ const UpdatePage = () => {
           <i>(The bedspace will remain.)</i>
         </div>
         <div>
-          Bed: {data[key].bed}
+          Bed: {gridData[key].bed}
           <br />
-          {data[key].lastName ? `Patient: ${data[key].lastName}` : ""}
+          {gridData[key].lastName ? `Patient: ${gridData[key].lastName}` : ""}
         </div>
       </>
     );
@@ -160,10 +140,9 @@ const UpdatePage = () => {
     showYesNoDialog(
       content,
       () => {
-        //should delete callback
-        let updatedData = [...data];
-        updatedData[key] = { bed: updatedData[key].bed };
-        console.log(`Cleared bedspace: ${updatedData[key].bed}`);
+        //should clear callback
+        let updatedData = [...gridData];
+        updatedData[key] = { bed: updatedData[key].bed }; // only keep the bed
         updateGridData(updatedData); //send new data to GridStateContext (handles truth data)
         setNeedsSave(false);
       },
@@ -187,9 +166,9 @@ const UpdatePage = () => {
           this bedspace and it's data?
         </div>
         <div>
-          Bed: {data[key].bed}
+          Bed: {gridData[key].bed}
           <br />
-          {data[key].lastName ? `Patient: ${data[key].lastName}` : ""}
+          {gridData[key].lastName ? `Patient: ${gridData[key].lastName}` : ""}
         </div>
       </>
     );
@@ -199,9 +178,8 @@ const UpdatePage = () => {
       content,
       () => {
         //should delete callback
-        let updatedData = [...data];
+        let updatedData = [...gridData];
         let deleted = updatedData.splice(key, 1);
-        console.log(`Removed bedspace: ${JSON.stringify(deleted)}`);
         updateGridData(updatedData); //send new data to GridStateContext (handles truth data)
         setNeedsSave(false);
         setSelectedKey(null);
@@ -213,13 +191,14 @@ const UpdatePage = () => {
     );
   };
 
-  /* This handles the save action before trying to merge this new bedspace data with
-  the overall GridDataContext. Specifically, we check to see if there has been a
-  new bedspace (bed number) entered, i.e. we will warn the user that this may
-  overwrite any data in that target bedspace */
+  /* Handles the SAVE action.
+  - Before trying to merge this new bedspace data with the gridData (in GridStateContext),
+  we can run some checks, E.g., see if there has been a new bed number entered--because 
+  we will warn the user that this may overwrite any data in that target bedspace
+  */
   const handleOnSave = useCallback(
     (bedspaceEditorData) => {
-      const updatedData = [...data];
+      const updatedData = [...gridData];
 
       /* The actual save action that merges this new bedspaceEditorData with
     the truth data in GridDataContext */
@@ -237,12 +216,19 @@ const UpdatePage = () => {
           dataToSave.push(bedspaceEditorData);
         }
         // send updated data to GridStateContext
-        updateGridData(dataToSave);
+        updateGridData(dataToSave).then((res) => {
+          if (res) {
+            const newKey = getKeyForBed(res, bedspaceEditorData.bed);
+            setSelectedKey(newKey);
+          } else {
+            setSelectedKey(null);
+          }
+        });
         setNeedsSave(false);
       };
 
       // See if bedspaceEditorData has changed the bed number for this patient
-      if (bedspaceEditorData.bed !== data[selectedKey].bed) {
+      if (bedspaceEditorData.bed !== gridData[selectedKey].bed) {
         // create the warning message
         const content = (
           <>
@@ -253,10 +239,10 @@ const UpdatePage = () => {
                   WARNING:{" "}
                 </span>
               </b>
-              This may overwrite any data already present in the new bedspace.
+              This will overwrite any data already present in the new bedspace.
             </div>
             <div>
-              Current Bed: {data[selectedKey].bed}
+              Current Bed: {gridData[selectedKey].bed}
               <br />
               New Bed: {bedspaceEditorData.bed}
             </div>
@@ -272,8 +258,6 @@ const UpdatePage = () => {
             updatedData.splice(selectedKey, 1);
             // commit the save action
             saveBedspaceEditorData(updatedData);
-            // since the selectedKey is now different, just null it so incorrect data isn't displayed
-            setSelectedKey(null);
           },
           () => {
             //should cancel callback
@@ -288,7 +272,7 @@ const UpdatePage = () => {
       }
     },
     [
-      data,
+      gridData,
       selectedKey,
       showYesNoDialog,
       theme.palette.warning.main,
@@ -298,7 +282,7 @@ const UpdatePage = () => {
 
   /* - - - - - RETURN - - - - - */
 
-  if (data != null) {
+  if (gridData != null) {
     return (
       <div>
         <Grid container className={classes.root}>
@@ -316,13 +300,13 @@ const UpdatePage = () => {
                 bedActionDelete: handleBedActionDelete,
               }}
             >
-              <TableBedList data={data} selectedKey={selectedKey} />
+              <TableBedList data={gridData} selectedKey={selectedKey} />
             </BedActionsContext.Provider>
           </Grid>
           <Grid item lg md={8} sm={12} xs={12} ref={refToBedspaceEditorDiv}>
             {selectedKey != null && (
               <DemoAndEditorController
-                defaultBedData={data[selectedKey]}
+                defaultBedData={gridData[selectedKey]}
                 needsSave={needsSave}
                 setNeedsSave={setNeedsSave}
                 onNextBedspace={navigateNextBedspace}
@@ -337,6 +321,15 @@ const UpdatePage = () => {
   } else {
     return <>Loading...</>;
   }
+};
+
+/* Helper function that returns the key in the gridData array corresponding
+to the bed number provided */
+const getKeyForBed = (gridData, bed) => {
+  for (const [index, element] of gridData.entries()) {
+    if (element.bed === bed) return index;
+  }
+  return null;
 };
 
 /* Helper function for finding next or previous index in given array, or 

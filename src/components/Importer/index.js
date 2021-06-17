@@ -60,7 +60,7 @@ const Importer = ({ onNewDataSelected = (f) => f }) => {
           component="span"
           size="small"
         >
-          Upload
+          File...
         </Button>
         {file && file.name}
       </label>

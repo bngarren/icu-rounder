@@ -200,7 +200,7 @@ const DemoAndEditorController = ({
         variant="h1"
         className={classes.bedspaceEditorToolbarBedNumber}
       >
-        {bedspaceEditorData.bed}
+        {defaultBedData.bed || ""}
       </Typography>
       <IconButton
         disabled={needsSave}
@@ -235,7 +235,7 @@ const DemoAndEditorController = ({
     </Toolbar>
   );
 
-  if (bedspaceEditorData) {
+  if (bedspaceEditorData && defaultBedData) {
     return (
       <Grid container>
         <Grid item xs={12}>
