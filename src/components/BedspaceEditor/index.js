@@ -4,11 +4,15 @@ import { debounce } from "lodash";
 import { TextField, Paper } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 
+import clsx from "clsx";
+
 import { getCursorPos, setCursorPos } from "../../utils/CursorPos";
 
 import { usePopupState } from "material-ui-popup-state/hooks";
 import SnippetPopover from "../SnippetPopover";
 
+// Components
+import CustomFormControlEditor from "../../components/CustomFormControl/CustomFormControlEditor";
 import ContingencyInput from "../ContingencyInput";
 
 // Settings context
@@ -32,6 +36,8 @@ const useStyles = makeStyles((theme) => ({
     "&$textFieldFocused": {
       backgroundColor: "#fff",
       borderColor: theme.palette.secondary.light,
+      boxShadow:
+        "0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
     },
     paddingBottom: "2px",
   },
@@ -44,6 +50,12 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   textFieldInputLabelFocused: {},
+  textFieldInputLabelUnsaved: {
+    color: theme.palette.primary.main,
+  },
+  textFieldInputLabelFocusedUnsaved: {
+    color: theme.palette.primary.main,
+  },
   textFieldBed: {
     margin: "2px",
     width: "75px",
@@ -87,39 +99,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CustomTextField = ({
-  id,
-  customStyle: classes,
-  reset = false,
-  forcedValue = "",
-  sendInputChange = (f) => f,
-  ...props
-}) => {
-  const [value, setValue] = useState("");
-
-  /* If the reset prop is toggled, reset this component's
-  state to the "forced value" or the default value we want
-  the input to display  */
-  useEffect(() => {
-    setValue(forcedValue);
-  }, [forcedValue, reset]);
-
-  /**
-   *
-   * @param {object} e Event object
-   * @param {*} id This TextField's id, so that we can send callback to parent component
-   * that this specific TextField has changed its input value
-   */
-  const handleInputChange = (e, id) => {
-    const val = e.target.value;
-    setValue(val);
-    sendInputChange(id, val);
-  };
-
+const CustomTextField = ({ id, customStyle: classes, diff, ...props }) => {
   return (
     <TextField
-      onChange={(e) => handleInputChange(e, id)}
-      value={value}
       InputProps={{
         classes: {
           root: classes.textFieldRoot,
@@ -132,8 +114,12 @@ const CustomTextField = ({
       }}
       InputLabelProps={{
         classes: {
-          root: classes.textFieldInputLabelRoot,
-          focused: classes.textFieldInputLabelFocused,
+          root: clsx(classes.textFieldInputLabelRoot, {
+            [classes.textFieldInputLabelUnsaved]: diff,
+          }),
+          focused: clsx(classes.textFieldInputLabelFocused, {
+            [classes.textFieldInputLabelFocusedUnsaved]: diff,
+          }),
         },
       }}
       id={id}
@@ -143,52 +129,54 @@ const CustomTextField = ({
 };
 
 const BedspaceEditor = ({
-  data: propData,
+  data,
+  dataRef,
   defaultValues,
   reset,
   onEditorDataChange = (f) => f,
+  setNeedsSave = (f) => f,
+  addDebouncedFunction = (f) => f,
   debounceInterval,
 }) => {
   const theme = useTheme();
   const classes = useStyles(theme);
+
   const { settings } = useSettings();
-  const [editorData, _setEditorData] = useState();
 
-  /* Create a ref and updater function to fix stale closure problem
-  E.g., see debouncedOnEditorChange function  */
-  const editorDataRef = useRef(editorData);
-  const setEditorData = (data) => {
-    editorDataRef.current = data;
-    _setEditorData(data);
+  /* For each input in the Editor, tracks whether it needs a save or not */
+  const [unsavedData, _setUnsavedData] = useState([]);
+
+  const setInputSavedStatus = (id, unsaved) => {
+    if (unsaved) {
+      /* If this input is now 'unsaved', add to the unsavedData array, only
+      if it doesn't already exist */
+      _setUnsavedData((prevValue) => {
+        if (prevValue.indexOf(id) === -1) {
+          return prevValue.concat([id]);
+        } else {
+          return prevValue;
+        }
+      });
+    } else {
+      /* If this input is now 'saved', remove it from the unsavedData array */
+      _setUnsavedData((prevValue) => {
+        return prevValue.filter((value) => value !== id);
+      });
+    }
   };
 
-  // Toggle this ref value to force a re-render in components with this passed as a prop
-  // ! yes it's hacky
-  const forceValue = useRef(false);
-  const toggleForceValue = () => {
-    forceValue.current = !forceValue.current;
-  };
+  const clearUnsavedData = () => _setUnsavedData([]);
 
-  /* Easily set all the forced values for our inputs with one function, passing in a 
-  data object that has a value for each input field */
-  const getForcedValues = (data) => {
-    return (
-      data && {
-        bed: data.bed ? data.bed : "",
-        lastName: data.lastName ? data.lastName : "",
-        firstName: data.firstName ? data.firstName : "",
-        teamNumber: data.teamNumber ? data.teamNumber : "",
-        oneLiner: data.oneLiner ? data.oneLiner : "",
-        contingencies: data.contingencies ? data.contingencies : [],
-        body: data.body ? data.body : "",
-        bottomText: data.bottomText ? data.bottomText : "",
-      }
-    );
-  };
+  /* Callback sent as prop to each CustomFormControlEditor component so
+  that this component knows when a change has occured that needs a save */
+  const onDiffChange = useCallback((id, diff) => {
+    setInputSavedStatus(id, diff);
+  }, []);
 
-  /* These are the values we can reset our input fields to reflect, e.g,
-  when default values need to be populated or the reset button is clicked */
-  const forcedValues = useRef(getForcedValues(defaultValues));
+  /* If the Editor is aware of the unsavedData array changing, let the parent component know */
+  useEffect(() => {
+    setNeedsSave(unsavedData.length > 0);
+  }, [unsavedData.length, setNeedsSave]);
 
   /* Ref to last name input field, so we can focus() here when a bed is selected */
   const lastNameInputRef = useRef();
@@ -201,27 +189,12 @@ const BedspaceEditor = ({
     element: null,
   });
 
-  /* When a new bedspace is selected by the user (in UpdatePage) or
-   new bedspace data comes through as prop, update this component's
-   state */
+  /* When a new bedspace is selected...*/
   useEffect(() => {
-    // Update our editor's bedspace data (JSON object)
-    setEditorData(propData);
+    // Reset the unsavedData array because this new data shouldn't have any 'unsaved' status
+    clearUnsavedData();
 
-    // Force out input fields to match this new truth data
-    forcedValues.current = getForcedValues(propData);
-  }, [propData]);
-
-  /* When a new bedspace is selected or the reset button is clicked,
-  the input fields need to be repopulated with the "default data" which is
-  just the "truth"/saved data from UpdatePage */
-  useEffect(() => {
-    forcedValues.current = getForcedValues(defaultValues);
-    toggleForceValue();
-  }, [defaultValues, reset]);
-
-  /* When a new bedspace is selected, focus() on the last name input */
-  useEffect(() => {
+    // Focus on the lastName input
     if (lastNameInputRef?.current) lastNameInputRef.current.focus();
   }, [defaultValues]);
 
@@ -248,20 +221,28 @@ const BedspaceEditor = ({
   // the function we want to debounce
   debouncedOnEditorChangeFunction.current = (target, value) => {
     onEditorDataChange({
-      ...editorDataRef.current, //* use ref here, otherwise stale closure
+      ...dataRef.current, //* use ref here, otherwise stale closure
       [target]: value || "",
     });
   };
 
   // the debounced function
-  const debouncedOnEditorChange = useCallback(
-    debounce(
-      debouncedOnEditorChangeFunction.current,
-      debounceInterval, // time interval before allowing onEditorChange to fire
-      { leading: true } // doesn't debounce the first time it's called
-    ),
-    []
-  );
+  const debouncedOnEditorChange =
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useCallback(
+      debounce(
+        debouncedOnEditorChangeFunction.current,
+        debounceInterval, // time interval before allowing onEditorChange to fire
+        { leading: true } // doesn't debounce the first time it's called
+      ),
+      []
+    );
+
+  /* Add this debounced function to an array held by DemoAndEditorController so that it
+    can be flushed/canceled if needed */
+  useEffect(() => {
+    addDebouncedFunction(debouncedOnEditorChange);
+  }, [addDebouncedFunction, debouncedOnEditorChange]);
 
   /*  Handles the onInputChange callbacks for all the inputs, via a prop
   passed through CustomFormControlEditor component which wraps the input */
@@ -273,6 +254,10 @@ const BedspaceEditor = ({
     },
     [debouncedOnEditorChange]
   );
+
+  const handleInputOnBlur = useCallback(() => {
+    debouncedOnEditorChange.flush();
+  }, [debouncedOnEditorChange]);
 
   /* The user has selected a snippet to insert */
   const onSnippetSelected = (snippet) => {
@@ -360,104 +345,136 @@ const BedspaceEditor = ({
   }, [handleKeyDown]);
 
   /*  - - - - - RETURN - - - -  */
-  if (editorData) {
+  if (data) {
     return (
       <Paper className={classes.editorRoot}>
         <form className={classes.form} autoComplete="off" spellCheck="false">
           <div>
-            <CustomTextField
+            <CustomFormControlEditor
               id="bed"
-              className={classes.textFieldBed}
-              label="Bed"
-              variant="filled"
-              reset={forceValue.current}
-              forcedValue={forcedValues.current.bed}
-              sendInputChange={handleInputChange}
-              size="small"
-              customStyle={classes}
-            ></CustomTextField>
-            <CustomTextField
+              initialValue={defaultValues.bed || ""}
+              onInputChange={handleInputChange}
+              onDiffChange={onDiffChange}
+              onBlur={handleInputOnBlur}
+            >
+              <CustomTextField
+                className={classes.textFieldBed}
+                label="Bed"
+                variant="filled"
+                size="small"
+                customStyle={classes}
+              />
+            </CustomFormControlEditor>
+            <CustomFormControlEditor
               id="lastName"
-              className={classes.textFieldLastNameFirstName}
-              label="Last Name"
-              variant="filled"
-              reset={forceValue.current}
-              forcedValue={forcedValues.current.lastName}
-              sendInputChange={handleInputChange}
-              size="small"
-              customStyle={classes}
-              autoFocus
-              inputRef={lastNameInputRef}
-            ></CustomTextField>
-            <CustomTextField
+              initialValue={defaultValues.lastName || ""}
+              onInputChange={handleInputChange}
+              onDiffChange={onDiffChange}
+              onBlur={handleInputOnBlur}
+            >
+              <CustomTextField
+                className={classes.textFieldLastNameFirstName}
+                label="Last Name"
+                variant="filled"
+                size="small"
+                customStyle={classes}
+                autoFocus
+                inputRef={lastNameInputRef}
+              />
+            </CustomFormControlEditor>
+            <CustomFormControlEditor
               id="firstName"
-              className={classes.textFieldLastNameFirstName}
-              label="First Name"
-              variant="filled"
-              reset={forceValue.current}
-              forcedValue={forcedValues.current.firstName}
-              sendInputChange={handleInputChange}
-              size="small"
-              customStyle={classes}
-            ></CustomTextField>
-            <CustomTextField
+              initialValue={defaultValues.firstName || ""}
+              onInputChange={handleInputChange}
+              onDiffChange={onDiffChange}
+              onBlur={handleInputOnBlur}
+            >
+              <CustomTextField
+                className={classes.textFieldLastNameFirstName}
+                label="First Name"
+                variant="filled"
+                size="small"
+                customStyle={classes}
+              />
+            </CustomFormControlEditor>
+            <CustomFormControlEditor
               id="teamNumber"
-              className={classes.textFieldTeam}
-              label="Team"
-              variant="filled"
-              reset={forceValue.current}
-              forcedValue={forcedValues.current.teamNumber}
-              sendInputChange={handleInputChange}
-              size="small"
-              customStyle={classes}
-            ></CustomTextField>
+              initialValue={defaultValues.teamNumber || ""}
+              onInputChange={handleInputChange}
+              onDiffChange={onDiffChange}
+              onBlur={handleInputOnBlur}
+            >
+              <CustomTextField
+                className={classes.textFieldTeam}
+                label="Team"
+                variant="filled"
+                size="small"
+                customStyle={classes}
+              />
+            </CustomFormControlEditor>
           </div>
           <div>
-            <CustomTextField
+            <CustomFormControlEditor
               id="oneLiner"
-              className={classes.textFieldOneLiner}
-              label="One Liner"
-              variant="filled"
-              reset={forceValue.current}
-              forcedValue={forcedValues.current.oneLiner}
-              sendInputChange={handleInputChange}
-              multiline
-              rows={2}
-              customStyle={classes}
-            ></CustomTextField>
+              initialValue={defaultValues.oneLiner || ""}
+              onInputChange={handleInputChange}
+              onDiffChange={onDiffChange}
+              onBlur={handleInputOnBlur}
+            >
+              <CustomTextField
+                className={classes.textFieldOneLiner}
+                label="One Liner"
+                variant="filled"
+                multiline
+                rows={2}
+                customStyle={classes}
+              />
+            </CustomFormControlEditor>
             <div className={classes.contingenciesRoot}>
-              {
+              <CustomFormControlEditor
+                id="contingencies"
+                initialValue={defaultValues.contingencies || ""}
+                onInputChange={handleInputChange}
+                onDiffChange={onDiffChange}
+                onBlur={handleInputOnBlur}
+                onChangeArgument={1}
+              >
                 <ContingencyInput
                   customStyle={classes}
-                  reset={forceValue.current}
-                  forcedValue={forcedValues.current.contingencies}
-                  sendInputChange={handleInputChange}
                   options={settings.contingencyOptions}
                 />
-              }
+              </CustomFormControlEditor>
             </div>
-            <CustomTextField
+            <CustomFormControlEditor
               id="body"
-              className={classes.textFieldBody}
-              label="Content"
-              variant="filled"
-              reset={forceValue.current}
-              forcedValue={forcedValues.current.body}
-              sendInputChange={handleInputChange}
-              multiline
-              rows={10}
-              customStyle={classes}
-            ></CustomTextField>
-            <CustomTextField
+              initialValue={defaultValues.body || ""}
+              onInputChange={handleInputChange}
+              onDiffChange={onDiffChange}
+              onBlur={handleInputOnBlur}
+            >
+              <CustomTextField
+                className={classes.textFieldBody}
+                label="Content"
+                variant="filled"
+                multiline
+                rows={10}
+                customStyle={classes}
+              />
+            </CustomFormControlEditor>
+            <CustomFormControlEditor
               id="bottomText"
-              className={classes.textFieldBottomText}
-              label="Bottom Right Text"
-              variant="filled"
-              reset={forceValue.current}
-              forcedValue={forcedValues.current.bottomText}
-              sendInputChange={handleInputChange}
-              customStyle={classes}
-            ></CustomTextField>
+              initialValue={defaultValues.bottomText || ""}
+              onInputChange={handleInputChange}
+              onDiffChange={onDiffChange}
+              onBlur={handleInputOnBlur}
+            >
+              <CustomTextField
+                className={classes.textFieldBottomText}
+                label="Bottom Right Text"
+                variant="filled"
+                customStyle={classes}
+              />
+            </CustomFormControlEditor>
           </div>
         </form>
         <SnippetPopover popupState={popupState} onSelect={onSnippetSelected} />

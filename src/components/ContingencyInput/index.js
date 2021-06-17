@@ -69,7 +69,8 @@ const ContingencyInput = ({
       limitTags={5}
       multiple
       freeSolo
-      disableCloseOnSelect
+      autoHighlight
+      clearOnBlur
       options={options}
       renderInput={(params) => {
         return (

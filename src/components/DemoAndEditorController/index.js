@@ -14,7 +14,7 @@ import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 
 // Components
 import DemoBox from "../../components/DemoBox";
-import BedspaceEditor from "../../components/BedspaceEditor/_index.js";
+import BedspaceEditor from "../../components/BedspaceEditor";
 
 // Style
 const useStyles = makeStyles((theme) => ({

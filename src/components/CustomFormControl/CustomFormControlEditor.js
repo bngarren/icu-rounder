@@ -1,7 +1,4 @@
 import { useState, useEffect, cloneElement, useCallback } from "react";
-import { makeStyles } from "@material-ui/styles";
-
-const useStyles = makeStyles((theme) => ({}));
 
 const CustomFormControlEditor = ({
   initialValue,
@@ -12,7 +9,6 @@ const CustomFormControlEditor = ({
   onChangeArgument = 0,
   children,
 }) => {
-  const classes = useStyles();
   const [value, setValue] = useState("");
   const [diff, setDiff] = useState(false);
 
@@ -61,6 +57,7 @@ const CustomFormControlEditor = ({
     onChange: handleOnChange,
     onBlur: onBlur,
     id: id,
+    diff: diff,
   });
 
   return <>{childElement}</>;
