@@ -119,6 +119,7 @@ const DemoAndEditorController = ({
   to the saved "truth" data, i.e. reset changes back to the 
   last saved state */
   const handleOnReset = (e) => {
+    setBedspaceEditorData(defaultBedData);
     setResetKey(uniqueId());
   };
 
