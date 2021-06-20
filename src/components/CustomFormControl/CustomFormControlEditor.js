@@ -9,7 +9,7 @@ const CustomFormControlEditor = ({
   onChangeArgument = 0,
   children,
 }) => {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(initialValue);
   const [diff, setDiff] = useState(false);
 
   /* Each time a default value comes through as a prop,
@@ -33,8 +33,8 @@ const CustomFormControlEditor = ({
 
   /* Our custom onChange function that we inject into the child component.
   Since some components differ in the parameters they send to their onChange callback, 
-  i.e. Autocomplete, we receive all possible ...args here, and choose the one
-  we want. HACKY, but works for now. */
+  i.e. Autocomplete, ToggleContentType, we receive all possible ...args here, and choose the one
+  we want via prop. HACKY, but works for now. */
   const handleOnChange = useCallback(
     (...args) => {
       const val =
