@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, memo } from "react";
 import { debounce } from "lodash";
 
 import { TextField, Paper } from "@material-ui/core";
@@ -99,7 +99,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CustomTextField = ({ id, customStyle: classes, diff, ...props }) => {
+const CustomTextField = memo(function ({
+  id,
+  customStyle: classes,
+  diff,
+  ...props
+}) {
   return (
     <TextField
       InputProps={{
@@ -126,7 +131,7 @@ const CustomTextField = ({ id, customStyle: classes, diff, ...props }) => {
       {...props}
     />
   );
-};
+});
 
 const BedspaceEditor = ({
   data,

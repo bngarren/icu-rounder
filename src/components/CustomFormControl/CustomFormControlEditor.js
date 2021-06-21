@@ -1,4 +1,4 @@
-import { useState, useEffect, cloneElement, useCallback } from "react";
+import { useState, useEffect, cloneElement, useCallback, memo } from "react";
 
 const CustomFormControlEditor = ({
   initialValue,
@@ -63,4 +63,4 @@ const CustomFormControlEditor = ({
   return <>{childElement}</>;
 };
 
-export default CustomFormControlEditor;
+export default memo(CustomFormControlEditor);
