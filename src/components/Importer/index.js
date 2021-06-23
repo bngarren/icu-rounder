@@ -22,8 +22,10 @@ const Importer = ({ onNewDataSelected = (f) => f }) => {
       const fr = new FileReader();
       fr.onload = async (e) => {
         const result = await JSON.parse(e.target.result);
-        setData(result);
-        onNewDataSelected(result);
+
+        const modifiedResult = getModifiedJSON(result);
+        setData(modifiedResult);
+        onNewDataSelected(modifiedResult);
       };
 
       fr.readAsText(file, "application/json");
@@ -83,6 +85,27 @@ const Importer = ({ onNewDataSelected = (f) => f }) => {
       )}
     </div>
   );
+};
+
+/* Helper function to take the imported JSON data and clean it.
+E.g., remove objects who have empty beds or empty data */
+const getModifiedJSON = (dirtyJSON) => {
+  const cleanJSON = [];
+
+  dirtyJSON.forEach((element) => {
+    if (element.bed === "") return;
+
+    if (
+      (!element.firstName || element.firstName === "0") &&
+      (!element.lastName || element.lastName === "0")
+    ) {
+      cleanJSON.push({ bed: element.bed });
+    } else {
+      cleanJSON.push(element);
+    }
+  });
+
+  return cleanJSON;
 };
 
 export default Importer;
