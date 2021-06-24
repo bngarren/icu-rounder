@@ -1,4 +1,11 @@
-import { useState, useEffect, createContext, useRef, useCallback } from "react";
+import {
+  useState,
+  useEffect,
+  createContext,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import { useMediaQuery, Grid } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/styles";
 
@@ -79,139 +86,157 @@ const UpdatePage = () => {
     setCurrentBed(getNextBedspace(gridData, selectedKey, reverse));
   };
 
-  const handleBedActionEdit = (key) => {
-    const doAction = () => {
-      if (selectedKey === key) {
-        // re-clicked on the same bedspace
-        setSelectedKey(null);
+  const handleBedActionEdit = useCallback(
+    (key) => {
+      const doAction = () => {
+        if (selectedKey === key) {
+          // re-clicked on the same bedspace
+          setSelectedKey(null);
+        } else {
+          setCurrentBed(key);
+
+          if (refToBedspaceEditorDiv && !media_atleast_md) {
+            setTimeout(() => {
+              refToBedspaceEditorDiv.current.scrollIntoView(false);
+            }, 200);
+          }
+        }
+      };
+
+      if (needsSave) {
+        // Show a warning dialog if there is data that isn't saved
+
+        // Construct the message for the Dialog
+        const content = (
+          <>
+            <div>
+              There are{" "}
+              <span style={{ color: theme.palette.warning.main }}>
+                unsaved{" "}
+              </span>
+              changes for this bedspace. Continue <i>without</i> saving?
+            </div>
+            <div>
+              Bed: {gridData[selectedKey].bed}
+              <br />
+              {gridData[selectedKey].lastName
+                ? `Patient: ${gridData[selectedKey].lastName}`
+                : ""}
+            </div>
+          </>
+        );
+
+        showYesNoDialog(
+          content,
+          () => {
+            // chose to continue without saving
+            doAction();
+            setNeedsSave(false);
+          },
+          () => {
+            // chose to cancel
+            return;
+          }
+        );
       } else {
-        setCurrentBed(key);
-
-        if (refToBedspaceEditorDiv && !media_atleast_md) {
-          setTimeout(() => {
-            refToBedspaceEditorDiv.current.scrollIntoView(false);
-          }, 200);
-        }
+        doAction();
       }
-    };
-
-    if (needsSave) {
-      // Show a warning dialog if there is data that isn't saved
-
-      // Construct the message for the Dialog
-      const content = (
-        <>
-          <div>
-            There are{" "}
-            <span style={{ color: theme.palette.warning.main }}>unsaved </span>
-            changes for this bedspace. Continue <i>without</i> saving?
-          </div>
-          <div>
-            Bed: {gridData[selectedKey].bed}
-            <br />
-            {gridData[selectedKey].lastName
-              ? `Patient: ${gridData[selectedKey].lastName}`
-              : ""}
-          </div>
-        </>
-      );
-
-      showYesNoDialog(
-        content,
-        () => {
-          // chose to continue without saving
-          doAction();
-          setNeedsSave(false);
-        },
-        () => {
-          // chose to cancel
-          return;
-        }
-      );
-    } else {
-      doAction();
-    }
-  };
+    },
+    [
+      gridData,
+      media_atleast_md,
+      needsSave,
+      selectedKey,
+      showYesNoDialog,
+      theme.palette.warning.main,
+    ]
+  );
 
   /**
    *
    * @param {number} key Index of the bedspace to clear the data
    */
-  const handleBedActionClear = (key) => {
-    // Construct the message for the Dialog
-    const content = (
-      <>
-        <div>
-          Are you sure you want to{" "}
-          <b>
-            <span style={{ color: theme.palette.warning.main }}>CLEAR</span>
-          </b>{" "}
-          the data in this bedspace?
-          <br />
-          <i>(The bedspace will remain.)</i>
-        </div>
-        <div>
-          Bed: {gridData[key].bed}
-          <br />
-          {gridData[key].lastName ? `Patient: ${gridData[key].lastName}` : ""}
-        </div>
-      </>
-    );
+  const handleBedActionClear = useCallback(
+    (key) => {
+      // Construct the message for the Dialog
+      const content = (
+        <>
+          <div>
+            Are you sure you want to{" "}
+            <b>
+              <span style={{ color: theme.palette.warning.main }}>CLEAR</span>
+            </b>{" "}
+            the data in this bedspace?
+            <br />
+            <i>(The bedspace will remain.)</i>
+          </div>
+          <div>
+            Bed: {gridData[key].bed}
+            <br />
+            {gridData[key].lastName ? `Patient: ${gridData[key].lastName}` : ""}
+          </div>
+        </>
+      );
 
-    // Show the confirmation dialog before clearing
-    showYesNoDialog(
-      content,
-      () => {
-        //should clear callback
-        let updatedData = [...gridData];
-        updatedData[key] = { bed: updatedData[key].bed }; // only keep the bed
-        updateGridData(updatedData); //send new data to GridStateContext (handles truth data)
-        setNeedsSave(false);
-      },
-      () => {
-        //should cancel callback
-        return false;
-      }
-    );
-  };
+      // Show the confirmation dialog before clearing
+      showYesNoDialog(
+        content,
+        () => {
+          //should clear callback
+          let updatedData = [...gridData];
+          updatedData[key] = { bed: updatedData[key].bed }; // only keep the bed
+          updateGridData(updatedData); //send new data to GridStateContext (handles truth data)
+          setNeedsSave(false);
+        },
+        () => {
+          //should cancel callback
+          return false;
+        }
+      );
+    },
+    [gridData, showYesNoDialog, theme.palette.warning.main, updateGridData]
+  );
 
-  const handleBedActionDelete = (key) => {
-    // Construct the delete message for the Dialog
-    // Construct the message for the Dialog
-    const content = (
-      <>
-        <div>
-          Are you sure you want to{" "}
-          <b>
-            <span style={{ color: theme.palette.warning.main }}>REMOVE</span>
-          </b>{" "}
-          this bedspace and it's data?
-        </div>
-        <div>
-          Bed: {gridData[key].bed}
-          <br />
-          {gridData[key].lastName ? `Patient: ${gridData[key].lastName}` : ""}
-        </div>
-      </>
-    );
+  const handleBedActionDelete = useCallback(
+    (key) => {
+      // Construct the delete message for the Dialog
+      // Construct the message for the Dialog
+      const content = (
+        <>
+          <div>
+            Are you sure you want to{" "}
+            <b>
+              <span style={{ color: theme.palette.warning.main }}>REMOVE</span>
+            </b>{" "}
+            this bedspace and it's data?
+          </div>
+          <div>
+            Bed: {gridData[key].bed}
+            <br />
+            {gridData[key].lastName ? `Patient: ${gridData[key].lastName}` : ""}
+          </div>
+        </>
+      );
 
-    // Show the confirmation dialog before deleting
-    showYesNoDialog(
-      content,
-      () => {
-        //should delete callback
-        let updatedData = [...gridData];
-        let deleted = updatedData.splice(key, 1);
-        updateGridData(updatedData); //send new data to GridStateContext (handles truth data)
-        setNeedsSave(false);
-        setSelectedKey(null);
-      },
-      () => {
-        //should cancel callback
-        return false;
-      }
-    );
-  };
+      // Show the confirmation dialog before deleting
+      showYesNoDialog(
+        content,
+        () => {
+          //should delete callback
+          let updatedData = [...gridData];
+          let deleted = updatedData.splice(key, 1);
+          updateGridData(updatedData); //send new data to GridStateContext (handles truth data)
+          setNeedsSave(false);
+          setSelectedKey(null);
+        },
+        () => {
+          //should cancel callback
+          return false;
+        }
+      );
+    },
+    [gridData, showYesNoDialog, theme.palette.warning.main, updateGridData]
+  );
 
   /* Handles the SAVE action.
   - Before trying to merge this new bedspace data with the gridData (in GridStateContext),
@@ -302,6 +327,15 @@ const UpdatePage = () => {
     ]
   );
 
+  const bedActions = useMemo(
+    () => ({
+      bedActionEdit: handleBedActionEdit,
+      bedActionClear: handleBedActionClear,
+      bedActionDelete: handleBedActionDelete,
+    }),
+    [handleBedActionClear, handleBedActionDelete, handleBedActionEdit]
+  );
+
   /* - - - - - RETURN - - - - - */
 
   if (gridData != null) {
@@ -315,13 +349,7 @@ const UpdatePage = () => {
             xs={12}
             style={{ padding: "0 6px", marginBottom: "8px" }}
           >
-            <BedActionsContext.Provider
-              value={{
-                bedActionEdit: handleBedActionEdit,
-                bedActionClear: handleBedActionClear,
-                bedActionDelete: handleBedActionDelete,
-              }}
-            >
+            <BedActionsContext.Provider value={bedActions}>
               <TableBedList data={gridData} selectedKey={selectedKey} />
             </BedActionsContext.Provider>
           </Grid>

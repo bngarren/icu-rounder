@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, memo } from "react";
 import {
   TableContainer,
   Table,
@@ -228,49 +228,17 @@ const MyTableBody = ({ classes, data, page, rowsPerPage, selectedKey }) => {
           .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
           .map((value, key) => {
             let adjustedKey = key + page * rowsPerPage; // the key resets to index 0 for every pagination page
-            let isSelected = adjustedKey === selectedKey;
-            const emptyBed = isBedEmpty(value);
+            const isSelected = adjustedKey === selectedKey;
             return (
-              <TableRow
-                className={clsx(classes.tableRow, {
-                  [classes.highlightRowIn]: highlight === adjustedKey,
-                })}
-                key={value.bed}
-                hover
-                selected={isSelected}
-              >
-                <TableCell
-                  component="th"
-                  scope="row"
-                  align="left"
-                  className={tableCellClasses}
-                >
-                  <Typography
-                    variant="h5"
-                    className={classes.tableHeaderBedNumber}
-                  >
-                    {value.bed}
-                  </Typography>
-                </TableCell>
-                <TableCell align="left" className={tableCellClasses}>
-                  <span>
-                    {value["lastName"]}
-                    {value["lastName"] && value["firstName"] && ", "}
-                    {value["firstName"]}
-                  </span>
-                </TableCell>
-                <TableCell align="center" className={tableCellClasses}>
-                  <span>{value["teamNumber"]}</span>
-                </TableCell>
-                <TableCell className={tableCellClasses}>
-                  <BedActions
-                    classes={classes}
-                    isSelected={isSelected}
-                    bedKey={adjustedKey}
-                    emptyBed={emptyBed}
-                  />
-                </TableCell>
-              </TableRow>
+              <MyTableRow
+                classes={classes}
+                tableCellClasses={tableCellClasses}
+                highlight={highlight}
+                adjustedKey={adjustedKey}
+                isSelected={isSelected}
+                key={`MyTableRow-${value.bed}-${key}`}
+                value={value}
+              />
             );
           })}
         {MyInputTableRow}
@@ -279,7 +247,59 @@ const MyTableBody = ({ classes, data, page, rowsPerPage, selectedKey }) => {
   );
 };
 
-const BedActions = ({ classes, isSelected, bedKey, emptyBed }) => {
+const MyTableRow = memo(
+  ({
+    classes,
+    tableCellClasses,
+    highlight,
+    adjustedKey,
+    isSelected,
+    value,
+  }) => {
+    const emptyBed = isBedEmpty(value);
+    return (
+      <TableRow
+        className={clsx(classes.tableRow, {
+          [classes.highlightRowIn]: highlight === adjustedKey,
+        })}
+        key={value.bed}
+        hover
+        selected={isSelected}
+      >
+        <TableCell
+          component="th"
+          scope="row"
+          align="left"
+          className={tableCellClasses}
+        >
+          <Typography variant="h5" className={classes.tableHeaderBedNumber}>
+            {value.bed}
+          </Typography>
+        </TableCell>
+        <TableCell align="left" className={tableCellClasses}>
+          <span>
+            {value["lastName"]}
+            {value["lastName"] && value["firstName"] && ", "}
+            {value["firstName"]}
+          </span>
+        </TableCell>
+        <TableCell align="center" className={tableCellClasses}>
+          <span>{value["teamNumber"]}</span>
+        </TableCell>
+        <TableCell className={tableCellClasses}>
+          <BedActions
+            classes={classes}
+            isSelected={isSelected}
+            bedKey={adjustedKey}
+            emptyBed={emptyBed}
+          />
+        </TableCell>
+      </TableRow>
+    );
+  }
+);
+
+const BedActions = memo(({ classes, isSelected, bedKey, emptyBed }) => {
   const { bedActionEdit, bedActionClear, bedActionDelete } =
     useContext(BedActionsContext);
 
@@ -302,7 +322,7 @@ const BedActions = ({ classes, isSelected, bedKey, emptyBed }) => {
       }}
     >
       {
-        <Tooltip title="Edit">
+        <div title="Edit">
           <IconButton
             className={classes.tableEditIconButton}
             onClick={() => bedActionEdit(bedKey)}
@@ -315,7 +335,7 @@ const BedActions = ({ classes, isSelected, bedKey, emptyBed }) => {
               ].join(" ")}
             />
           </IconButton>
-        </Tooltip>
+        </div>
       }
       {
         <IconButton
@@ -338,6 +358,6 @@ const BedActions = ({ classes, isSelected, bedKey, emptyBed }) => {
       />
     </div>
   );
-};
+});
 
 export default TableBedList;

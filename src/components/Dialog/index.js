@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import {
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
-  Typography,
   Button,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
@@ -26,41 +25,44 @@ export const useDialog = () => {
     setOpen(false);
   };
 
-  const handleOnAction = (cb) => {
+  const handleOnAction = useCallback((cb) => {
     handleOnClose();
     cb();
-  };
+  }, []);
 
-  const showYesNoDialog = (
-    content = "",
-    onSubmit = () => console.log("Dialog sumbit."),
-    onCancel = () => console.log("Dialog cancel."),
-    buttonLabels = { yes: "Yes", no: "Cancel" }
-  ) => {
-    if (!content) {
-      throw new Error("Cannot show Dialog without content.");
-    } else if (open) {
-      throw new Error("Dialog is already open.");
-    }
+  const showYesNoDialog = useCallback(
+    (
+      content = "",
+      onSubmit = () => console.log("Dialog sumbit."),
+      onCancel = () => console.log("Dialog cancel."),
+      buttonLabels = { yes: "Yes", no: "Cancel" }
+    ) => {
+      if (!content) {
+        throw new Error("Cannot show Dialog without content.");
+      } else if (open) {
+        throw new Error("Dialog is already open.");
+      }
 
-    setOpen(true);
+      setOpen(true);
 
-    setDialog(
-      <Dialog
-        classes={{ paper: classes.paper }}
-        open={true}
-        onClose={handleOnClose}
-        transitionDuration={TRANSITION_DURATION}
-      >
-        <YesNoDialog
-          content={content}
-          onSubmit={() => handleOnAction(onSubmit)}
-          onCancel={() => handleOnAction(onCancel)}
-          buttonLabels={buttonLabels}
-        />
-      </Dialog>
-    );
-  };
+      setDialog(
+        <Dialog
+          classes={{ paper: classes.paper }}
+          open={true}
+          onClose={handleOnClose}
+          transitionDuration={TRANSITION_DURATION}
+        >
+          <YesNoDialog
+            content={content}
+            onSubmit={() => handleOnAction(onSubmit)}
+            onCancel={() => handleOnAction(onCancel)}
+            buttonLabels={buttonLabels}
+          />
+        </Dialog>
+      );
+    },
+    [classes.paper, handleOnAction, open]
+  );
 
   return {
     dialogIsOpen: open,
