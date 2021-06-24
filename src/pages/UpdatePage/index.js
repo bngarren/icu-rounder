@@ -40,10 +40,10 @@ const UpdatePage = () => {
     firstName: "",
     teamNumber: "",
     oneLiner: "",
-    contingencies: "",
+    contingencies: [],
     contentType: "simple",
     simpleContent: "",
-    nestedContent: "",
+    nestedContent: [],
     bottomText: "",
   });
 
