@@ -363,7 +363,7 @@ const BedspaceEditor = ({
           <div>
             <CustomFormControlEditor
               id="bed"
-              initialValue={defaultValues.bed || ""}
+              initialValue={defaultValues.bed}
               onInputChange={handleInputChange}
               onDiffChange={onDiffChange}
               onBlur={handleInputOnBlur}
@@ -378,7 +378,7 @@ const BedspaceEditor = ({
             </CustomFormControlEditor>
             <CustomFormControlEditor
               id="lastName"
-              initialValue={defaultValues.lastName || ""}
+              initialValue={defaultValues.lastName}
               onInputChange={handleInputChange}
               onDiffChange={onDiffChange}
               onBlur={handleInputOnBlur}
@@ -395,7 +395,7 @@ const BedspaceEditor = ({
             </CustomFormControlEditor>
             <CustomFormControlEditor
               id="firstName"
-              initialValue={defaultValues.firstName || ""}
+              initialValue={defaultValues.firstName}
               onInputChange={handleInputChange}
               onDiffChange={onDiffChange}
               onBlur={handleInputOnBlur}
@@ -410,7 +410,7 @@ const BedspaceEditor = ({
             </CustomFormControlEditor>
             <CustomFormControlEditor
               id="teamNumber"
-              initialValue={defaultValues.teamNumber || ""}
+              initialValue={defaultValues.teamNumber}
               onInputChange={handleInputChange}
               onDiffChange={onDiffChange}
               onBlur={handleInputOnBlur}
@@ -427,7 +427,7 @@ const BedspaceEditor = ({
           <div>
             <CustomFormControlEditor
               id="oneLiner"
-              initialValue={defaultValues.oneLiner || ""}
+              initialValue={defaultValues.oneLiner}
               onInputChange={handleInputChange}
               onDiffChange={onDiffChange}
               onBlur={handleInputOnBlur}
@@ -444,7 +444,7 @@ const BedspaceEditor = ({
             <div className={classes.contingenciesRoot}>
               <CustomFormControlEditor
                 id="contingencies"
-                initialValue={defaultValues.contingencies || ""}
+                initialValue={defaultValues.contingencies}
                 onInputChange={handleInputChange}
                 onDiffChange={onDiffChange}
                 onBlur={handleInputOnBlur}
@@ -474,7 +474,7 @@ const BedspaceEditor = ({
             </CustomFormControlEditor>
             <CustomFormControlEditor
               id="bottomText"
-              initialValue={defaultValues.bottomText || ""}
+              initialValue={defaultValues.bottomText}
               onInputChange={handleInputChange}
               onDiffChange={onDiffChange}
               onBlur={handleInputOnBlur}

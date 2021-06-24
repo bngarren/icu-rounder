@@ -37,12 +37,18 @@ const CustomFormControlEditor = ({
   we want via prop. HACKY, but works for now. */
   const handleOnChange = useCallback(
     (...args) => {
-      const val =
+      let val =
         onChangeArgument === 0
           ? args[onChangeArgument].target.value
           : args[onChangeArgument];
 
-      setDiff(!(val === initialValue));
+      let iv = initialValue;
+      if (typeof val === "number" || typeof initialValue === "number") {
+        val = val + "";
+        iv = iv + "";
+      }
+
+      setDiff(!(val === iv));
 
       setValue(val);
 

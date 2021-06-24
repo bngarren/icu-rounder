@@ -1,4 +1,4 @@
-import { useState, createContext, useRef, useCallback } from "react";
+import { useState, useEffect, createContext, useRef, useCallback } from "react";
 import { useMediaQuery, Grid } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/styles";
 
@@ -31,6 +31,28 @@ const UpdatePage = () => {
 
   const [selectedKey, setSelectedKey] = useState(); // index of the bedspace being "edited"
   const [needsSave, setNeedsSave] = useState(false); // true, if an unsaved changed has occurred in bedspaceEditor
+
+  const [defaultBedData, setDefaultBedData] = useState();
+  /* Default bed data */
+  const defaults = useRef({
+    bed: "",
+    lastName: "",
+    firstName: "",
+    teamNumber: "",
+    oneLiner: "",
+    contingencies: "",
+    contentType: "simple",
+    simpleContent: "",
+    nestedContent: "",
+    bottomText: "",
+  });
+
+  useEffect(() => {
+    setDefaultBedData({
+      ...defaults.current,
+      ...gridData[selectedKey],
+    });
+  }, [selectedKey, gridData]);
 
   /* Hook for our Dialog modal */
   const { dialogIsOpen, dialog, showYesNoDialog } = useDialog();
@@ -306,7 +328,7 @@ const UpdatePage = () => {
           <Grid item lg md={8} sm={12} xs={12} ref={refToBedspaceEditorDiv}>
             {selectedKey != null && (
               <DemoAndEditorController
-                defaultBedData={gridData[selectedKey]}
+                defaultBedData={defaultBedData}
                 needsSave={needsSave}
                 setNeedsSave={setNeedsSave}
                 onNextBedspace={navigateNextBedspace}

@@ -102,11 +102,21 @@ const DemoAndEditorController = ({
     bedspaceEditorDataRef.current = data;
   };
 
+  const [resetKey, setResetKey] = useState(uniqueId()); // value not important, just using it to trigger re-render
+
+  /* Want to reset the data being used in the bedspaceEditor
+  to the saved "truth" data, e.g., reset changes back to the 
+  last saved state */
+  const handleOnReset = useCallback(() => {
+    setBedspaceEditorData(defaultBedData);
+    setResetKey(uniqueId());
+  }, [defaultBedData]);
+
   /* Keep the editor's data up to date with the truth data */
   useEffect(() => {
-    setBedspaceEditorData(defaultBedData);
+    handleOnReset(); // this will make BedspaceEditorData = defaultBedData
     setNeedsSave(false);
-  }, [defaultBedData, setNeedsSave]);
+  }, [defaultBedData, setNeedsSave, handleOnReset]);
 
   /* When a change in the BedspaceEditor's data occurs, it
   sends the new bedspace JSON object here.  */
@@ -118,16 +128,6 @@ const DemoAndEditorController = ({
   helpful for setting debounce interval in BedspaceEditor 
   i.e., if demobox is not visible, the debounce interval can be higher */
   const [demoBoxCollapsed, setDemoBoxCollapsed] = useState(true);
-
-  const [resetKey, setResetKey] = useState(uniqueId()); // value not important, just using it to trigger re-render
-
-  /* Want to reset the data being used in the bedspaceEditor
-  to the saved "truth" data, i.e. reset changes back to the 
-  last saved state */
-  const handleOnReset = (e) => {
-    setBedspaceEditorData(defaultBedData);
-    setResetKey(uniqueId());
-  };
 
   /* A ref to hold any debounced functions being used.
   These will be flushed when necessary.
