@@ -89,6 +89,7 @@ const ContingencyInput = ({
             }}
             InputLabelProps={{
               ...params.InputLabelProps,
+              shrink: true,
               classes: {
                 root: textFieldClasses.textFieldInputLabelRoot,
                 focused: textFieldClasses.textFieldInputLabelFocused,

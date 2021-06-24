@@ -23,9 +23,13 @@ const Importer = ({ onNewDataSelected = (f) => f }) => {
       fr.onload = async (e) => {
         const result = await JSON.parse(e.target.result);
 
-        const modifiedResult = getModifiedJSON(result);
-        setData(modifiedResult);
-        onNewDataSelected(modifiedResult);
+        try {
+          const modifiedResult = getModifiedJSON(result);
+          setData(modifiedResult);
+          onNewDataSelected(modifiedResult);
+        } catch (err) {
+          console.error(`Error in Importer: ${err.message}`);
+        }
       };
 
       fr.readAsText(file, "application/json");
@@ -92,18 +96,36 @@ E.g., remove objects who have empty beds or empty data */
 const getModifiedJSON = (dirtyJSON) => {
   const cleanJSON = [];
 
-  dirtyJSON.forEach((element) => {
-    if (element.bed === "") return;
+  // make sure it's an array
+  if (dirtyJSON instanceof Array) {
+    dirtyJSON.forEach((element) => {
+      // each element in the array should be an object
+      if (element instanceof Object) {
+        // object has no keys, i.e. is empty
+        if (Object.keys(element).length === 0) return; // skip this element
 
-    if (
-      (!element.firstName || element.firstName === "0") &&
-      (!element.lastName || element.lastName === "0")
-    ) {
-      cleanJSON.push({ bed: element.bed });
-    } else {
-      cleanJSON.push(element);
-    }
-  });
+        // if no bed key, skip this element
+        if (element.bed === "") return;
+
+        // workaround for data exported from Excel grid at BCH
+        if (
+          (!element.firstName || element.firstName === "0") &&
+          (!element.lastName || element.lastName === "0")
+        ) {
+          cleanJSON.push({ bed: element.bed });
+        } else {
+          cleanJSON.push(element);
+        }
+      } else {
+        // All elements in this imported array are expected to be Objects
+        throw new Error(
+          "Imported data has an element that is not of type Object."
+        );
+      }
+    });
+  } else {
+    throw new Error("Imported data is not an array structure.");
+  }
 
   return cleanJSON;
 };

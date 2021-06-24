@@ -57,13 +57,19 @@ const useStyles = makeStyles((theme) => ({
     color: "#626060",
     fontWeight: "bold",
   },
-  tableEditButton: {
+  tableEditIconButton: {
+    padding: "6px",
+  },
+  tableEditIcon: {
     cursor: "pointer",
     color: "#626060",
     fontSize: "22px",
   },
-  tableEditButtonSelected: {
+  tableEditIconSelected: {
     color: theme.palette.secondary.main,
+  },
+  tableMenuIconButton: {
+    padding: "6px",
   },
   tableDeleteButton: {
     cursor: "pointer",
@@ -297,19 +303,25 @@ const BedActions = ({ classes, isSelected, bedKey, emptyBed }) => {
     >
       {
         <Tooltip title="Edit">
-          <IconButton onClick={() => bedActionEdit(bedKey)}>
+          <IconButton
+            className={classes.tableEditIconButton}
+            onClick={() => bedActionEdit(bedKey)}
+          >
             <EditIcon
               fontSize="small"
               className={[
-                classes.tableEditButton,
-                isSelected && classes.tableEditButtonSelected,
+                classes.tableEditIcon,
+                isSelected && classes.tableEditIconSelected,
               ].join(" ")}
             />
           </IconButton>
         </Tooltip>
       }
       {
-        <IconButton onClick={(e) => handleOnClickMenu(e, bedKey)}>
+        <IconButton
+          className={classes.tableMenuIconButton}
+          onClick={(e) => handleOnClickMenu(e, bedKey)}
+        >
           {popupState.isOpen ? (
             <MenuOpenIcon fontSize="small" />
           ) : (

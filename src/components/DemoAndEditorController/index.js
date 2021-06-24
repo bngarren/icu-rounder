@@ -28,6 +28,12 @@ const useStyles = makeStyles((theme) => ({
   bedspaceEditorToolbar: {
     borderBottom: "2px solid #f6f8fa",
   },
+  navigationDiv: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    minWidth: "235px",
+  },
   bedspaceEditorToolbarBedNumber: {
     color: "#8c888821",
   },
@@ -194,28 +200,30 @@ const DemoAndEditorController = ({
   Navigation arrows, Save, and Reset buttons */
   const renderToolbar = () => (
     <Toolbar variant="dense" className={classes.bedspaceEditorToolbar}>
-      <IconButton
-        disabled={needsSave}
-        className={classes.navigateIconButton}
-        disableRipple
-        onClick={() => onNextBedspace(true)}
-      >
-        <NavigateBeforeIcon className={classes.navigateIcon} />
-      </IconButton>
-      <Typography
-        variant="h1"
-        className={classes.bedspaceEditorToolbarBedNumber}
-      >
-        {defaultBedData.bed || ""}
-      </Typography>
-      <IconButton
-        disabled={needsSave}
-        className={classes.navigateIconButton}
-        disableRipple
-        onClick={() => onNextBedspace(false)}
-      >
-        <NavigateNextIcon className={classes.navigateIcon} />
-      </IconButton>
+      <div className={classes.navigationDiv}>
+        <IconButton
+          disabled={needsSave}
+          className={classes.navigateIconButton}
+          disableRipple
+          onClick={() => onNextBedspace(true)}
+        >
+          <NavigateBeforeIcon className={classes.navigateIcon} />
+        </IconButton>
+        <Typography
+          variant="h1"
+          className={classes.bedspaceEditorToolbarBedNumber}
+        >
+          {defaultBedData.bed || ""}
+        </Typography>
+        <IconButton
+          disabled={needsSave}
+          className={classes.navigateIconButton}
+          disableRipple
+          onClick={() => onNextBedspace(false)}
+        >
+          <NavigateNextIcon className={classes.navigateIcon} />
+        </IconButton>
+      </div>
       <Button
         classes={{
           root: classes.saveButton,

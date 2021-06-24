@@ -118,6 +118,7 @@ const CustomTextField = memo(function ({
         },
       }}
       InputLabelProps={{
+        shrink: true,
         classes: {
           root: clsx(classes.textFieldInputLabelRoot, {
             [classes.textFieldInputLabelUnsaved]: diff,
