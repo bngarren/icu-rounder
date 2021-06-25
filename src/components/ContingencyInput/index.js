@@ -9,7 +9,7 @@ import CheckBoxIcon from "@material-ui/icons/CheckBox";
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   popper: {
     width: "300px !important",
     zIndex: 1,
@@ -27,10 +27,13 @@ const useStyles = makeStyles({
     minHeight: "auto",
     alignItems: "center",
     padding: 3,
-    '&[aria-selected="true"]': {
-      backgroundColor: "transparent",
+    // Selected
+    '&[aria-selected="true"]': {},
+    // Hover
+    '&[data-focus="true"]': {
+      backgroundColor: theme.palette.secondary.light,
+      color: theme.palette.secondary.contrastText,
     },
-    '&[data-focus="true"]': {},
   },
   checkboxRoot: {
     padding: "3px",
@@ -40,13 +43,13 @@ const useStyles = makeStyles({
   },
   checkboxColorSecondary: {
     "&.Mui-checked": {
-      color: "#b7d100",
+      color: theme.palette.secondary,
       "&:hover": {
         backgroundColor: "rgba(183, 209, 0, 0.1)",
       },
     },
   },
-});
+}));
 
 const ContingencyInput = ({
   customStyle: textFieldClasses,
@@ -71,6 +74,7 @@ const ContingencyInput = ({
       multiple
       freeSolo
       clearOnBlur
+      filterSelectedOptions
       options={options}
       renderInput={(params) => {
         return (
