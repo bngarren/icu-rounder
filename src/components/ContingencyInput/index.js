@@ -52,6 +52,7 @@ const ContingencyInput = ({
   customStyle: textFieldClasses,
   options,
   value,
+  diff,
   ...props
 }) => {
   const classes = useStyles();

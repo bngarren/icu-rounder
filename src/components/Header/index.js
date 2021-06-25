@@ -8,7 +8,6 @@ import {
   AppBar,
   Toolbar,
   IconButton,
-  Typography,
   useScrollTrigger,
   Menu,
   MenuItem,
@@ -23,6 +22,9 @@ import GetAppIcon from "@material-ui/icons/GetApp";
 import ViewListIcon from "@material-ui/icons/ViewList";
 import SettingsIcon from "@material-ui/icons/Settings";
 import MenuIcon from "@material-ui/icons/Menu";
+
+// lodash
+import { uniqueId } from "lodash";
 
 // React Router
 import { useHistory, useRouteMatch } from "react-router-dom";
@@ -222,11 +224,7 @@ const HeaderMenu = ({
     : "grid";
 
   const loggedInMenu = [
-    <MenuItem
-      onClick={handleEdit}
-      disabled={Boolean(useRouteMatch("/update"))}
-      key="menuItemEdit"
-    >
+    <MenuItem onClick={handleEdit} disabled={Boolean(useRouteMatch("/update"))}>
       <ListItemIcon>
         <ViewListIcon />
       </ListItemIcon>
@@ -235,30 +233,29 @@ const HeaderMenu = ({
     <MenuItem
       onClick={handleSettings}
       disabled={Boolean(useRouteMatch("/settings"))}
-      key="menuItemSettings"
     >
       <ListItemIcon>
         <SettingsIcon />
       </ListItemIcon>
       <CustomListItemText>Settings</CustomListItemText>
     </MenuItem>,
-    <Divider key="menuItemDivider1" />,
-    <MenuItem onClick={handleDownloadPdf} key="menuItemDownloadPdf">
+    <Divider />,
+    <MenuItem onClick={handleDownloadPdf}>
       <ListItemIcon>
         <PictureAsPdfIcon />
       </ListItemIcon>
       <CustomListItemText>Download PDF</CustomListItemText>
     </MenuItem>,
     <Exporter onExported={handleOnExported} filename={exportFilename}>
-      <MenuItem key="menuItemExportJson">
+      <MenuItem>
         <ListItemIcon>
           <GetAppIcon />
         </ListItemIcon>
         <CustomListItemText>Export Grid</CustomListItemText>
       </MenuItem>
     </Exporter>,
-    <Divider key="menuItemDivider2" />,
-    <MenuItem onClick={handleLogout} key="menuItemLogout">
+    <Divider />,
+    <MenuItem onClick={handleLogout}>
       <ListItemIcon>
         <ExitToAppIcon />
       </ListItemIcon>
@@ -267,7 +264,7 @@ const HeaderMenu = ({
   ];
 
   const loggedOutMenu = [
-    <MenuItem onClick={handleLogin} key="menuItemLogin">
+    <MenuItem onClick={handleLogin}>
       <ListItemIcon>
         <AccountBoxIcon />
       </ListItemIcon>
@@ -298,8 +295,12 @@ const HeaderMenu = ({
         onClose={handleClose}
       >
         {userIsLoggedIn
-          ? loggedInMenu.map((i) => i)
-          : loggedOutMenu.map((i) => i)}
+          ? loggedInMenu.map((i) =>
+              cloneElement(i, { key: uniqueId("menuItem-") })
+            )
+          : loggedOutMenu.map((i) =>
+              cloneElement(i, { key: uniqueId("menuItem-") })
+            )}
       </Menu>
     </div>
   );
