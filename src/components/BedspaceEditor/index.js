@@ -150,39 +150,40 @@ const BedspaceEditor = ({
   const { settings } = useSettings();
 
   /* For each input in the Editor, tracks whether it needs a save or not */
-  const [unsavedData, _setUnsavedData] = useState([]);
+  const unsavedData = useRef([]);
 
-  const setInputSavedStatus = (id, unsaved) => {
-    if (unsaved) {
-      /* If this input is now 'unsaved', add to the unsavedData array, only
+  const setInputSavedStatus = useCallback(
+    (id, unsaved) => {
+      if (unsaved) {
+        /* If this input is now 'unsaved', add to the unsavedData array, only
       if it doesn't already exist */
-      _setUnsavedData((prevValue) => {
-        if (prevValue.indexOf(id) === -1) {
-          return prevValue.concat([id]);
-        } else {
-          return prevValue;
+        if (unsavedData.current.indexOf(id) === -1) {
+          unsavedData.current.push(id);
         }
-      });
-    } else {
-      /* If this input is now 'saved', remove it from the unsavedData array */
-      _setUnsavedData((prevValue) => {
-        return prevValue.filter((value) => value !== id);
-      });
-    }
-  };
+      } else {
+        /* If this input is now 'saved', remove it from the unsavedData array */
+        unsavedData.current = unsavedData.current.filter(
+          (value) => value !== id
+        );
+      }
 
-  const clearUnsavedData = () => _setUnsavedData([]);
+      setNeedsSave(unsavedData.current.length > 0);
+    },
+    [setNeedsSave]
+  );
+
+  const clearUnsavedData = () => {
+    unsavedData.current = [];
+  };
 
   /* Callback sent as prop to each CustomFormControlEditor component so
   that this component knows when a change has occured that needs a save */
-  const onDiffChange = useCallback((id, diff) => {
-    setInputSavedStatus(id, diff);
-  }, []);
-
-  /* If the Editor is aware of the unsavedData array changing, let the parent component know */
-  useEffect(() => {
-    setNeedsSave(unsavedData.length > 0);
-  }, [unsavedData.length, setNeedsSave]);
+  const onDiffChange = useCallback(
+    (id, diff) => {
+      setInputSavedStatus(id, diff);
+    },
+    [setInputSavedStatus]
+  );
 
   /* Ref to last name input field, so we can focus() here when a bed is selected */
   const lastNameInputRef = useRef();
