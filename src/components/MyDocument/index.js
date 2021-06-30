@@ -33,7 +33,21 @@ const pdfStyles = StyleSheet.create({
   },
   header: {
     fontSize: "13pt",
+    display: "flex",
+    flexDirection: "row",
+  },
+  titleRoot: {
+    flexGrow: 1,
     textAlign: "center",
+  },
+  censusRoot: {
+    fontSize: "8pt",
+    alignSelf: "center",
+    flexBasis: "20%",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingRight: "5pt",
   },
   gridListRoot: {
     display: "flex",
@@ -121,6 +135,9 @@ const pdfStyles = StyleSheet.create({
     fontSize: "7pt",
     padding: "2pt 4pt 2pt 2pt",
   },
+  bold: {
+    fontWeight: "bold",
+  },
 });
 
 /* Hard coded Pt sizes for Letter size PDF document
@@ -143,7 +160,7 @@ export const getWidth = (colsPerPage, factor = 1) => {
   return res.toString() + "pt";
 };
 
-const MyDocument = ({ bedLayout, title, colsPerPage, data }) => {
+const MyDocument = ({ bedLayout, title, colsPerPage, data, census }) => {
   const beds = bedLayout.length;
 
   const getMatrix = (r, c) => {
@@ -167,7 +184,31 @@ const MyDocument = ({ bedLayout, title, colsPerPage, data }) => {
     <Document>
       <Page size="letter" style={pdfStyles.page}>
         <View style={pdfStyles.header}>
-          <Text>{title}</Text>
+          <View style={pdfStyles.titleRoot}>
+            <Text>{title}</Text>
+          </View>
+
+          <View style={pdfStyles.censusRoot}>
+            {census ? (
+              <>
+                <Text>
+                  {`${census.filledTotal}/${census.total}`}{" "}
+                  {census.emptyBeds.length > 0 &&
+                    `[${census.emptyBeds.toString()}]`}
+                </Text>
+                {census.teamTotals.map((t) => {
+                  return (
+                    <Text key={t.id}>
+                      <Text style={pdfStyles.bold}>{t.id}</Text>
+                      {`: ${t.value}`}
+                    </Text>
+                  );
+                })}
+              </>
+            ) : (
+              <></>
+            )}
+          </View>
         </View>
         <View style={pdfStyles.gridListRoot}>
           {matrix.map((row, rIndex) => {
