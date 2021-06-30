@@ -41,9 +41,13 @@ const pdfStyles = StyleSheet.create({
     textAlign: "center",
   },
   censusRoot: {
-    fontSize: "9pt",
+    fontSize: "8pt",
     alignSelf: "center",
     flexBasis: "20%",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingRight: "5pt",
   },
   gridListRoot: {
     display: "flex",
@@ -184,9 +188,11 @@ const MyDocument = ({ bedLayout, title, colsPerPage, data, census }) => {
           <View style={pdfStyles.censusRoot}>
             {census ? (
               <>
-                <Text>{`${census.filledTotal}/${
-                  census.total
-                } (${census.emptyBeds.toString()})`}</Text>
+                <Text>
+                  {`${census.filledTotal}/${census.total}`}{" "}
+                  {census.emptyBeds.length > 0 &&
+                    `[${census.emptyBeds.toString()}]`}
+                </Text>
                 {census.teamTotals.map((t) => {
                   return <Text key={t.id}>{`${t.id}=${t.value}`}</Text>;
                 })}
