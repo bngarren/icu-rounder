@@ -2,7 +2,11 @@ import { useEffect, useState, useCallback, useRef, memo } from "react";
 import { debounce } from "lodash";
 
 import { TextField, Paper } from "@material-ui/core";
+import ToggleButton from "@material-ui/lab/ToggleButton";
+import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
+import NotesIcon from "@material-ui/icons/Notes";
+import VerticalSplitIcon from "@material-ui/icons/VerticalSplit";
 
 import clsx from "clsx";
 
@@ -352,6 +356,15 @@ const BedspaceEditor = ({
     };
   }, [handleKeyDown]);
 
+  /* Toggle buttons for selecting the content type */
+  const [contentType, setContentType] = useState("simple");
+
+  const handleToggleContentType = (event, newContentType) => {
+    setContentType((prevValue) => {
+      return newContentType !== null ? newContentType : prevValue;
+    });
+  };
+
   /*  - - - - - RETURN - - - -  */
   if (data) {
     return (
@@ -459,22 +472,46 @@ const BedspaceEditor = ({
               </CustomFormControlEditor>
             </div>
             <div>
+              <ToggleButtonGroup
+                value={contentType}
+                exclusive
+                onChange={handleToggleContentType}
+                aria-label="content type"
+              >
+                <ToggleButton
+                  value="simple"
+                  aria-label="simple input"
+                  size="small"
+                >
+                  <NotesIcon style={{ fontSize: "12pt" }} />
+                </ToggleButton>
+                <ToggleButton
+                  value="nested"
+                  aria-label="nested input"
+                  size="small"
+                >
+                  <VerticalSplitIcon style={{ fontSize: "12pt" }} />
+                </ToggleButton>
+              </ToggleButtonGroup>
               <CustomFormControlEditor
-                id="body"
-                initialValue={defaultValues.body || ""}
+                id="simpleContent"
+                initialValue={defaultValues.simpleContent || ""}
                 onInputChange={handleInputChange}
                 onDiffChange={onDiffChange}
                 onBlur={handleInputOnBlur}
               >
-                {/* <CustomTextField
-                  className={classes.textFieldBody}
-                  label="Content"
-                  variant="filled"
-                  multiline
-                  rows={10}
-                  customStyle={classes}
-                /> */}
-                <ContentInput />
+                {contentType === "simple" ? (
+                  <CustomTextField
+                    className={classes.textFieldBody}
+                    label="Content"
+                    variant="filled"
+                    multiline
+                    rows={10}
+                    customStyle={classes}
+                  />
+                ) : (
+                  <ContentInput />
+                )}
               </CustomFormControlEditor>
             </div>
 
