@@ -13,6 +13,7 @@ import SnippetPopover from "../SnippetPopover";
 
 // Components
 import CustomFormControlEditor from "../../components/CustomFormControl/CustomFormControlEditor";
+import ContentInput from "../ContentInput";
 import ContingencyInput from "../ContingencyInput";
 
 // Settings context
@@ -457,22 +458,26 @@ const BedspaceEditor = ({
                 />
               </CustomFormControlEditor>
             </div>
-            <CustomFormControlEditor
-              id="body"
-              initialValue={defaultValues.body || ""}
-              onInputChange={handleInputChange}
-              onDiffChange={onDiffChange}
-              onBlur={handleInputOnBlur}
-            >
-              <CustomTextField
-                className={classes.textFieldBody}
-                label="Content"
-                variant="filled"
-                multiline
-                rows={10}
-                customStyle={classes}
-              />
-            </CustomFormControlEditor>
+            <div>
+              <CustomFormControlEditor
+                id="body"
+                initialValue={defaultValues.body || ""}
+                onInputChange={handleInputChange}
+                onDiffChange={onDiffChange}
+                onBlur={handleInputOnBlur}
+              >
+                {/* <CustomTextField
+                  className={classes.textFieldBody}
+                  label="Content"
+                  variant="filled"
+                  multiline
+                  rows={10}
+                  customStyle={classes}
+                /> */}
+                <ContentInput />
+              </CustomFormControlEditor>
+            </div>
+
             <CustomFormControlEditor
               id="bottomText"
               initialValue={defaultValues.bottomText}
