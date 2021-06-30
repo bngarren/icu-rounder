@@ -4,6 +4,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  ListItemSecondaryAction,
   Typography,
   Collapse,
   TextField,
@@ -59,15 +60,54 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
       if (index !== -1) {
         let arr = [...data];
         arr[index] = newSectionData;
+
+        // the first variable is just a dummy
         onChange(index, arr);
       }
     },
     [onChange]
   );
 
+  /* Add a new blank Section */
+  const handleOnClickAddSection = useCallback(() => {
+    let arr = [...dataRef.current];
+    const l = arr.push({
+      id: uniqueId("section-"),
+      title: "",
+      top: "",
+      items: [],
+    });
+    // the first variable is just a dummy
+    onChange(l, arr);
+  }, [onChange]);
+
+  /* Remove a section, by id */
+  const handleRemoveSection = useCallback(
+    (e, id) => {
+      let arr = [...dataRef.current];
+      const index = arr.findIndex((el) => el.id === id);
+      if (index === -1) return;
+
+      arr.splice(index, 1);
+
+      // the first variable is just a dummy
+      onChange(index, arr);
+
+      e.stopPropagation();
+
+      if (selectedSection?.id === id) {
+        setSelectedSection(null);
+      }
+    },
+    [onChange, selectedSection]
+  );
+
   return (
     <Grid container className={classes.root} spacing={1}>
       <Grid item md={6}>
+        <IconButton onClick={handleOnClickAddSection}>
+          <AddBoxIcon />
+        </IconButton>
         <List component="nav">
           {data &&
             data.map((element) => {
@@ -78,6 +118,7 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
                   key={element.id}
                   selected={selected}
                   onClickSection={handleOnClickSectionContainer}
+                  onRemoveSection={handleRemoveSection}
                 />
               );
             })}
@@ -117,7 +158,12 @@ const useStylesForSectionContainer = makeStyles((theme) => ({
   },
 }));
 
-const SectionContainer = ({ element, selected, onClickSection = (f) => f }) => {
+const SectionContainer = ({
+  element,
+  selected,
+  onClickSection = (f) => f,
+  onRemoveSection = (f) => f,
+}) => {
   const classes = useStylesForSectionContainer();
 
   return (
@@ -128,18 +174,34 @@ const SectionContainer = ({ element, selected, onClickSection = (f) => f }) => {
       onClick={() => onClickSection(element.id)}
     >
       <Section
-        title={element.title || ""}
-        top={element.top || ""}
-        items={element.items || []}
+        data={element}
         selected={selected}
+        onRemoveSection={onRemoveSection}
       />
     </div>
   );
 };
 
 const useStylesForSection = makeStyles((theme) => ({
-  sectionTitle: {
+  sectionListItemContainer: {
     padding: "0px",
+    minHeight: "15px",
+    "&:hover $sectionListItemSecondaryAction": {
+      visibility: "inherit",
+      opacity: 1,
+    },
+  },
+  sectionListItemRoot: {
+    padding: "0px",
+  },
+  sectionListItemSecondaryAction: {
+    right: "2px",
+    visibility: "hidden",
+    opacity: 0,
+    transition: "visibility 0s linear 0s, opacity 300ms",
+  },
+  emptySection: {
+    backgroundColor: "#eee",
   },
   sectionTitleText: {
     fontSize: "10pt",
@@ -158,21 +220,47 @@ const useStylesForSection = makeStyles((theme) => ({
   sectionItemTextPrimary: {
     fontSize: "9pt",
   },
+  sectionRemoveIconButton: {
+    padding: "2px",
+  },
 }));
 
-const Section = ({ title, top, items }) => {
+const Section = ({ data, onRemoveSection = (f) => f }) => {
   const classes = useStylesForSection();
   const [open, setOpen] = useState(true);
+
+  const { id, title, top, items } = data;
+  const isEmpty = !title && !top && items.length < 1;
 
   const handleOnClickTitle = () => {
     setOpen((prevValue) => !prevValue);
   };
 
   return (
-    <>
-      <ListItem onClick={handleOnClickTitle} className={classes.sectionTitle}>
-        <Typography className={classes.sectionTitleText}>{title}:</Typography>
+    <div>
+      <ListItem
+        onClick={handleOnClickTitle}
+        classes={{
+          root: classes.sectionListItemRoot,
+          container: clsx(classes.sectionListItemContainer, {
+            [classes.emptySection]: isEmpty,
+          }),
+        }}
+      >
+        <Typography className={classes.sectionTitleText}>
+          {title && `${title}:`}
+        </Typography>
         <Typography className={classes.sectionTopText}>{top}</Typography>
+        <ListItemSecondaryAction
+          className={classes.sectionListItemSecondaryAction}
+        >
+          <IconButton
+            className={classes.sectionRemoveIconButton}
+            onClick={(e) => onRemoveSection(e, id)}
+          >
+            <ClearIcon style={{ fontSize: "20px" }} />
+          </IconButton>
+        </ListItemSecondaryAction>
       </ListItem>
       <Collapse in={true} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
@@ -198,7 +286,7 @@ const Section = ({ title, top, items }) => {
             })}
         </List>
       </Collapse>
-    </>
+    </div>
   );
 };
 
