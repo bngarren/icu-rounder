@@ -5,6 +5,8 @@ import {
   View,
   StyleSheet,
   Font,
+  Svg,
+  Rect,
 } from "@react-pdf/renderer";
 
 import RobotoRegular from "../../fonts/roboto/roboto-v27-latin-regular.woff";
@@ -127,6 +129,21 @@ const pdfStyles = StyleSheet.create({
   gridBoxBody: {
     fontSize: "7pt",
     padding: "2pt 5pt 5pt 2pt",
+  },
+  gridBoxNestedContentSectionRoot: {
+    marginTop: "2pt",
+  },
+  gridBoxNestedContentTopText: {},
+  gridBoxNestedContentTitle: {
+    fontWeight: "bold",
+  },
+  gridBoxNestedContentItemRoot: {
+    display: "flex",
+    flexDirection: "row",
+    marginLeft: "5pt",
+  },
+  gridBoxNestedContentItemText: {
+    marginLeft: "3pt",
   },
   gridBoxBottomText: {
     position: "absolute",
@@ -286,7 +303,43 @@ const GridBox = ({ bedspaceData, box, width, removeLeftBorder }) => {
           )}
           {bedspaceData.contentType === "nested" && (
             <View>
-              <Text>{bedspaceData.nestedContent}</Text>
+              {bedspaceData.nestedContent.map((sectionData) => {
+                return (
+                  <View
+                    key={sectionData.id}
+                    style={pdfStyles.gridBoxNestedContentSectionRoot}
+                  >
+                    <Text style={pdfStyles.gridBoxNestedContentTopText}>
+                      <Text style={pdfStyles.gridBoxNestedContentTitle}>
+                        {sectionData.title}:{" "}
+                      </Text>
+                      {sectionData.top}
+                    </Text>
+                    {sectionData.items.map((item) => {
+                      return (
+                        <View
+                          key={item.id}
+                          style={pdfStyles.gridBoxNestedContentItemRoot}
+                        >
+                          <Svg width="4pt" height="5.5pt">
+                            <Rect
+                              x="0"
+                              y="2pt"
+                              width="3pt"
+                              height="3pt"
+                              stroke="black"
+                              fill="black"
+                            />
+                          </Svg>
+                          <Text style={pdfStyles.gridBoxNestedContentItemText}>
+                            {item.value}
+                          </Text>
+                        </View>
+                      );
+                    })}
+                  </View>
+                );
+              })}
             </View>
           )}
         </View>
