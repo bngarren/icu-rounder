@@ -25,6 +25,7 @@ import { uniqueId } from "lodash";
 
 const useStylesForContentInput = makeStyles((theme) => ({
   root: {
+    flexDirection: "column",
     backgroundColor: "white",
     border: "1px solid #dcdcdc",
     borderRadius: "3px",

@@ -20,7 +20,7 @@ const useStylesForQuickAddInput = makeStyles((theme) => ({
   },
 }));
 
-const QuickAddInput = ({ placeholder, onSubmit = (f) => f }) => {
+const QuickAddInput = ({ onSubmit = (f) => f, ...props }) => {
   const classes = useStylesForQuickAddInput();
   const [value, setValue] = useState("");
 
@@ -46,7 +46,6 @@ const QuickAddInput = ({ placeholder, onSubmit = (f) => f }) => {
         value={value}
         onChange={handleOnChange}
         onKeyDown={handleKeyDown}
-        placeholder={placeholder}
         InputProps={{
           startAdornment: (
             <InputAdornment>
@@ -56,6 +55,7 @@ const QuickAddInput = ({ placeholder, onSubmit = (f) => f }) => {
             </InputAdornment>
           ),
         }}
+        {...props}
       />
     </div>
   );

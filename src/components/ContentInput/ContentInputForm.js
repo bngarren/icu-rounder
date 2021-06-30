@@ -148,7 +148,6 @@ const ContentInputForm = ({
         placeholder="Content"
         multiline
         rows={2}
-        maxRows={2}
         value={topText}
         onChange={(e) => handleOnTopTextChange(e.target.value)}
       />

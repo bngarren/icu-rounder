@@ -23,9 +23,8 @@ const useStylesForCustomTextField = makeStyles((theme) => ({
   },
   textFieldFocused: {},
   textFieldInputLabelRoot: {
-    color: "black",
-    fontSize: "12pt",
-    fontWeight: "bold",
+    color: "#626060",
+    fontSize: "11pt",
     "&$textFieldInputLabelFocused": {
       color: theme.palette.secondary.main,
     },
