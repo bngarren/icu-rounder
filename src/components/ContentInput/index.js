@@ -35,6 +35,11 @@ const useStylesForContentInput = makeStyles((theme) => ({
 const ContentInput = ({ value: data, onChange = (f) => f }) => {
   const classes = useStylesForContentInput();
 
+  const dataRef = useRef(data);
+  useEffect(() => {
+    dataRef.current = data;
+  }, [data]);
+
   const [selectedSection, setSelectedSection] = useState(null);
 
   const handleOnClickSectionContainer = (id) => {
@@ -48,14 +53,17 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
     setSelectedSection(sect || null);
   };
 
-  const handleContentInputFormChange = (newSectionData) => {
-    const index = data.findIndex((el) => el.id === newSectionData.id);
-    if (index !== -1) {
-      let arr = [...data];
-      arr[index] = newSectionData;
-      onChange(arr);
-    }
-  };
+  const handleContentInputFormChange = useCallback(
+    (data, newSectionData) => {
+      const index = data.findIndex((el) => el.id === newSectionData.id);
+      if (index !== -1) {
+        let arr = [...data];
+        arr[index] = newSectionData;
+        onChange(index, arr);
+      }
+    },
+    [onChange]
+  );
 
   return (
     <Grid container className={classes.root} spacing={1}>
@@ -79,7 +87,9 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
         <Collapse in={selectedSection !== null} unmountOnExit>
           <ContentInputForm
             initialData={selectedSection}
-            onContentInputFormChange={handleContentInputFormChange}
+            onContentInputFormChange={(newData) =>
+              handleContentInputFormChange(dataRef.current, newData)
+            }
           />
         </Collapse>
       </Grid>

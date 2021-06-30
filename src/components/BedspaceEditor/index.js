@@ -485,7 +485,7 @@ const BedspaceEditor = ({
               >
                 <ToggleContentType />
               </CustomFormControlEditor>
-              {data.contentType === "simple" && (
+              {(data.contentType == null || data.contentType === "simple") && (
                 <CustomFormControlEditor
                   id="simpleContent"
                   initialValue={defaultValues.simpleContent || ""}
@@ -506,7 +506,7 @@ const BedspaceEditor = ({
               {data.contentType === "nested" && (
                 <CustomFormControlEditor
                   id="nestedContent"
-                  initialValue={DATA || []}
+                  initialValue={defaultValues.nestedContent || []}
                   onInputChange={handleInputChange}
                   onDiffChange={onDiffChange}
                   onBlur={handleInputOnBlur}
