@@ -121,7 +121,7 @@ const DemoBox = ({ data: propsData, collapsed }) => {
                   );
                 })}
             </div>
-            {data.simpleContent}
+            {data.contentType === "simple" && data.simpleContent}
           </div>
           <div className={classes.demoBoxBottomText}>{data.bottomText}</div>
         </Paper>

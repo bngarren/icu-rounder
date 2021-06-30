@@ -2,11 +2,7 @@ import { useEffect, useState, useCallback, useRef, memo } from "react";
 import { debounce } from "lodash";
 
 import { TextField, Paper } from "@material-ui/core";
-import ToggleButton from "@material-ui/lab/ToggleButton";
-import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
-import NotesIcon from "@material-ui/icons/Notes";
-import VerticalSplitIcon from "@material-ui/icons/VerticalSplit";
 
 import clsx from "clsx";
 
@@ -17,11 +13,15 @@ import SnippetPopover from "../SnippetPopover";
 
 // Components
 import CustomFormControlEditor from "../../components/CustomFormControl/CustomFormControlEditor";
+import ToggleContentType from "../ToggleContentType";
 import ContentInput from "../ContentInput";
 import ContingencyInput from "../ContingencyInput";
 
 // Settings context
 import { useSettings } from "../../context/Settings";
+
+// lodash
+import { uniqueId } from "lodash";
 
 const useStyles = makeStyles((theme) => ({
   editorRoot: {
@@ -359,10 +359,9 @@ const BedspaceEditor = ({
   /* Toggle buttons for selecting the content type */
   const [contentType, setContentType] = useState("simple");
 
-  const handleToggleContentType = (event, newContentType) => {
-    setContentType((prevValue) => {
-      return newContentType !== null ? newContentType : prevValue;
-    });
+  const handleOnChangeToggleContentType = (target, value) => {
+    setContentType(value);
+    handleInputChange(target, value);
   };
 
   /*  - - - - - RETURN - - - -  */
@@ -472,35 +471,23 @@ const BedspaceEditor = ({
               </CustomFormControlEditor>
             </div>
             <div>
-              <ToggleButtonGroup
-                value={contentType}
-                exclusive
-                onChange={handleToggleContentType}
-                aria-label="content type"
-              >
-                <ToggleButton
-                  value="simple"
-                  aria-label="simple input"
-                  size="small"
-                >
-                  <NotesIcon style={{ fontSize: "12pt" }} />
-                </ToggleButton>
-                <ToggleButton
-                  value="nested"
-                  aria-label="nested input"
-                  size="small"
-                >
-                  <VerticalSplitIcon style={{ fontSize: "12pt" }} />
-                </ToggleButton>
-              </ToggleButtonGroup>
               <CustomFormControlEditor
-                id="simpleContent"
-                initialValue={defaultValues.simpleContent || ""}
-                onInputChange={handleInputChange}
+                id="contentType"
+                initialValue={defaultValues.contentType || "simple"}
+                onInputChange={handleOnChangeToggleContentType}
                 onDiffChange={onDiffChange}
-                onBlur={handleInputOnBlur}
+                onChangeArgument={1}
               >
-                {contentType === "simple" ? (
+                <ToggleContentType />
+              </CustomFormControlEditor>
+              {contentType === "simple" && (
+                <CustomFormControlEditor
+                  id="simpleContent"
+                  initialValue={defaultValues.simpleContent || ""}
+                  onInputChange={handleInputChange}
+                  onDiffChange={onDiffChange}
+                  onBlur={handleInputOnBlur}
+                >
                   <CustomTextField
                     className={classes.textFieldBody}
                     label="Content"
@@ -509,10 +496,19 @@ const BedspaceEditor = ({
                     rows={10}
                     customStyle={classes}
                   />
-                ) : (
+                </CustomFormControlEditor>
+              )}
+              {contentType === "nested" && (
+                <CustomFormControlEditor
+                  id="nestedContent"
+                  initialValue={DATA || []}
+                  onInputChange={handleInputChange}
+                  onDiffChange={onDiffChange}
+                  onBlur={handleInputOnBlur}
+                >
                   <ContentInput />
-                )}
-              </CustomFormControlEditor>
+                </CustomFormControlEditor>
+              )}
             </div>
 
             <CustomFormControlEditor
@@ -538,5 +534,33 @@ const BedspaceEditor = ({
     return <></>;
   }
 };
+
+const DATA = [
+  {
+    id: uniqueId("section-"),
+    title: "NEURO",
+    top: "Mo, Mz, Dex gtts, No NSAIDs",
+    items: [{ id: uniqueId("item-"), value: "MR brain today" }],
+  },
+  { id: uniqueId("section-"), title: "CV", top: "had normal ECHO", items: [] },
+  {
+    id: uniqueId("section-"),
+    title: "RESP",
+    top: "easy airway; PCV 24/8 x12 40%",
+    items: [
+      { id: uniqueId("item-"), value: "add nebs" },
+      { id: uniqueId("item-"), value: "wean to extubate" },
+    ],
+  },
+  { id: uniqueId("section-"), title: "FEN", top: "PN/IL ~100mkd", items: [] },
+  {
+    id: uniqueId("section-"),
+    title: "ID",
+    top: "New fever 6/15, empiric Vanc + Cefepime",
+    items: [{ id: uniqueId("item-"), value: "f/u Cx's" }],
+  },
+  { id: uniqueId("section-"), title: "HEME", top: "7/10" },
+  { id: uniqueId("section-"), title: "ACCESS", top: "PICC, AL, GT" },
+];
 
 export default BedspaceEditor;

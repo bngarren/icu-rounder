@@ -28,18 +28,14 @@ const useStylesForContentInput = makeStyles((theme) => ({
     padding: "2px 4px 2px 8px",
     margin: "2px",
     marginTop: "8px",
+    minHeight: "200px",
   },
 }));
 
-const ContentInput = () => {
+const ContentInput = ({ value: data, onChange = (f) => f }) => {
   const classes = useStylesForContentInput();
 
-  const [sections, setSections] = useState();
   const [selectedSection, setSelectedSection] = useState(null);
-
-  useEffect(() => {
-    setSections(DATA);
-  }, []);
 
   const handleOnClickSectionContainer = (id) => {
     // if this section is already selected
@@ -48,18 +44,16 @@ const ContentInput = () => {
       return;
     }
     // otherwise set the selectedSection to this id's corresponding section
-    const sect = sections.find((element) => element.id === id);
+    const sect = data.find((element) => element.id === id);
     setSelectedSection(sect || null);
   };
 
   const handleContentInputFormChange = (newSectionData) => {
-    const index = sections.findIndex((el) => el.id === newSectionData.id);
+    const index = data.findIndex((el) => el.id === newSectionData.id);
     if (index !== -1) {
-      setSections((prevValue) => {
-        let arr = [...prevValue];
-        arr[index] = newSectionData;
-        return arr;
-      });
+      let arr = [...data];
+      arr[index] = newSectionData;
+      onChange(arr);
     }
   };
 
@@ -67,8 +61,8 @@ const ContentInput = () => {
     <Grid container className={classes.root} spacing={1}>
       <Grid item md={6}>
         <List component="nav">
-          {sections &&
-            sections.map((element) => {
+          {data &&
+            data.map((element) => {
               const selected = selectedSection?.id === element.id;
               return (
                 <SectionContainer
@@ -428,33 +422,5 @@ const CustomTextField = ({ InputProps, InputLabelProps, ...props }) => {
     />
   );
 };
-
-const DATA = [
-  {
-    id: uniqueId("section-"),
-    title: "NEURO",
-    top: "Mo, Mz, Dex gtts, No NSAIDs",
-    items: [{ id: uniqueId("item-"), value: "MR brain today" }],
-  },
-  { id: uniqueId("section-"), title: "CV", top: "had normal ECHO", items: [] },
-  {
-    id: uniqueId("section-"),
-    title: "RESP",
-    top: "easy airway; PCV 24/8 x12 40%",
-    items: [
-      { id: uniqueId("item-"), value: "add nebs" },
-      { id: uniqueId("item-"), value: "wean to extubate" },
-    ],
-  },
-  { id: uniqueId("section-"), title: "FEN", top: "PN/IL ~100mkd", items: [] },
-  {
-    id: uniqueId("section-"),
-    title: "ID",
-    top: "New fever 6/15, empiric Vanc + Cefepime",
-    items: [{ id: uniqueId("item-"), value: "f/u Cx's" }],
-  },
-  { id: uniqueId("section-"), title: "HEME", top: "7/10" },
-  { id: uniqueId("section-"), title: "ACCESS", top: "PICC, AL, GT" },
-];
 
 export default ContentInput;

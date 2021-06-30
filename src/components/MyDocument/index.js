@@ -281,7 +281,14 @@ const GridBox = ({ bedspaceData, box, width, removeLeftBorder }) => {
                 );
               })}
           </View>
-          <Text>{bedspaceData.body}</Text>
+          {bedspaceData.contentType === "simple" && (
+            <Text>{bedspaceData.simpleContent}</Text>
+          )}
+          {bedspaceData.contentType === "nested" && (
+            <View>
+              <Text>{bedspaceData.nestedContent}</Text>
+            </View>
+          )}
         </View>
         <View style={pdfStyles.gridBoxBottomText}>
           <Text>{bedspaceData.bottomText}</Text>
