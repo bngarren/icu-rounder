@@ -3,14 +3,10 @@ import {
   List,
   ListItem,
   ListItemText,
-  Grid,
   Typography,
   Collapse,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
-
-// Components
-import UpDownArrows from "../UpDownArrows";
 
 // lodash
 import { uniqueId } from "lodash";
@@ -40,12 +36,7 @@ const DATA = [
   { id: uniqueId("section-"), title: "ACCESS", top: "PICC, AL, GT" },
 ];
 
-const useStylesForContentInput = makeStyles((theme) => ({
-  sectionContainer: {
-    display: "flex",
-    flexDirection: "row",
-  },
-}));
+const useStylesForContentInput = makeStyles((theme) => ({}));
 
 const ContentInput = () => {
   const classes = useStylesForContentInput();
@@ -60,22 +51,28 @@ const ContentInput = () => {
     <div>
       <List component="nav">
         {sections &&
-          sections.map((element, index) => {
-            return (
-              <div key={element.id} className={classes.sectionContainer}>
-                <UpDownArrows />
-                <div>
-                  <SectionList
-                    title={element.title || ""}
-                    top={element.top || ""}
-                    items={element.items || []}
-                    classes={classes}
-                  />
-                </div>
-              </div>
-            );
+          sections.map((element) => {
+            return <SectionContainer element={element} key={element.id} />;
           })}
       </List>
+    </div>
+  );
+};
+
+const useStylesForSectionContainer = makeStyles((theme) => ({
+  sectionContainer: {},
+}));
+
+const SectionContainer = ({ element }) => {
+  const classes = useStylesForSectionContainer();
+
+  return (
+    <div className={classes.sectionContainer}>
+      <Section
+        title={element.title || ""}
+        top={element.top || ""}
+        items={element.items || []}
+      />
     </div>
   );
 };
@@ -103,7 +100,7 @@ const useStylesForSectionList = makeStyles((theme) => ({
   },
 }));
 
-const SectionList = ({ title, top, items }) => {
+const Section = ({ title, top, items }) => {
   const classes = useStylesForSectionList();
   const [open, setOpen] = useState(true);
 

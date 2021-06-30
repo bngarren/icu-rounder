@@ -7,15 +7,19 @@ import { makeStyles } from "@material-ui/styles";
 const useStyles = makeStyles((theme) => ({
   container: {
     width: "auto",
-  },
-  gridItemUp: {
     transform: "translateY(-5px)",
   },
-  gridItemDown: {
-    transform: "translateY(-15px)",
+  gridItemUp: {
+    height: "12px",
   },
-  iconButton: {
-    padding: 0,
+  gridItemDown: {
+    height: "12px",
+  },
+  upIcon: {
+    transform: "scale(1.5)",
+  },
+  downIcon: {
+    transform: "scale(1.5)",
   },
 }));
 
@@ -24,14 +28,10 @@ const UpDownArrows = ({ onUp = (f) => f, onDown = (f) => f }) => {
   return (
     <Grid container direction="column" className={classes.container}>
       <Grid item className={classes.gridItemUp}>
-        <IconButton onClick={onUp} className={classes.iconButton}>
-          <ArrowDropUpIcon />
-        </IconButton>
+        <ArrowDropUpIcon className={classes.upIcon} />
       </Grid>
       <Grid item className={classes.gridItemDown}>
-        <IconButton onClick={onDown} className={classes.iconButton}>
-          <ArrowDropDownIcon />
-        </IconButton>
+        <ArrowDropDownIcon className={classes.downIcon} />
       </Grid>
     </Grid>
   );
