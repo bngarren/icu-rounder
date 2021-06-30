@@ -196,7 +196,13 @@ const ContentInput = ({ initialValue, value: data, onChange = (f) => f }) => {
                 </List>
               )}
               renderItem={({ value, props, isDragged }) => (
-                <li {...props}>
+                <li
+                  {...props}
+                  style={{
+                    ...props.style,
+                    listStyleType: "none",
+                  }}
+                >
                   <SectionContainer
                     element={value}
                     selected={selectedSection?.id === value.id}
@@ -225,6 +231,7 @@ const ContentInput = ({ initialValue, value: data, onChange = (f) => f }) => {
 
 const useStylesForSectionContainer = makeStyles((theme) => ({
   sectionContainer: {
+    backgroundColor: "white",
     opacity: "0.6",
     minHeight: "20px",
     marginBottom: "5px",
@@ -243,6 +250,10 @@ const useStylesForSectionContainer = makeStyles((theme) => ({
       opacity: "1",
     },
   },
+  sectionContainerDragged: {
+    border: "1px dashed #988b8b",
+    opacity: 1,
+  },
 }));
 
 const SectionContainer = memo(function ({
@@ -258,6 +269,7 @@ const SectionContainer = memo(function ({
     <div
       className={clsx(classes.sectionContainer, {
         [classes.sectionContainerSelected]: selected,
+        [classes.sectionContainerDragged]: isDragged,
       })}
       onClick={() => onClickSection(element.id)}
     >
@@ -291,7 +303,7 @@ const useStylesForSection = makeStyles((theme) => ({
     borderRight: `3px solid ${theme.palette.secondary.main}`,
   },
   contentDiv: {
-    marginLeft: "3px",
+    marginLeft: "6px",
     flexGrow: 1,
   },
   emptySection: {},
@@ -302,10 +314,12 @@ const useStylesForSection = makeStyles((theme) => ({
     justifyContent: "flex-start",
   },
   sectionDragIndicatorIcon: {
+    fontSize: "20px",
     color: "#626060",
     "&:hover": {
       color: theme.palette.secondary.light,
     },
+    transform: "rotate(90deg)",
   },
   sectionRemoveIconButton: {
     padding: "2px",
