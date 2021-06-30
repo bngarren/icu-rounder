@@ -38,7 +38,7 @@ const useStylesForCustomTextField = makeStyles((theme) => ({
 
 const CustomTextField = forwardRef(
   (
-    { InputProps, InputLabelProps, inputProps, overflow = "auto", ...props },
+    { InputProps, InputLabelProps, inputProps, overflow = "inherit", ...props },
     ref
   ) => {
     const classes = useStylesForCustomTextField();
