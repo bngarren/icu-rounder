@@ -10,7 +10,7 @@ import { useGridStateContext } from "../../context/GridState";
 
 const DocumentPage = () => {
   const { settings, dispatchSettings } = useSettings();
-  const { bedLayout, gridData } = useGridStateContext();
+  const { bedLayout, gridData, census } = useGridStateContext();
 
   if (gridData) {
     return (
@@ -21,6 +21,7 @@ const DocumentPage = () => {
             title={settings.document_title}
             colsPerPage={settings.document_cols_per_page}
             data={gridData}
+            census={census}
           />
         </PDFViewer>
       </div>

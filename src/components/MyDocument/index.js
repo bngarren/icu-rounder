@@ -33,7 +33,17 @@ const pdfStyles = StyleSheet.create({
   },
   header: {
     fontSize: "13pt",
+    display: "flex",
+    flexDirection: "row",
+  },
+  titleRoot: {
+    flexGrow: 1,
     textAlign: "center",
+  },
+  censusRoot: {
+    fontSize: "9pt",
+    alignSelf: "center",
+    flexBasis: "20%",
   },
   gridListRoot: {
     display: "flex",
@@ -143,7 +153,7 @@ export const getWidth = (colsPerPage, factor = 1) => {
   return res.toString() + "pt";
 };
 
-const MyDocument = ({ bedLayout, title, colsPerPage, data }) => {
+const MyDocument = ({ bedLayout, title, colsPerPage, data, census }) => {
   const beds = bedLayout.length;
 
   const getMatrix = (r, c) => {
@@ -167,7 +177,24 @@ const MyDocument = ({ bedLayout, title, colsPerPage, data }) => {
     <Document>
       <Page size="letter" style={pdfStyles.page}>
         <View style={pdfStyles.header}>
-          <Text>{title}</Text>
+          <View style={pdfStyles.titleRoot}>
+            <Text>{title}</Text>
+          </View>
+
+          <View style={pdfStyles.censusRoot}>
+            {census ? (
+              <>
+                <Text>{`${census.filledTotal}/${
+                  census.total
+                } (${census.emptyBeds.toString()})`}</Text>
+                {census.teamTotals.map((t) => {
+                  return <Text key={t.id}>{`${t.id}=${t.value}`}</Text>;
+                })}
+              </>
+            ) : (
+              <></>
+            )}
+          </View>
         </View>
         <View style={pdfStyles.gridListRoot}>
           {matrix.map((row, rIndex) => {
