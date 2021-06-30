@@ -11,14 +11,21 @@ const useStylesForCustomTextField = makeStyles((theme) => ({
     },
     "&$textFieldFocused": {
       backgroundColor: "#fff",
-      borderColor: theme.palette.secondary.light,
     },
   },
   textFieldNativeInput: {
-    borderBottom: "1.4px dotted #e2e2e1",
+    borderBottom: "1px dotted transparent",
+    transition: "border-color linear 0.1s",
     fontSize: "10pt",
     paddingBottom: "2px",
     paddingLeft: "4px",
+    "&:hover": {
+      borderColor: "#5f5f5f",
+    },
+    "&:focus": {
+      borderStyle: "solid",
+      borderColor: theme.palette.secondary.light,
+    },
   },
   textFieldFocused: {},
   textFieldInputLabelRoot: {
@@ -38,12 +45,20 @@ const useStylesForCustomTextField = makeStyles((theme) => ({
 
 const CustomTextField = forwardRef(
   (
-    { InputProps, InputLabelProps, inputProps, overflow = "inherit", ...props },
+    {
+      InputProps,
+      InputLabelProps,
+      inputProps,
+      tooltip = "",
+      overflow = "inherit",
+      ...props
+    },
     ref
   ) => {
     const classes = useStylesForCustomTextField();
     return (
       <TextField
+        title={tooltip}
         inputRef={ref}
         InputProps={{
           ...InputProps,

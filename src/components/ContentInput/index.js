@@ -46,6 +46,12 @@ const useStylesForContentInput = makeStyles((theme) => ({
   mainList: {
     padding: 0,
   },
+  movableLi: {
+    listStyleType: "none",
+    "&:focus-visible": {
+      outline: `1px dotted ${theme.palette.primary.light}`,
+    },
+  },
 }));
 
 const ContentInput = ({ initialValue, value: data, onChange = (f) => f }) => {
@@ -196,13 +202,7 @@ const ContentInput = ({ initialValue, value: data, onChange = (f) => f }) => {
                 </List>
               )}
               renderItem={({ value, props, isDragged }) => (
-                <li
-                  {...props}
-                  style={{
-                    ...props.style,
-                    listStyleType: "none",
-                  }}
-                >
+                <li className={classes.movableLi} {...props}>
                   <SectionContainer
                     element={value}
                     selected={selectedSection?.id === value.id}

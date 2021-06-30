@@ -69,6 +69,9 @@ const useStylesForContentInputForm = makeStyles((theme) => ({
     fontSize: "10px",
     color: "#626060",
   },
+  quickAddInput: {
+    width: "85%",
+  },
 }));
 
 /* - - - CONTENT INPUT FORM - - -  */
@@ -203,6 +206,7 @@ const ContentInputForm = ({
       <CustomTextField
         ref={refToTitle}
         placeholder="Title"
+        tooltip="Section Title"
         value={title}
         onChange={(e) => handleOnTitleChange(e.target.value)}
         inputProps={{
@@ -211,6 +215,7 @@ const ContentInputForm = ({
       />
       <CustomTextField
         placeholder="Content"
+        tooltip="Content"
         multiline
         rows={1}
         rowsMax={3}
@@ -277,7 +282,12 @@ const ContentInputForm = ({
       />
 
       <div style={{ marginLeft: 10 }}>
-        <QuickAddInput placeholder="Add Item" onSubmit={handleAddItem} />
+        <QuickAddInput
+          className={classes.quickAddInput}
+          placeholder="Add Item"
+          tooltip="Add Item"
+          onSubmit={handleAddItem}
+        />
       </div>
     </div>
   );

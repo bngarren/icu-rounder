@@ -546,32 +546,4 @@ const BedspaceEditor = ({
   }
 };
 
-const DATA = [
-  {
-    id: uniqueId("section-"),
-    title: "NEURO",
-    top: "Mo, Mz, Dex gtts, No NSAIDs",
-    items: [{ id: uniqueId("item-"), value: "MR brain today" }],
-  },
-  { id: uniqueId("section-"), title: "CV", top: "had normal ECHO", items: [] },
-  {
-    id: uniqueId("section-"),
-    title: "RESP",
-    top: "easy airway; PCV 24/8 x12 40%",
-    items: [
-      { id: uniqueId("item-"), value: "add nebs" },
-      { id: uniqueId("item-"), value: "wean to extubate" },
-    ],
-  },
-  { id: uniqueId("section-"), title: "FEN", top: "PN/IL ~100mkd", items: [] },
-  {
-    id: uniqueId("section-"),
-    title: "ID",
-    top: "New fever 6/15, empiric Vanc + Cefepime",
-    items: [{ id: uniqueId("item-"), value: "f/u Cx's" }],
-  },
-  { id: uniqueId("section-"), title: "HEME", top: "7/10" },
-  { id: uniqueId("section-"), title: "ACCESS", top: "PICC, AL, GT" },
-];
-
 export default BedspaceEditor;
