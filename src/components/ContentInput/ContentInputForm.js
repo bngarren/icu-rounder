@@ -36,6 +36,7 @@ const useStylesForContentInputForm = makeStyles((theme) => ({
     fontWeight: "bold",
     textTransform: "uppercase",
     marginBottom: "4px",
+    textAlign: "center",
   },
   itemList: {
     padding: "0px 0px 10px 12px",
