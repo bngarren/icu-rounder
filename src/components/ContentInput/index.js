@@ -236,7 +236,6 @@ const useStylesForSectionContainer = makeStyles((theme) => ({
     minHeight: "20px",
     marginBottom: "5px",
     cursor: "pointer",
-    borderRadius: "3px",
     "&:hover": {
       backgroundColor: "#f8f8f8",
       opacity: "0.7",
@@ -246,6 +245,8 @@ const useStylesForSectionContainer = makeStyles((theme) => ({
   sectionContainerSelected: {
     opacity: "1",
     transition: "background-color 0.3s",
+    boxShadow:
+      "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.04) 0px 0px 0px 1px",
     "&:hover": {
       opacity: "1",
     },
@@ -299,9 +300,7 @@ const useStylesForSection = makeStyles((theme) => ({
     alignItems: "center",
     borderRight: "3px solid transparent",
   },
-  buttonsDivSelected: {
-    borderRight: `3px solid ${theme.palette.secondary.main}`,
-  },
+  buttonsDivSelected: {},
   contentDiv: {
     marginLeft: "6px",
     flexGrow: 1,
@@ -340,17 +339,23 @@ const useStylesForSection = makeStyles((theme) => ({
     fontWeight: "bold",
     marginRight: "5px",
   },
+  sectionTitleTextEmpty: {
+    fontWeight: "normal",
+    letterSpacing: "2px",
+  },
   sectionTopText: {
     fontSize: "9pt",
     lineHeight: "1",
     whiteSpace: "pre-line",
     width: "100%",
+    marginBottom: "2px",
   },
   sectionItem: {
-    padding: "0 0 0 6px",
+    padding: "1px 0 1px 8px",
   },
   sectionItemTextRoot: {
     margin: "0",
+    paddingLeft: "3px",
   },
   sectionItemTextPrimary: {
     fontSize: "9pt",
@@ -396,7 +401,12 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
           })}
         >
           <Typography className={classes.sectionTopText}>
-            <Typography component="span" className={classes.sectionTitleText}>
+            <Typography
+              component="span"
+              className={clsx(classes.sectionTitleText, {
+                [classes.sectionTitleTextEmpty]: isEmpty,
+              })}
+            >
               {title && `${title}:`}
               {isEmpty && <i>empty section</i>}
             </Typography>
@@ -413,7 +423,7 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
                   className={classes.sectionItem}
                   key={uniqueId("sectionItem-")}
                 >
-                  <StopIcon style={{ fontSize: "9px", color: "#8e8e8e" }} />
+                  <StopIcon style={{ fontSize: "9px", color: "#626060" }} />
                   <ListItemText
                     primary={itemText}
                     classes={{

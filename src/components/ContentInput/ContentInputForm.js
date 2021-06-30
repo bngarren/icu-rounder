@@ -25,10 +25,10 @@ const useStylesForContentInputForm = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexDirection: "column",
-    borderLeft: `3px solid ${theme.palette.secondary.main}`,
-    padding: "4px 4px 8px 4px",
+    borderLeft: `3px solid ${theme.palette.secondary.light}`,
+    padding: "10px 4px 30px 4px",
     boxShadow:
-      "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px",
+      "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px",
   },
   header: {
     color: theme.palette.primary.main,
@@ -37,6 +37,7 @@ const useStylesForContentInputForm = makeStyles((theme) => ({
     textTransform: "uppercase",
     marginBottom: "4px",
     textAlign: "center",
+    letterSpacing: "1px",
   },
   itemList: {
     padding: "0px 0px 10px 12px",
@@ -192,7 +193,7 @@ const ContentInputForm = ({
         placeholder="Content"
         multiline
         rows={1}
-        rowsMax={2}
+        rowsMax={3}
         value={topText}
         onChange={(e) => handleOnTopTextChange(e.target.value)}
       />
