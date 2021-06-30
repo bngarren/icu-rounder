@@ -20,10 +20,10 @@ const useStylesForContentInputToolbar = makeStyles((theme) => ({
   },
   toolbar: {
     minHeight: "auto",
-    padding: "2px 4px",
+    padding: "2px 6px",
   },
   divider: {
-    margin: "0 4px",
+    margin: "0 6px",
   },
 }));
 

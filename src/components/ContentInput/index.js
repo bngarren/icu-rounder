@@ -158,6 +158,8 @@ const ContentInput = ({ initialValue, value: data, onChange = (f) => f }) => {
 
       // first parameter is dummy
       onChange(0, arr);
+
+      setSelectedSection(null);
     },
     [onChange]
   );
@@ -298,6 +300,10 @@ const useStylesForSection = makeStyles((theme) => ({
   },
   sectionRemoveIconButton: {
     padding: "2px",
+    color: theme.palette.secondary.light,
+    "&:hover": {
+      backgroundColor: theme.palette.secondary.faint,
+    },
   },
   sectionEditIcon: {
     alignSelf: "flex-start",

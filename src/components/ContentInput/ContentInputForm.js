@@ -24,6 +24,7 @@ const useStylesForContentInputForm = makeStyles((theme) => ({
     fontSize: "11pt",
     fontWeight: "bold",
     textTransform: "uppercase",
+    marginBottom: "4px",
   },
   addIconButton: {
     padding: 6,

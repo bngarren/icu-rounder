@@ -12,6 +12,7 @@ export const theme = createMuiTheme({
       light: "#159298",
       veryLight: "#017C8270",
       veryVeryLight: "#017C824A",
+      faint: "#017C820F",
       dark: "#01656A",
     },
     warning: {
