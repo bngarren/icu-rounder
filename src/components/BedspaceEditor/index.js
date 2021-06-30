@@ -356,18 +356,9 @@ const BedspaceEditor = ({
     };
   }, [handleKeyDown]);
 
-  const [contentType, setContentType] = useState();
-
   const handleOnToggleContentType = (target, value) => {
-    setContentType(value);
     handleInputChange(target, value);
   };
-
-  /* If new default data comes through or reset is hit, update
-  our local contentType state so that we show the correct form */
-  useEffect(() => {
-    setContentType(defaultValues.contentType || "simple");
-  }, [defaultValues.contentType, resetKey]);
 
   /*  - - - - - RETURN - - - -  */
   if (data) {
@@ -506,7 +497,7 @@ const BedspaceEditor = ({
               {data.contentType === "nested" && (
                 <CustomFormControlEditor
                   id="nestedContent"
-                  initialValue={defaultValues.nestedContent || []}
+                  initialValue={defaultValues.nestedContent || ""}
                   onInputChange={handleInputChange}
                   onDiffChange={onDiffChange}
                   onBlur={handleInputOnBlur}
