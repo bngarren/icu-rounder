@@ -135,6 +135,9 @@ const pdfStyles = StyleSheet.create({
     fontSize: "7pt",
     padding: "2pt 4pt 2pt 2pt",
   },
+  bold: {
+    fontWeight: "bold",
+  },
 });
 
 /* Hard coded Pt sizes for Letter size PDF document
@@ -194,7 +197,12 @@ const MyDocument = ({ bedLayout, title, colsPerPage, data, census }) => {
                     `[${census.emptyBeds.toString()}]`}
                 </Text>
                 {census.teamTotals.map((t) => {
-                  return <Text key={t.id}>{`${t.id}=${t.value}`}</Text>;
+                  return (
+                    <Text key={t.id}>
+                      <Text style={pdfStyles.bold}>{t.id}</Text>
+                      {`: ${t.value}`}
+                    </Text>
+                  );
                 })}
               </>
             ) : (

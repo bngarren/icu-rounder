@@ -6,7 +6,7 @@ import {
   useCallback,
   useMemo,
 } from "react";
-import { useMediaQuery, Grid } from "@material-ui/core";
+import { useMediaQuery, Grid, Typography } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/styles";
 
 // Components
@@ -18,7 +18,14 @@ import { useDialog } from "../../components/Dialog";
 import { useAuthStateContext } from "../../context/AuthState";
 import { useGridStateContext } from "../../context/GridState";
 
-const useStyles = makeStyles((theme) => ({}));
+const useStyles = makeStyles((theme) => ({
+  censusRoot: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    padding: "8px 4px 4px 4px",
+  },
+}));
 
 /* This holds the functions we pass way down to the TableBedList's buttons */
 export const BedActionsContext = createContext();
@@ -31,7 +38,7 @@ const UpdatePage = () => {
   const media_atleast_md = useMediaQuery("(min-width:960px)");
 
   // The truth GridState and gridData
-  const { gridData, updateGridData } = useGridStateContext();
+  const { gridData, census, updateGridData } = useGridStateContext();
 
   // Authentication
   const { authState, userIsLoggedIn } = useAuthStateContext();
@@ -352,6 +359,25 @@ const UpdatePage = () => {
             <BedActionsContext.Provider value={bedActions}>
               <TableBedList data={gridData} selectedKey={selectedKey} />
             </BedActionsContext.Provider>
+            {census ? (
+              <div className={classes.censusRoot}>
+                <Typography variant="caption">
+                  {`${census.filledTotal}/${census.total}`}{" "}
+                  {census.emptyBeds.length > 0 &&
+                    `[${census.emptyBeds.toString()}]`}
+                </Typography>
+                {census.teamTotals.map((t) => {
+                  return (
+                    <Typography variant="caption" key={t.id}>
+                      <b>{t.id}</b>
+                      {`: ${t.value}`}
+                    </Typography>
+                  );
+                })}
+              </div>
+            ) : (
+              <></>
+            )}
           </Grid>
           <Grid item lg md={8} sm={12} xs={12} ref={refToBedspaceEditorDiv}>
             {selectedKey != null && (
