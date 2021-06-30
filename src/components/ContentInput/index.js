@@ -1,15 +1,95 @@
-import { useState } from "react";
-import { List, ListItem, ListItemText, Collapse } from "@material-ui/core";
+import { useState, useEffect } from "react";
+import {
+  List,
+  ListItem,
+  ListItemText,
+  Grid,
+  Typography,
+  Collapse,
+} from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 
-const useStyles = makeStyles((theme) => ({
+// Components
+import UpDownArrows from "../UpDownArrows";
+
+// lodash
+import { uniqueId } from "lodash";
+
+const DATA = [
+  {
+    id: uniqueId("section-"),
+    title: "NEURO",
+    top: "Mo, Mz, Dex gtts, No NSAIDs",
+    items: ["MR brain today"],
+  },
+  { id: uniqueId("section-"), title: "CV", top: "had normal ECHO", items: [] },
+  {
+    id: uniqueId("section-"),
+    title: "RESP",
+    top: "easy airway; PCV 24/8 x12 40%",
+    items: ["add nebs", "wean to extubate"],
+  },
+  { id: uniqueId("section-"), title: "FEN", top: "PN/IL ~100mkd", items: [] },
+  {
+    id: uniqueId("section-"),
+    title: "ID",
+    top: "New fever 6/15, empiric Vanc + Cefepime",
+    items: ["f/u Cx's"],
+  },
+  { id: uniqueId("section-"), title: "HEME", top: "7/10" },
+  { id: uniqueId("section-"), title: "ACCESS", top: "PICC, AL, GT" },
+];
+
+const useStylesForContentInput = makeStyles((theme) => ({
+  sectionContainer: {
+    display: "flex",
+    flexDirection: "row",
+  },
+}));
+
+const ContentInput = () => {
+  const classes = useStylesForContentInput();
+
+  const [sections, setSections] = useState();
+
+  useEffect(() => {
+    setSections(DATA);
+  }, []);
+
+  return (
+    <div>
+      <List component="nav">
+        {sections &&
+          sections.map((element, index) => {
+            return (
+              <div key={element.id} className={classes.sectionContainer}>
+                <UpDownArrows />
+                <div>
+                  <SectionList
+                    title={element.title || ""}
+                    top={element.top || ""}
+                    items={element.items || []}
+                    classes={classes}
+                  />
+                </div>
+              </div>
+            );
+          })}
+      </List>
+    </div>
+  );
+};
+
+const useStylesForSectionList = makeStyles((theme) => ({
   sectionTitle: {
     padding: "0px",
   },
-  sectionTitleTextRoot: {
-    margin: 0,
+  sectionTitleText: {
+    fontSize: "9pt",
+    fontWeight: "bold",
+    marginRight: "5px",
   },
-  sectionTitleTextPrimary: {
+  sectionTopText: {
     fontSize: "8pt",
   },
   sectionItem: {
@@ -19,43 +99,12 @@ const useStyles = makeStyles((theme) => ({
     margin: "0",
   },
   sectionItemTextPrimary: {
-    fontSize: "7pt",
+    fontSize: "8pt",
   },
 }));
 
-const DATA = {
-  NEURO: ["Mo, Mz, Dex gtts", "No NSAIDs"],
-  CV: ["Nl ECHO", "Epi/NE gtt", "MAP > 50"],
-  RESP: ["Int/MV PCV 20/8 x12 40%", "easy airway"],
-  FEN: ["NPO MIVF", "PRN Zofran"],
-  ID: ["Fever, empiric Vanc + Cefepime", "f/u Cx's"],
-  HEME: ["7/10"],
-  ENDO: ["would need SDS", "insulin gtt 120-220"],
-  ACCESS: ["PICC, AL, GT"],
-};
-
-const ContentInput = () => {
-  const classes = useStyles();
-
-  return (
-    <div>
-      <List component="nav">
-        {Object.entries(DATA).map((value, key) => {
-          return (
-            <SectionList
-              title={value[0]}
-              items={value[1]}
-              key={key}
-              classes={classes}
-            />
-          );
-        })}
-      </List>
-    </div>
-  );
-};
-
-const SectionList = ({ title, items = [], classes }) => {
+const SectionList = ({ title, top, items }) => {
+  const classes = useStylesForSectionList();
   const [open, setOpen] = useState(true);
 
   const handleOnClickTitle = () => {
@@ -65,29 +114,29 @@ const SectionList = ({ title, items = [], classes }) => {
   return (
     <>
       <ListItem onClick={handleOnClickTitle} className={classes.sectionTitle}>
-        <ListItemText
-          primary={title}
-          classes={{
-            root: classes.sectionTitleTextRoot,
-            primary: classes.sectionTitleTextPrimary,
-          }}
-        />
+        <Typography className={classes.sectionTitleText}>{title}:</Typography>
+        <Typography className={classes.sectionTopText}>{top}</Typography>
       </ListItem>
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          {items.map((i) => {
-            return (
-              <ListItem className={classes.sectionItem}>
-                <ListItemText
-                  primary={i}
-                  classes={{
-                    root: classes.sectionItemTextRoot,
-                    primary: classes.sectionItemTextPrimary,
-                  }}
-                />
-              </ListItem>
-            );
-          })}
+          {items &&
+            items.length > 0 &&
+            items.map((element, index) => {
+              return (
+                <ListItem
+                  className={classes.sectionItem}
+                  key={uniqueId("sectionItem-")}
+                >
+                  <ListItemText
+                    primary={element}
+                    classes={{
+                      root: classes.sectionItemTextRoot,
+                      primary: classes.sectionItemTextPrimary,
+                    }}
+                  />
+                </ListItem>
+              );
+            })}
         </List>
       </Collapse>
     </>
