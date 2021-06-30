@@ -32,7 +32,9 @@ import { useHistory, useRouteMatch } from "react-router-dom";
 // Context
 import { useAuthStateContext } from "../../context/AuthState";
 import { useSettings } from "../../context/Settings";
-import { useGridStateContext } from "../../context/GridState";
+
+// hooks
+import usePdfMaker from "../../hooks/usePdfMaker";
 
 // Login
 import { useLoginDialog } from "../../components/Login";
@@ -100,25 +102,9 @@ const Header = () => {
   const theme = useTheme();
   const classes = useStyles(theme);
 
-  const { settings } = useSettings();
-  const { bedLayout, gridData } = useGridStateContext();
-
   const { showLogin, LoginDialog } = useLoginDialog();
 
-  const getPdf = async () => {
-    await pdf(
-      <MyDocument
-        bedLayout={bedLayout}
-        title={settings.document_title}
-        colsPerPage={settings.document_cols_per_page}
-        data={gridData}
-      />
-    )
-      .toBlob()
-      .then((blob) => {
-        saveAs(blob, "grid.pdf");
-      });
-  };
+  const { getPdf } = usePdfMaker();
 
   const handleClickLogin = () => {
     showLogin((prevValue) => !prevValue);
