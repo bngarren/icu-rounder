@@ -254,6 +254,7 @@ const useStylesForSectionContainer = makeStyles((theme) => ({
   sectionContainerDragged: {
     border: "1px dashed #988b8b",
     opacity: 1,
+    backgroundColor: "#ffffff6b !important",
   },
 }));
 
@@ -394,13 +395,62 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
           <div data-movable-handle></div>
         )}
       </div>
-      <div className={classes.contentDiv}>
-        <div
-          className={clsx(classes.sectionTopDiv, {
-            [classes.emptySection]: isEmpty,
-          })}
-        >
-          <Typography className={classes.sectionTopText}>
+      {!isDragged ? (
+        <div className={classes.contentDiv}>
+          <div
+            className={clsx(classes.sectionTopDiv, {
+              [classes.emptySection]: isEmpty,
+            })}
+          >
+            <Typography className={classes.sectionTopText}>
+              <Typography
+                component="span"
+                className={clsx(classes.sectionTitleText, {
+                  [classes.sectionTitleTextEmpty]: isEmpty,
+                })}
+              >
+                {title && `${title}:`}
+                {isEmpty && <i>empty section</i>}
+              </Typography>
+              {top}
+            </Typography>
+          </div>
+          <List component="ul" disablePadding>
+            {items &&
+              items.length > 0 &&
+              items.map((item, index) => {
+                const itemText = item.value !== "" ? item.value : "";
+                return (
+                  <ListItem
+                    className={classes.sectionItem}
+                    key={uniqueId("sectionItem-")}
+                  >
+                    <StopIcon style={{ fontSize: "9px", color: "#626060" }} />
+                    <ListItemText
+                      primary={itemText}
+                      classes={{
+                        root: classes.sectionItemTextRoot,
+                        primary: classes.sectionItemTextPrimary,
+                      }}
+                    />
+                  </ListItem>
+                );
+              })}
+          </List>
+        </div>
+      ) : (
+        // Is being dragged so show this instead
+        <div className={classes.contentDiv}>
+          <Typography
+            className={classes.sectionTopText}
+            style={{
+              display: "inline-block",
+              maxWidth: "200px",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+            }}
+          >
             <Typography
               component="span"
               className={clsx(classes.sectionTitleText, {
@@ -413,29 +463,7 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
             {top}
           </Typography>
         </div>
-        <List component="ul" disablePadding>
-          {items &&
-            items.length > 0 &&
-            items.map((item, index) => {
-              const itemText = item.value !== "" ? item.value : "";
-              return (
-                <ListItem
-                  className={classes.sectionItem}
-                  key={uniqueId("sectionItem-")}
-                >
-                  <StopIcon style={{ fontSize: "9px", color: "#626060" }} />
-                  <ListItemText
-                    primary={itemText}
-                    classes={{
-                      root: classes.sectionItemTextRoot,
-                      primary: classes.sectionItemTextPrimary,
-                    }}
-                  />
-                </ListItem>
-              );
-            })}
-        </List>
-      </div>
+      )}
     </div>
   );
 };
