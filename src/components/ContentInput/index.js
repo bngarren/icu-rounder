@@ -1,4 +1,11 @@
-import { useState, useEffect, useCallback, useRef, forwardRef } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  forwardRef,
+  memo,
+} from "react";
 import {
   Grid,
   List,
@@ -44,16 +51,21 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
   // store the selected sections' id
   const [selectedSection, setSelectedSection] = useState(null);
 
-  const handleOnClickSectionContainer = (id) => {
-    // if this section is already selected
-    if (selectedSection !== null && selectedSection.id === id) {
-      setSelectedSection(null);
-      return;
-    }
+  const handleOnClickSectionContainer = useCallback(
+    (id) => {
+      // if this section is already selected
+      if (selectedSection !== null && selectedSection.id === id) {
+        setSelectedSection(null);
+        return;
+      }
 
-    const sect = data?.length > 0 && data.find((element) => element.id === id);
-    setSelectedSection(sect || null);
-  };
+      const sect =
+        dataRef.current?.length > 0 &&
+        dataRef.current.find((element) => element.id === id);
+      setSelectedSection(sect || null);
+    },
+    [selectedSection]
+  );
 
   const handleContentInputFormChange = useCallback(
     (data, newSectionData) => {
@@ -167,12 +179,12 @@ const useStylesForSectionContainer = makeStyles((theme) => ({
   },
 }));
 
-const SectionContainer = ({
+const SectionContainer = memo(function ({
   element,
   selected,
   onClickSection = (f) => f,
   onRemoveSection = (f) => f,
-}) => {
+}) {
   const classes = useStylesForSectionContainer();
 
   return (
@@ -189,7 +201,7 @@ const SectionContainer = ({
       />
     </div>
   );
-};
+});
 
 const useStylesForSection = makeStyles((theme) => ({
   root: {
