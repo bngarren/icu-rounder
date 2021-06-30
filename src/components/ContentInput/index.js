@@ -6,15 +6,30 @@ import {
   ListItemText,
   Typography,
   Collapse,
+  TextField,
+  IconButton,
+  InputAdornment,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
+import AddBoxIcon from "@material-ui/icons/AddBox";
+import StopIcon from "@material-ui/icons/Stop";
+import ClearIcon from "@material-ui/icons/Clear";
 
 import clsx from "clsx";
 
 // lodash
 import { uniqueId, debounce } from "lodash";
 
-const useStylesForContentInput = makeStyles((theme) => ({}));
+const useStylesForContentInput = makeStyles((theme) => ({
+  root: {
+    backgroundColor: "white",
+    border: "1px solid #dcdcdc",
+    borderRadius: "3px",
+    padding: "2px 4px 2px 8px",
+    margin: "2px",
+    marginTop: "8px",
+  },
+}));
 
 const ContentInput = () => {
   const classes = useStylesForContentInput();
@@ -49,7 +64,7 @@ const ContentInput = () => {
   };
 
   return (
-    <Grid container>
+    <Grid container className={classes.root} spacing={1}>
       <Grid item md={6}>
         <List component="nav">
           {sections &&
@@ -81,15 +96,19 @@ const ContentInput = () => {
 const useStylesForSectionContainer = makeStyles((theme) => ({
   sectionContainer: {
     cursor: "pointer",
+    borderRadius: "3px",
+    padding: "2px",
     "&:hover": {
-      backgroundColor: "#dcdcdc",
+      border: `2px dotted ${theme.palette.secondary.veryVeryLight}`,
+      padding: 0,
     },
   },
   sectionContainerSelected: {
-    backgroundColor: "#9a9a9a6a",
+    border: `2px dotted ${theme.palette.primary.main}`,
     transition: "background-color 0.3s",
     "&:hover": {
-      backgroundColor: "#9a9a9a",
+      borderColor: theme.palette.primary.light,
+      padding: "2px",
     },
   },
 }));
@@ -108,6 +127,7 @@ const SectionContainer = ({ element, selected, onClickSection = (f) => f }) => {
         title={element.title || ""}
         top={element.top || ""}
         items={element.items || []}
+        selected={selected}
       />
     </div>
   );
@@ -118,12 +138,12 @@ const useStylesForSection = makeStyles((theme) => ({
     padding: "0px",
   },
   sectionTitleText: {
-    fontSize: "9pt",
+    fontSize: "10pt",
     fontWeight: "bold",
     marginRight: "5px",
   },
   sectionTopText: {
-    fontSize: "8pt",
+    fontSize: "9pt",
   },
   sectionItem: {
     padding: "0 0 0 6px",
@@ -132,7 +152,7 @@ const useStylesForSection = makeStyles((theme) => ({
     margin: "0",
   },
   sectionItemTextPrimary: {
-    fontSize: "8pt",
+    fontSize: "9pt",
   },
 }));
 
@@ -155,13 +175,15 @@ const Section = ({ title, top, items }) => {
           {items &&
             items.length > 0 &&
             items.map((item, index) => {
+              const itemText = item.value !== "" ? item.value : "";
               return (
                 <ListItem
                   className={classes.sectionItem}
                   key={uniqueId("sectionItem-")}
                 >
+                  <StopIcon style={{ fontSize: "9px", color: "#8e8e8e" }} />
                   <ListItemText
-                    primary={item.value}
+                    primary={itemText}
                     classes={{
                       root: classes.sectionItemTextRoot,
                       primary: classes.sectionItemTextPrimary,
@@ -181,11 +203,25 @@ const useStylesForContentInputForm = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
   },
+  addIconButton: {
+    padding: 6,
+  },
+  removeIconButton: {
+    padding: 2,
+  },
   inputItem: {
-    marginLeft: "10px",
+    marginLeft: "15px",
+  },
+  text: {
+    fontSize: "9pt",
+    fontWeight: "bold",
+    color: theme.palette.primary.main,
+    letterSpacing: "0.137573px",
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
   },
 }));
 
+/* - - - CONTENT INPUT FORM - - -  */
 const ContentInputForm = ({
   initialData,
   onContentInputFormChange = (f) => f,
@@ -221,15 +257,38 @@ const ContentInputForm = ({
   };
 
   const handleOnItemChange = (val, id) => {
-    let arr = [];
     setItems((prevValue) => {
-      arr = [...prevValue];
+      let arr = [...prevValue];
       const index = arr.findIndex((el) => el.id === id);
       if (index === -1) return;
       arr[index] = { id: id, value: val || "" };
+
+      debouncedNotifyParent({ ...getSectionObject(), items: arr });
       return arr;
     });
-    debouncedNotifyParent({ ...getSectionObject(), items: arr });
+  };
+
+  const handleAddItem = () => {
+    setItems((prevValue) => {
+      let arr = [...prevValue];
+      arr.push({ id: uniqueId("item-"), value: "" });
+
+      debouncedNotifyParent({ ...getSectionObject(), items: arr });
+      return arr;
+    });
+  };
+
+  const handleRemoveItem = (id) => {
+    setItems((prevValue) => {
+      let arr = [...prevValue];
+
+      const index = arr.findIndex((el) => el.id === id);
+      if (index === -1) return;
+      arr.splice(index, 1);
+
+      debouncedNotifyParent({ ...getSectionObject(), items: arr });
+      return arr;
+    });
   };
 
   const debouncedNotifyParentFunction = useRef();
@@ -251,26 +310,122 @@ const ContentInputForm = ({
 
   return (
     <div className={classes.root}>
-      <input
+      <CustomTextField
+        label="Title"
+        variant="filled"
         value={title}
         onChange={(e) => handleOnTitleChange(e.target.value)}
       />
-      <input
+      <CustomTextField
+        label="Content"
+        variant="filled"
         value={topText}
         onChange={(e) => handleOnTopTextChange(e.target.value)}
       />
+      <div>
+        <IconButton
+          className={classes.addIconButton}
+          onClick={(e) => handleAddItem(e)}
+        >
+          <AddBoxIcon />
+        </IconButton>
+        <span className={classes.text}>Items</span>
+      </div>
       {items?.length > 0 &&
         items.map((item, index) => {
           return (
-            <input
+            <CustomTextField
               className={classes.inputItem}
               key={item.id}
               value={item.value}
               onChange={(e) => handleOnItemChange(e.target.value, item.id)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <StopIcon style={{ fontSize: "10px", color: "#8e8e8e" }} />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => handleRemoveItem(item.id)}
+                      className={classes.removeIconButton}
+                    >
+                      <ClearIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
           );
         })}
     </div>
+  );
+};
+
+const useStylesForCustomTextField = makeStyles((theme) => ({
+  textFieldRoot: {
+    borderBottom: "1.4px dotted #e2e2e1",
+    overflow: "hidden",
+    backgroundColor: "white",
+    "&:hover": {
+      backgroundColor: "white",
+    },
+    "&$textFieldFocused": {
+      backgroundColor: "#fff",
+      borderColor: theme.palette.secondary.light,
+    },
+    paddingBottom: "2px",
+    marginBottom: "4px",
+  },
+  textFieldFocused: {},
+  textFieldInputLabelRoot: {
+    color: theme.palette.primary.main,
+    fontSize: "11pt",
+    fontWeight: "bold",
+    "&$textFieldInputLabelFocused": {
+      color: theme.palette.primary.light,
+    },
+  },
+  textFieldInputLabelFocused: {},
+  textFieldInputLabelFilled: {
+    "&.MuiInputLabel-shrink.MuiInputLabel-marginDense": {
+      transform: "translate(4px, 6px) scale(0.75)",
+    },
+  },
+}));
+
+const CustomTextField = ({ InputProps, InputLabelProps, ...props }) => {
+  const classes = useStylesForCustomTextField();
+  return (
+    <TextField
+      InputProps={{
+        ...InputProps,
+        classes: {
+          root: classes.textFieldRoot,
+          focused: classes.textFieldFocused,
+        },
+        disableUnderline: true,
+        inputProps: {
+          style: {
+            fontSize: "10pt",
+            paddingBottom: "2px",
+            paddingLeft: "4px",
+          },
+        },
+      }}
+      InputLabelProps={{
+        ...InputLabelProps,
+        classes: {
+          root: classes.textFieldInputLabelRoot,
+          focused: classes.textFieldInputLabelFocused,
+          filled: classes.textFieldInputLabelFilled,
+        },
+        shrink: true,
+      }}
+      size="small"
+      {...props}
+    />
   );
 };
 
