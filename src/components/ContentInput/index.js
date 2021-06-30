@@ -17,7 +17,7 @@ import clsx from "clsx";
 
 // Components
 import ContentInputForm from "./ContentInputForm";
-import QuickAddInput from "./QuickAddInput";
+import ContentInputToolbar from "./ContentInputToolbar";
 
 // lodash
 import { uniqueId } from "lodash";
@@ -27,7 +27,7 @@ const useStylesForContentInput = makeStyles((theme) => ({
     backgroundColor: "white",
     border: "1px solid #dcdcdc",
     borderRadius: "3px",
-    padding: "2px 4px 20px 8px",
+    padding: "0px 0px 20px 0px",
     margin: "2px",
     marginTop: "8px",
     minHeight: "225px",
@@ -127,12 +127,11 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
   );
 
   return (
-    <Grid container className={classes.root} spacing={1}>
-      <Grid item md={6}>
-        <QuickAddInput
-          placeholder="Add Section"
-          onSubmit={handleOnAddSection}
-        />
+    <Grid container className={classes.root}>
+      <Grid item xs={12}>
+        <ContentInputToolbar onAddSection={handleOnAddSection} />
+      </Grid>
+      <Grid item md={6} style={{ padding: "0px 4px 0px 8px" }}>
         <List component="nav">
           {data &&
             data.map((element) => {
