@@ -66,7 +66,9 @@ const useStyles = makeStyles({
   demoBoxNestedContentSectionRoot: {
     marginTop: "1.5px",
   },
-  demoBoxNestedContentTopText: {},
+  demoBoxNestedContentTopText: {
+    minHeight: "5pt",
+  },
   demoBoxNestedContentTitle: {
     fontWeight: "bold",
     marginRight: "2px",
@@ -146,12 +148,14 @@ const DemoBox = ({ data: propsData, collapsed }) => {
                     key={sectionData.id}
                     className={classes.demoBoxNestedContentSectionRoot}
                   >
-                    <span className={classes.demoBoxNestedContentTopText}>
-                      <span className={classes.demoBoxNestedContentTitle}>
-                        {sectionData.title}:
-                      </span>
+                    <div className={classes.demoBoxNestedContentTopText}>
+                      {sectionData.title && (
+                        <span className={classes.demoBoxNestedContentTitle}>
+                          {`${sectionData.title}:`}
+                        </span>
+                      )}
                       {sectionData.top}
-                    </span>
+                    </div>
                     {sectionData.items.map((item) => {
                       return (
                         <div

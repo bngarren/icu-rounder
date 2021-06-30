@@ -133,7 +133,9 @@ const pdfStyles = StyleSheet.create({
   gridBoxNestedContentSectionRoot: {
     marginTop: "2pt",
   },
-  gridBoxNestedContentTopText: {},
+  gridBoxNestedContentTopText: {
+    minHeight: "5pt",
+  },
   gridBoxNestedContentTitle: {
     fontWeight: "bold",
   },
@@ -311,7 +313,7 @@ const GridBox = ({ bedspaceData, box, width, removeLeftBorder }) => {
                   >
                     <Text style={pdfStyles.gridBoxNestedContentTopText}>
                       <Text style={pdfStyles.gridBoxNestedContentTitle}>
-                        {sectionData.title}:{" "}
+                        {sectionData.title && `${sectionData.title}: `}
                       </Text>
                       {sectionData.top}
                     </Text>

@@ -1,11 +1,4 @@
-import {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  forwardRef,
-  memo,
-} from "react";
+import { useState, useEffect, useCallback, useRef, memo } from "react";
 import {
   Grid,
   List,
@@ -14,19 +7,20 @@ import {
   ListItemSecondaryAction,
   Typography,
   Collapse,
-  TextField,
   IconButton,
-  InputAdornment,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
-import AddBoxIcon from "@material-ui/icons/AddBox";
 import StopIcon from "@material-ui/icons/Stop";
 import ClearIcon from "@material-ui/icons/Clear";
 
 import clsx from "clsx";
 
+// Components
+import ContentInputForm from "./ContentInputForm";
+import QuickAddInput from "./QuickAddInput";
+
 // lodash
-import { uniqueId, debounce } from "lodash";
+import { uniqueId } from "lodash";
 
 const useStylesForContentInput = makeStyles((theme) => ({
   root: {
@@ -167,59 +161,6 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
         </Collapse>
       </Grid>
     </Grid>
-  );
-};
-
-const useStylesForQuickAddInput = makeStyles((theme) => ({
-  iconButton: {
-    padding: 2,
-  },
-  icon: {
-    color: theme.palette.secondary.main,
-    "&:hover": {
-      color: theme.palette.secondary.light,
-    },
-  },
-}));
-
-const QuickAddInput = ({ placeholder, onSubmit = (f) => f }) => {
-  const classes = useStylesForQuickAddInput();
-  const [value, setValue] = useState("");
-
-  const handleSubmit = () => {
-    onSubmit(value || null);
-    setValue("");
-  };
-
-  const handleOnChange = (e) => {
-    setValue(e.target.value);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSubmit();
-    }
-  };
-
-  return (
-    <div>
-      <CustomTextField
-        value={value}
-        onChange={handleOnChange}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment>
-              <IconButton onClick={handleSubmit} className={classes.iconButton}>
-                <AddBoxIcon className={classes.icon} />
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
-    </div>
   );
 };
 
@@ -385,241 +326,5 @@ const Section = ({ data, onRemoveSection = (f) => f }) => {
     </div>
   );
 };
-
-const useStylesForContentInputForm = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-    flexDirection: "column",
-  },
-  addIconButton: {
-    padding: 6,
-  },
-  removeIconButton: {
-    padding: 2,
-  },
-  inputItem: {
-    marginLeft: "15px",
-  },
-  text: {
-    fontSize: "10pt",
-    fontWeight: "bold",
-    color: theme.palette.primary.main,
-    letterSpacing: "0.137573px",
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-  },
-}));
-
-/* - - - CONTENT INPUT FORM - - -  */
-const ContentInputForm = ({
-  initialData,
-  stealFocus = false,
-  onContentInputFormChange = (f) => f,
-}) => {
-  const classes = useStylesForContentInputForm();
-
-  const [title, setTitle] = useState("");
-  const [topText, setTopText] = useState("");
-  const [items, setItems] = useState([]);
-
-  const refToTitle = useRef();
-
-  const getSectionObject = () => {
-    return {
-      id: initialData.id,
-      title: title,
-      top: topText,
-      items: items,
-    };
-  };
-
-  useEffect(() => {
-    setTitle(initialData?.title || "");
-    setTopText(initialData?.top || "");
-    setItems(initialData?.items || []);
-
-    if (refToTitle?.current && stealFocus) {
-      refToTitle.current.focus();
-    }
-  }, [initialData]);
-
-  const handleOnTitleChange = (val) => {
-    setTitle(val);
-    debouncedNotifyParent({ ...getSectionObject(), title: val });
-  };
-  const handleOnTopTextChange = (val) => {
-    setTopText(val);
-    debouncedNotifyParent({ ...getSectionObject(), top: val });
-  };
-
-  const handleOnItemChange = (val, id) => {
-    setItems((prevValue) => {
-      let arr = [...prevValue];
-      const index = arr.findIndex((el) => el.id === id);
-      if (index === -1) return;
-      arr[index] = { id: id, value: val || "" };
-
-      debouncedNotifyParent({ ...getSectionObject(), items: arr });
-      return arr;
-    });
-  };
-
-  const handleAddItem = (value) => {
-    setItems((prevValue) => {
-      let arr = [...prevValue];
-      arr.push({ id: uniqueId("item-"), value: value || "" });
-
-      debouncedNotifyParent({ ...getSectionObject(), items: arr });
-      return arr;
-    });
-  };
-
-  const handleRemoveItem = (id) => {
-    setItems((prevValue) => {
-      let arr = [...prevValue];
-
-      const index = arr.findIndex((el) => el.id === id);
-      if (index === -1) return;
-      arr.splice(index, 1);
-
-      debouncedNotifyParent({ ...getSectionObject(), items: arr });
-      return arr;
-    });
-  };
-
-  const debouncedNotifyParentFunction = useRef();
-
-  // the function we want to debounce
-  debouncedNotifyParentFunction.current = (sectionData) => {
-    onContentInputFormChange(sectionData);
-  };
-
-  // the debounced function
-  const debouncedNotifyParent =
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useCallback(
-      debounce(debouncedNotifyParentFunction.current, 400, {
-        leading: true,
-      }),
-      []
-    );
-
-  return (
-    <div className={classes.root}>
-      <CustomTextField
-        ref={refToTitle}
-        label="Title"
-        variant="filled"
-        value={title}
-        onChange={(e) => handleOnTitleChange(e.target.value)}
-      />
-      <CustomTextField
-        label="Content"
-        variant="filled"
-        value={topText}
-        onChange={(e) => handleOnTopTextChange(e.target.value)}
-      />
-      <div style={{ marginLeft: 10 }}>
-        <QuickAddInput placeholder="Add Item" onSubmit={handleAddItem} />
-      </div>
-      {items?.length > 0 &&
-        items.map((item, index) => {
-          return (
-            <CustomTextField
-              className={classes.inputItem}
-              key={item.id}
-              value={item.value}
-              onChange={(e) => handleOnItemChange(e.target.value, item.id)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <StopIcon style={{ fontSize: "10px", color: "#8e8e8e" }} />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => handleRemoveItem(item.id)}
-                      className={classes.removeIconButton}
-                    >
-                      <ClearIcon />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          );
-        })}
-    </div>
-  );
-};
-
-const useStylesForCustomTextField = makeStyles((theme) => ({
-  textFieldRoot: {
-    borderBottom: "1.4px dotted #e2e2e1",
-    overflow: "hidden",
-    backgroundColor: "white",
-    "&:hover": {
-      backgroundColor: "white",
-    },
-    "&$textFieldFocused": {
-      backgroundColor: "#fff",
-      borderColor: theme.palette.secondary.light,
-    },
-    paddingBottom: "2px",
-    marginBottom: "4px",
-  },
-  textFieldFocused: {},
-  textFieldInputLabelRoot: {
-    color: "black",
-    fontSize: "12pt",
-    fontWeight: "bold",
-    "&$textFieldInputLabelFocused": {
-      color: theme.palette.secondary.main,
-    },
-  },
-  textFieldInputLabelFocused: {},
-  textFieldInputLabelFilled: {
-    "&.MuiInputLabel-shrink.MuiInputLabel-marginDense": {
-      transform: "translate(4px, 6px) scale(0.75)",
-    },
-  },
-}));
-
-const CustomTextField = forwardRef(
-  ({ InputProps, InputLabelProps, ...props }, ref) => {
-    const classes = useStylesForCustomTextField();
-    return (
-      <TextField
-        inputRef={ref}
-        InputProps={{
-          ...InputProps,
-          classes: {
-            root: classes.textFieldRoot,
-            focused: classes.textFieldFocused,
-          },
-          disableUnderline: true,
-          inputProps: {
-            style: {
-              fontSize: "10pt",
-              paddingBottom: "2px",
-              paddingLeft: "4px",
-            },
-          },
-        }}
-        InputLabelProps={{
-          ...InputLabelProps,
-          classes: {
-            root: classes.textFieldInputLabelRoot,
-            focused: classes.textFieldInputLabelFocused,
-            filled: classes.textFieldInputLabelFilled,
-          },
-          shrink: true,
-        }}
-        size="small"
-        {...props}
-      />
-    );
-  }
-);
 
 export default ContentInput;
