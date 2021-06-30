@@ -33,10 +33,10 @@ const useStylesForContentInput = makeStyles((theme) => ({
     backgroundColor: "white",
     border: "1px solid #dcdcdc",
     borderRadius: "3px",
-    padding: "2px 4px 2px 8px",
+    padding: "2px 4px 20px 8px",
     margin: "2px",
     marginTop: "8px",
-    minHeight: "200px",
+    minHeight: "225px",
   },
 }));
 
@@ -48,11 +48,15 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
     dataRef.current = data;
   }, [data]);
 
-  // store the selected sections' id
+  // store the selected section
   const [selectedSection, setSelectedSection] = useState(null);
+
+  const shouldFocusOnContentInputForm = useRef(false);
 
   const handleOnClickSectionContainer = useCallback(
     (id) => {
+      shouldFocusOnContentInputForm.current = true;
+
       // if this section is already selected
       if (selectedSection !== null && selectedSection.id === id) {
         setSelectedSection(null);
@@ -82,24 +86,30 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
   );
 
   /* Add a new blank Section */
-  const handleOnClickAddSection = useCallback(() => {
-    let arr = [...dataRef.current];
+  const handleOnAddSection = useCallback(
+    (value) => {
+      let arr = [...dataRef.current];
 
-    const newSection = {
-      id: uniqueId("section-"),
-      title: "",
-      top: "",
-      items: [],
-    };
+      const newSection = {
+        id: uniqueId("section-"),
+        title: value || "",
+        top: "",
+        items: [],
+      };
 
-    const newArr = arr.concat([newSection]);
+      const newArr = arr.concat([newSection]);
 
-    // the first variable is just a dummy
-    onChange(0, newArr);
+      // the first variable is just a dummy
+      onChange(0, newArr);
 
-    // set this new section as selected so we can start typing immediately
-    setSelectedSection(newSection);
-  }, [onChange]);
+      /* If any empty section is created, focus the input on the ContentInputForm */
+      shouldFocusOnContentInputForm.current = !value;
+
+      // set this new section as selected so we can start typing immediately
+      setSelectedSection(newSection);
+    },
+    [onChange]
+  );
 
   /* Remove a section, by id */
   const handleRemoveSection = useCallback(
@@ -125,9 +135,10 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
   return (
     <Grid container className={classes.root} spacing={1}>
       <Grid item md={6}>
-        <IconButton onClick={handleOnClickAddSection}>
-          <AddBoxIcon />
-        </IconButton>
+        <QuickAddInput
+          placeholder="Add Section"
+          onSubmit={handleOnAddSection}
+        />
         <List component="nav">
           {data &&
             data.map((element) => {
@@ -148,6 +159,7 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
         <Collapse in={selectedSection !== null} unmountOnExit>
           <ContentInputForm
             initialData={selectedSection}
+            stealFocus={shouldFocusOnContentInputForm.current}
             onContentInputFormChange={(newData) =>
               handleContentInputFormChange(dataRef.current, newData)
             }
@@ -155,6 +167,59 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
         </Collapse>
       </Grid>
     </Grid>
+  );
+};
+
+const useStylesForQuickAddInput = makeStyles((theme) => ({
+  iconButton: {
+    padding: 2,
+  },
+  icon: {
+    color: theme.palette.secondary.main,
+    "&:hover": {
+      color: theme.palette.secondary.light,
+    },
+  },
+}));
+
+const QuickAddInput = ({ placeholder, onSubmit = (f) => f }) => {
+  const classes = useStylesForQuickAddInput();
+  const [value, setValue] = useState("");
+
+  const handleSubmit = () => {
+    onSubmit(value || null);
+    setValue("");
+  };
+
+  const handleOnChange = (e) => {
+    setValue(e.target.value);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
+  return (
+    <div>
+      <CustomTextField
+        value={value}
+        onChange={handleOnChange}
+        onKeyDown={handleKeyDown}
+        placeholder={placeholder}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment>
+              <IconButton onClick={handleSubmit} className={classes.iconButton}>
+                <AddBoxIcon className={classes.icon} />
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+      />
+    </div>
   );
 };
 
@@ -347,6 +412,7 @@ const useStylesForContentInputForm = makeStyles((theme) => ({
 /* - - - CONTENT INPUT FORM - - -  */
 const ContentInputForm = ({
   initialData,
+  stealFocus = false,
   onContentInputFormChange = (f) => f,
 }) => {
   const classes = useStylesForContentInputForm();
@@ -371,7 +437,7 @@ const ContentInputForm = ({
     setTopText(initialData?.top || "");
     setItems(initialData?.items || []);
 
-    if (refToTitle?.current) {
+    if (refToTitle?.current && stealFocus) {
       refToTitle.current.focus();
     }
   }, [initialData]);
@@ -397,10 +463,10 @@ const ContentInputForm = ({
     });
   };
 
-  const handleAddItem = () => {
+  const handleAddItem = (value) => {
     setItems((prevValue) => {
       let arr = [...prevValue];
-      arr.push({ id: uniqueId("item-"), value: "" });
+      arr.push({ id: uniqueId("item-"), value: value || "" });
 
       debouncedNotifyParent({ ...getSectionObject(), items: arr });
       return arr;
@@ -452,14 +518,8 @@ const ContentInputForm = ({
         value={topText}
         onChange={(e) => handleOnTopTextChange(e.target.value)}
       />
-      <div>
-        <IconButton
-          className={classes.addIconButton}
-          onClick={(e) => handleAddItem(e)}
-        >
-          <AddBoxIcon />
-        </IconButton>
-        <span className={classes.text}>Items</span>
+      <div style={{ marginLeft: 10 }}>
+        <QuickAddInput placeholder="Add Item" onSubmit={handleAddItem} />
       </div>
       {items?.length > 0 &&
         items.map((item, index) => {
@@ -510,11 +570,11 @@ const useStylesForCustomTextField = makeStyles((theme) => ({
   },
   textFieldFocused: {},
   textFieldInputLabelRoot: {
-    color: theme.palette.primary.main,
+    color: "black",
     fontSize: "12pt",
     fontWeight: "bold",
     "&$textFieldInputLabelFocused": {
-      color: theme.palette.primary.light,
+      color: theme.palette.secondary.main,
     },
   },
   textFieldInputLabelFocused: {},
