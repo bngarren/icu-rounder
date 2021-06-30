@@ -5,7 +5,6 @@ import { makeStyles } from "@material-ui/styles";
 
 const useStylesForCustomTextField = makeStyles((theme) => ({
   textFieldRoot: {
-    overflow: "hidden",
     backgroundColor: "white",
     "&:hover": {
       backgroundColor: "white",
@@ -38,7 +37,10 @@ const useStylesForCustomTextField = makeStyles((theme) => ({
 }));
 
 const CustomTextField = forwardRef(
-  ({ InputProps, InputLabelProps, inputProps, ...props }, ref) => {
+  (
+    { InputProps, InputLabelProps, inputProps, overflow = "auto", ...props },
+    ref
+  ) => {
     const classes = useStylesForCustomTextField();
     return (
       <TextField
@@ -48,6 +50,9 @@ const CustomTextField = forwardRef(
           classes: {
             root: classes.textFieldRoot,
             focused: classes.textFieldFocused,
+          },
+          style: {
+            overflow: overflow,
           },
           disableUnderline: true,
           inputProps: {

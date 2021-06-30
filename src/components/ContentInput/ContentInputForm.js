@@ -59,7 +59,9 @@ const useStylesForContentInputForm = makeStyles((theme) => ({
     },
     transform: "rotate(90deg)",
   },
-  inputItem: {},
+  inputItem: {
+    width: "100%",
+  },
   bullet: {
     fontSize: "10px",
     color: "#626060",
@@ -219,11 +221,18 @@ const ContentInputForm = ({
               key={value.id}
               value={value.value}
               onChange={(e) => handleOnItemChange(e.target.value, value.id)}
+              multiline
+              rows={1}
+              rowsMax={3}
               InputProps={{
                 startAdornment: (
                   <InputAdornment
                     position="start"
-                    style={{ marginRight: "2px" }}
+                    style={{
+                      marginRight: "2px",
+                      alignSelf: "flex-start",
+                      marginTop: "10px",
+                    }}
                   >
                     <StopIcon className={classes.bullet} />
                   </InputAdornment>

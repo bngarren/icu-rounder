@@ -70,6 +70,9 @@ const useStylesForSelectTemplate = makeStyles((theme) => ({
       borderColor: theme.palette.secondary.main,
     },
   },
+  menuPaper: {
+    maxWidth: "200px",
+  },
   menuList: {
     paddingTop: 0,
     paddingBottom: 0,
@@ -83,6 +86,9 @@ const useStylesForSelectTemplate = makeStyles((theme) => ({
   },
   menuItem: {
     fontSize: "10pt",
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+    textOverflow: "ellipsis",
   },
 }));
 
@@ -110,6 +116,7 @@ const SelectTemplate = ({ onSelect = (f) => f }) => {
       select
       id="selectTemplate"
       label="Template"
+      overflow="hidden"
       SelectProps={{
         classes: {
           root: classes.select,
@@ -118,6 +125,9 @@ const SelectTemplate = ({ onSelect = (f) => f }) => {
         MenuProps: {
           classes: {
             list: classes.menuList,
+          },
+          PaperProps: {
+            className: classes.menuPaper,
           },
           anchorOrigin: {
             vertical: "bottom",
