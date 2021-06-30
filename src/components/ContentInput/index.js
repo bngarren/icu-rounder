@@ -43,8 +43,14 @@ const useStylesForContentInput = makeStyles((theme) => ({
   },
 }));
 
-const ContentInput = ({ value: data, onChange = (f) => f }) => {
+const ContentInput = ({ initialValue, value: data, onChange = (f) => f }) => {
   const classes = useStylesForContentInput();
+
+  /* we use the initialValue prop to know when to reset the content input,
+  i.e., get rid of any selected section */
+  useEffect(() => {
+    setSelectedSection(null);
+  }, [initialValue]);
 
   const dataRef = useRef(data);
   useEffect(() => {
@@ -75,10 +81,12 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
   );
 
   const handleContentInputFormChange = useCallback(
-    (data, newSectionData) => {
-      const index = data.findIndex((el) => el.id === newSectionData.id);
+    (newSectionData) => {
+      const index = dataRef.current.findIndex(
+        (el) => el.id === newSectionData.id
+      );
       if (index !== -1) {
-        let arr = [...data];
+        let arr = [...dataRef.current];
         arr[index] = newSectionData;
 
         // the first variable is just a dummy
@@ -135,10 +143,31 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
     [onChange, selectedSection]
   );
 
+  const handleOnSelectTemplate = useCallback(
+    (sectionTitlesArray) => {
+      let arr = [];
+      sectionTitlesArray.forEach((title) => {
+        arr.push({
+          id: uniqueId("section-"),
+          title: title,
+          top: "",
+          items: [],
+        });
+      });
+
+      // first parameter is dummy
+      onChange(0, arr);
+    },
+    [onChange]
+  );
+
   return (
     <Grid container className={classes.root}>
       <Grid item xs={12}>
-        <ContentInputToolbar onAddSection={handleOnAddSection} />
+        <ContentInputToolbar
+          onAddSection={handleOnAddSection}
+          onSelectTemplate={handleOnSelectTemplate}
+        />
       </Grid>
       <Grid item container xs={12} className={classes.gridBody}>
         <Grid item md={6} style={{ padding: "0px 4px 0px 8px" }}>
@@ -163,9 +192,7 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
             <ContentInputForm
               initialData={selectedSection}
               stealFocus={shouldFocusOnContentInputForm.current}
-              onContentInputFormChange={(newData) =>
-                handleContentInputFormChange(dataRef.current, newData)
-              }
+              onContentInputFormChange={handleContentInputFormChange}
             />
           </Collapse>
         </Grid>
@@ -241,6 +268,13 @@ const useStylesForSection = makeStyles((theme) => ({
     transition: "visibility 0s linear 0s, opacity 300ms",
   },
   emptySection: {},
+  sectionTopDiv: {
+    display: "flex",
+    flexDirection: "row",
+    flexGrow: "1",
+    justifyContent: "space-between",
+    paddingRight: "25px",
+  },
   sectionTitleText: {
     fontSize: "10pt",
     fontWeight: "bold",
@@ -249,7 +283,7 @@ const useStylesForSection = makeStyles((theme) => ({
   sectionTopText: {
     fontSize: "9pt",
     lineHeight: "1",
-    paddingRight: "10px",
+    whiteSpace: "pre-line",
   },
   sectionItem: {
     padding: "0 0 0 6px",
@@ -265,6 +299,7 @@ const useStylesForSection = makeStyles((theme) => ({
     padding: "2px",
   },
   sectionEditIcon: {
+    alignSelf: "flex-start",
     color: theme.palette.primary.main,
   },
 }));
@@ -291,7 +326,7 @@ const Section = ({ data, selected, onRemoveSection = (f) => f }) => {
           }),
         }}
       >
-        <div>
+        <div className={classes.sectionTopDiv}>
           <Typography className={classes.sectionTopText}>
             <Typography component="span" className={classes.sectionTitleText}>
               {title && `${title}:`}
@@ -299,8 +334,11 @@ const Section = ({ data, selected, onRemoveSection = (f) => f }) => {
             </Typography>
             {top}
           </Typography>
+          {selected && (
+            <EditAttributesIcon className={classes.sectionEditIcon} />
+          )}
         </div>
-        {selected && <EditAttributesIcon className={classes.sectionEditIcon} />}
+
         <ListItemSecondaryAction
           className={classes.sectionListItemSecondaryAction}
         >

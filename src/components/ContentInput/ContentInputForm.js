@@ -16,6 +16,8 @@ const useStylesForContentInputForm = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexDirection: "column",
+    borderLeft: `3px solid ${theme.palette.primary.main}`,
+    paddingLeft: "4px",
   },
   header: {
     color: theme.palette.primary.main,
@@ -135,14 +137,18 @@ const ContentInputForm = ({
       </Typography>
       <CustomTextField
         ref={refToTitle}
-        label="Title"
-        variant="filled"
+        placeholder="Title"
         value={title}
         onChange={(e) => handleOnTitleChange(e.target.value)}
+        inputProps={{
+          style: { fontWeight: "bold" },
+        }}
       />
       <CustomTextField
-        label="Content"
-        variant="filled"
+        placeholder="Content"
+        multiline
+        rows={2}
+        maxRows={2}
         value={topText}
         onChange={(e) => handleOnTopTextChange(e.target.value)}
       />

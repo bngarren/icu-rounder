@@ -503,7 +503,11 @@ const BedspaceEditor = ({
                   onBlur={handleInputOnBlur}
                   onChangeArgument={1}
                 >
-                  <ContentInput />
+                  {/* also pass the initialValue prop here so that ContentInput
+                  knows when to reset itself, i.e. after a bed change */}
+                  <ContentInput
+                    initialValue={defaultValues.nestedContent || ""}
+                  />
                 </CustomFormControlEditor>
               )}
             </div>

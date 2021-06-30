@@ -14,8 +14,6 @@ const useStylesForCustomTextField = makeStyles((theme) => ({
       backgroundColor: "#fff",
       borderColor: theme.palette.secondary.light,
     },
-    paddingBottom: "2px",
-    marginBottom: "4px",
   },
   textFieldNativeInput: {
     borderBottom: "1.4px dotted #e2e2e1",
@@ -41,7 +39,7 @@ const useStylesForCustomTextField = makeStyles((theme) => ({
 }));
 
 const CustomTextField = forwardRef(
-  ({ InputProps, InputLabelProps, ...props }, ref) => {
+  ({ InputProps, InputLabelProps, inputProps, ...props }, ref) => {
     const classes = useStylesForCustomTextField();
     return (
       <TextField
@@ -54,6 +52,7 @@ const CustomTextField = forwardRef(
           },
           disableUnderline: true,
           inputProps: {
+            ...inputProps,
             className: classes.textFieldNativeInput,
           },
         }}
