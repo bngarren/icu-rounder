@@ -356,13 +356,18 @@ const BedspaceEditor = ({
     };
   }, [handleKeyDown]);
 
-  /* Toggle buttons for selecting the content type */
-  const [contentType, setContentType] = useState("simple");
+  const [contentType, setContentType] = useState();
 
-  const handleOnChangeToggleContentType = (target, value) => {
+  const handleOnToggleContentType = (target, value) => {
     setContentType(value);
     handleInputChange(target, value);
   };
+
+  /* If new default data comes through or reset is hit, update
+  our local contentType state so that we show the correct form */
+  useEffect(() => {
+    setContentType(defaultValues.contentType || "simple");
+  }, [defaultValues.contentType, resetKey]);
 
   /*  - - - - - RETURN - - - -  */
   if (data) {
@@ -474,13 +479,13 @@ const BedspaceEditor = ({
               <CustomFormControlEditor
                 id="contentType"
                 initialValue={defaultValues.contentType || "simple"}
-                onInputChange={handleOnChangeToggleContentType}
+                onInputChange={handleOnToggleContentType}
                 onDiffChange={onDiffChange}
                 onChangeArgument={1}
               >
                 <ToggleContentType />
               </CustomFormControlEditor>
-              {contentType === "simple" && (
+              {data.contentType === "simple" && (
                 <CustomFormControlEditor
                   id="simpleContent"
                   initialValue={defaultValues.simpleContent || ""}
@@ -498,13 +503,14 @@ const BedspaceEditor = ({
                   />
                 </CustomFormControlEditor>
               )}
-              {contentType === "nested" && (
+              {data.contentType === "nested" && (
                 <CustomFormControlEditor
                   id="nestedContent"
                   initialValue={DATA || []}
                   onInputChange={handleInputChange}
                   onDiffChange={onDiffChange}
                   onBlur={handleInputOnBlur}
+                  onChangeArgument={1}
                 >
                   <ContentInput />
                 </CustomFormControlEditor>
