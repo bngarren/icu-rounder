@@ -36,6 +36,11 @@ const useStylesForContentInput = makeStyles((theme) => ({
     marginTop: "8px",
     minHeight: "225px",
   },
+  label: {
+    color: theme.palette.secondary.main,
+    fontSize: "9pt",
+    fontWeight: "600",
+  },
   gridBody: {
     flexDirection: "row",
     flex: "2",
@@ -184,6 +189,9 @@ const ContentInput = ({ initialValue, value: data, onChange = (f) => f }) => {
   return (
     <Grid container className={classes.root}>
       <Grid item xs={12}>
+        <Typography variant="h6" className={classes.label}>
+          Content
+        </Typography>
         <ContentInputToolbar
           onAddSection={handleOnAddSection}
           onSelectTemplate={handleOnSelectTemplate}
