@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, forwardRef } from "react";
 import {
   Grid,
   List,
@@ -41,6 +41,7 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
     dataRef.current = data;
   }, [data]);
 
+  // store the selected sections' id
   const [selectedSection, setSelectedSection] = useState(null);
 
   const handleOnClickSectionContainer = (id) => {
@@ -49,8 +50,8 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
       setSelectedSection(null);
       return;
     }
-    // otherwise set the selectedSection to this id's corresponding section
-    const sect = data.find((element) => element.id === id);
+
+    const sect = data?.length > 0 && data.find((element) => element.id === id);
     setSelectedSection(sect || null);
   };
 
@@ -71,14 +72,21 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
   /* Add a new blank Section */
   const handleOnClickAddSection = useCallback(() => {
     let arr = [...dataRef.current];
-    const l = arr.push({
+
+    const newSection = {
       id: uniqueId("section-"),
       title: "",
       top: "",
       items: [],
-    });
+    };
+
+    const newArr = arr.concat([newSection]);
+
     // the first variable is just a dummy
-    onChange(l, arr);
+    onChange(0, newArr);
+
+    // set this new section as selected so we can start typing immediately
+    setSelectedSection(newSection);
   }, [onChange]);
 
   /* Remove a section, by id */
@@ -140,9 +148,10 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
 
 const useStylesForSectionContainer = makeStyles((theme) => ({
   sectionContainer: {
+    minHeight: "20px",
     cursor: "pointer",
     borderRadius: "3px",
-    padding: "2px",
+    padding: "2px 0 2px 2px",
     "&:hover": {
       border: `2px dotted ${theme.palette.secondary.veryVeryLight}`,
       padding: 0,
@@ -153,7 +162,7 @@ const useStylesForSectionContainer = makeStyles((theme) => ({
     transition: "background-color 0.3s",
     "&:hover": {
       borderColor: theme.palette.primary.light,
-      padding: "2px",
+      padding: "2px 0 2px 2px",
     },
   },
 }));
@@ -183,19 +192,22 @@ const SectionContainer = ({
 };
 
 const useStylesForSection = makeStyles((theme) => ({
-  sectionListItemContainer: {
-    padding: "0px",
-    minHeight: "15px",
+  root: {
     "&:hover $sectionListItemSecondaryAction": {
       visibility: "inherit",
       opacity: 1,
     },
+  },
+  sectionListItemContainer: {
+    padding: "0px",
   },
   sectionListItemRoot: {
     padding: "0px",
   },
   sectionListItemSecondaryAction: {
     right: "2px",
+    top: "-2px",
+    transform: "none",
     visibility: "hidden",
     opacity: 0,
     transition: "visibility 0s linear 0s, opacity 300ms",
@@ -210,6 +222,8 @@ const useStylesForSection = makeStyles((theme) => ({
   },
   sectionTopText: {
     fontSize: "9pt",
+    lineHeight: "1",
+    paddingRight: "10px",
   },
   sectionItem: {
     padding: "0 0 0 6px",
@@ -219,6 +233,7 @@ const useStylesForSection = makeStyles((theme) => ({
   },
   sectionItemTextPrimary: {
     fontSize: "9pt",
+    lineHeight: "1",
   },
   sectionRemoveIconButton: {
     padding: "2px",
@@ -237,7 +252,7 @@ const Section = ({ data, onRemoveSection = (f) => f }) => {
   };
 
   return (
-    <div>
+    <div className={classes.root}>
       <ListItem
         onClick={handleOnClickTitle}
         classes={{
@@ -247,10 +262,14 @@ const Section = ({ data, onRemoveSection = (f) => f }) => {
           }),
         }}
       >
-        <Typography className={classes.sectionTitleText}>
-          {title && `${title}:`}
-        </Typography>
-        <Typography className={classes.sectionTopText}>{top}</Typography>
+        <div>
+          <Typography className={classes.sectionTopText}>
+            <Typography component="span" className={classes.sectionTitleText}>
+              {title && `${title}:`}
+            </Typography>
+            {top}
+          </Typography>
+        </div>
         <ListItemSecondaryAction
           className={classes.sectionListItemSecondaryAction}
         >
@@ -305,7 +324,7 @@ const useStylesForContentInputForm = makeStyles((theme) => ({
     marginLeft: "15px",
   },
   text: {
-    fontSize: "9pt",
+    fontSize: "10pt",
     fontWeight: "bold",
     color: theme.palette.primary.main,
     letterSpacing: "0.137573px",
@@ -324,6 +343,8 @@ const ContentInputForm = ({
   const [topText, setTopText] = useState("");
   const [items, setItems] = useState([]);
 
+  const refToTitle = useRef();
+
   const getSectionObject = () => {
     return {
       id: initialData.id,
@@ -337,6 +358,10 @@ const ContentInputForm = ({
     setTitle(initialData?.title || "");
     setTopText(initialData?.top || "");
     setItems(initialData?.items || []);
+
+    if (refToTitle?.current) {
+      refToTitle.current.focus();
+    }
   }, [initialData]);
 
   const handleOnTitleChange = (val) => {
@@ -403,6 +428,7 @@ const ContentInputForm = ({
   return (
     <div className={classes.root}>
       <CustomTextField
+        ref={refToTitle}
         label="Title"
         variant="filled"
         value={title}
@@ -473,7 +499,7 @@ const useStylesForCustomTextField = makeStyles((theme) => ({
   textFieldFocused: {},
   textFieldInputLabelRoot: {
     color: theme.palette.primary.main,
-    fontSize: "11pt",
+    fontSize: "12pt",
     fontWeight: "bold",
     "&$textFieldInputLabelFocused": {
       color: theme.palette.primary.light,
@@ -487,38 +513,41 @@ const useStylesForCustomTextField = makeStyles((theme) => ({
   },
 }));
 
-const CustomTextField = ({ InputProps, InputLabelProps, ...props }) => {
-  const classes = useStylesForCustomTextField();
-  return (
-    <TextField
-      InputProps={{
-        ...InputProps,
-        classes: {
-          root: classes.textFieldRoot,
-          focused: classes.textFieldFocused,
-        },
-        disableUnderline: true,
-        inputProps: {
-          style: {
-            fontSize: "10pt",
-            paddingBottom: "2px",
-            paddingLeft: "4px",
+const CustomTextField = forwardRef(
+  ({ InputProps, InputLabelProps, ...props }, ref) => {
+    const classes = useStylesForCustomTextField();
+    return (
+      <TextField
+        inputRef={ref}
+        InputProps={{
+          ...InputProps,
+          classes: {
+            root: classes.textFieldRoot,
+            focused: classes.textFieldFocused,
           },
-        },
-      }}
-      InputLabelProps={{
-        ...InputLabelProps,
-        classes: {
-          root: classes.textFieldInputLabelRoot,
-          focused: classes.textFieldInputLabelFocused,
-          filled: classes.textFieldInputLabelFilled,
-        },
-        shrink: true,
-      }}
-      size="small"
-      {...props}
-    />
-  );
-};
+          disableUnderline: true,
+          inputProps: {
+            style: {
+              fontSize: "10pt",
+              paddingBottom: "2px",
+              paddingLeft: "4px",
+            },
+          },
+        }}
+        InputLabelProps={{
+          ...InputLabelProps,
+          classes: {
+            root: classes.textFieldInputLabelRoot,
+            focused: classes.textFieldInputLabelFocused,
+            filled: classes.textFieldInputLabelFilled,
+          },
+          shrink: true,
+        }}
+        size="small"
+        {...props}
+      />
+    );
+  }
+);
 
 export default ContentInput;
