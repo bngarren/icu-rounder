@@ -16,8 +16,10 @@ const useStylesForContentInputForm = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexDirection: "column",
-    borderLeft: `3px solid ${theme.palette.primary.main}`,
-    paddingLeft: "4px",
+    borderLeft: `3px solid ${theme.palette.secondary.main}`,
+    padding: "4px 4px 8px 4px",
+    boxShadow:
+      "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px",
   },
   header: {
     color: theme.palette.primary.main,
@@ -149,7 +151,8 @@ const ContentInputForm = ({
       <CustomTextField
         placeholder="Content"
         multiline
-        rows={2}
+        rows={1}
+        rowsMax={2}
         value={topText}
         onChange={(e) => handleOnTopTextChange(e.target.value)}
       />

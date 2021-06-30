@@ -5,16 +5,18 @@ import {
   ListItem,
   ListItemText,
   Typography,
-  Collapse,
   IconButton,
   Fade,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import StopIcon from "@material-ui/icons/Stop";
 import ClearIcon from "@material-ui/icons/Clear";
-import EditAttributesIcon from "@material-ui/icons/EditAttributes";
+import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
 
 import clsx from "clsx";
+
+// React Movable
+import { List as MovableList, arrayMove } from "react-movable";
 
 // Components
 import ContentInputForm from "./ContentInputForm";
@@ -38,6 +40,8 @@ const useStylesForContentInput = makeStyles((theme) => ({
     flexDirection: "row",
     flex: "2",
     paddingTop: "15px",
+    paddingLeft: "4px",
+    paddingRight: "8px",
   },
   mainList: {
     padding: 0,
@@ -164,6 +168,13 @@ const ContentInput = ({ initialValue, value: data, onChange = (f) => f }) => {
     [onChange]
   );
 
+  const handleMoveSection = useCallback(
+    ({ oldIndex, newIndex }) => {
+      onChange(0, arrayMove(dataRef.current, oldIndex, newIndex));
+    },
+    [onChange]
+  );
+
   return (
     <Grid container className={classes.root}>
       <Grid item xs={12}>
@@ -174,21 +185,29 @@ const ContentInput = ({ initialValue, value: data, onChange = (f) => f }) => {
       </Grid>
       <Grid item container xs={12} className={classes.gridBody}>
         <Grid item xs={12} sm={6} style={{ padding: "0px 4px 0px 0px" }}>
-          <List component="nav" className={classes.mainList}>
-            {data &&
-              data.map((element) => {
-                const selected = selectedSection?.id === element.id;
-                return (
+          {data?.length > 0 && (
+            <MovableList
+              values={data}
+              onChange={handleMoveSection}
+              lockVertically={true}
+              renderList={({ children, props }) => (
+                <List component="nav" className={classes.mainList} {...props}>
+                  {children}
+                </List>
+              )}
+              renderItem={({ value, props, isDragged }) => (
+                <li {...props}>
                   <SectionContainer
-                    element={element}
-                    key={element.id}
-                    selected={selected}
+                    element={value}
+                    selected={selectedSection?.id === value.id}
+                    isDragged={isDragged}
                     onClickSection={handleOnClickSectionContainer}
                     onRemoveSection={handleRemoveSection}
                   />
-                );
-              })}
-          </List>
+                </li>
+              )}
+            />
+          )}
         </Grid>
         <Grid item xs={12} sm={6}>
           <Fade in={selectedSection !== null} timeout={200}>
@@ -229,13 +248,14 @@ const useStylesForSectionContainer = makeStyles((theme) => ({
 const SectionContainer = memo(function ({
   element,
   selected,
+  isDragged,
   onClickSection = (f) => f,
   onRemoveSection = (f) => f,
 }) {
   const classes = useStylesForSectionContainer();
 
   return (
-    <li
+    <div
       className={clsx(classes.sectionContainer, {
         [classes.sectionContainerSelected]: selected,
       })}
@@ -244,9 +264,10 @@ const SectionContainer = memo(function ({
       <Section
         data={element}
         selected={selected}
+        isDragged={isDragged}
         onRemoveSection={onRemoveSection}
       />
-    </li>
+    </div>
   );
 });
 
@@ -267,10 +288,11 @@ const useStylesForSection = makeStyles((theme) => ({
     borderRight: "3px solid transparent",
   },
   buttonsDivSelected: {
-    borderRight: `3px dotted ${theme.palette.primary.main}`,
+    borderRight: `3px solid ${theme.palette.secondary.main}`,
   },
   contentDiv: {
     marginLeft: "3px",
+    flexGrow: 1,
   },
   emptySection: {},
   sectionTopDiv: {
@@ -278,6 +300,12 @@ const useStylesForSection = makeStyles((theme) => ({
     flexDirection: "row",
     flexGrow: "1",
     justifyContent: "flex-start",
+  },
+  sectionDragIndicatorIcon: {
+    color: "#626060",
+    "&:hover": {
+      color: theme.palette.secondary.light,
+    },
   },
   sectionRemoveIconButton: {
     padding: "2px",
@@ -289,6 +317,10 @@ const useStylesForSection = makeStyles((theme) => ({
       backgroundColor: theme.palette.secondary.faint,
     },
   },
+  sectionRemoveIconButtonSelected: {
+    visibility: "inherit",
+    opacity: 1,
+  },
   sectionTitleText: {
     fontSize: "10pt",
     fontWeight: "bold",
@@ -298,6 +330,7 @@ const useStylesForSection = makeStyles((theme) => ({
     fontSize: "9pt",
     lineHeight: "1",
     whiteSpace: "pre-line",
+    width: "100%",
   },
   sectionItem: {
     padding: "0 0 0 6px",
@@ -311,7 +344,7 @@ const useStylesForSection = makeStyles((theme) => ({
   },
 }));
 
-const Section = ({ data, selected, onRemoveSection = (f) => f }) => {
+const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
   const classes = useStylesForSection();
 
   const { id, title, top, items } = data;
@@ -325,11 +358,22 @@ const Section = ({ data, selected, onRemoveSection = (f) => f }) => {
         })}
       >
         <IconButton
-          className={classes.sectionRemoveIconButton}
+          className={clsx(classes.sectionRemoveIconButton, {
+            [classes.sectionRemoveIconButtonSelected]: selected,
+          })}
           onClick={(e) => onRemoveSection(e, id)}
         >
           <ClearIcon style={{ fontSize: "20px" }} />
         </IconButton>
+        {selected ? (
+          <DragIndicatorIcon
+            data-movable-handle
+            className={classes.sectionDragIndicatorIcon}
+            style={{ cursor: isDragged ? "grabbing" : "grab" }}
+          />
+        ) : (
+          <div data-movable-handle></div>
+        )}
       </div>
       <div className={classes.contentDiv}>
         <div
@@ -345,7 +389,7 @@ const Section = ({ data, selected, onRemoveSection = (f) => f }) => {
             {top}
           </Typography>
         </div>
-        <List component="div" disablePadding>
+        <List component="ul" disablePadding>
           {items &&
             items.length > 0 &&
             items.map((item, index) => {
