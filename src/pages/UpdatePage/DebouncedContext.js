@@ -1,4 +1,4 @@
-import { createContext, useRef, useCallback, useContext } from "react";
+import { createContext, useRef, useCallback, useContext, useMemo } from "react";
 
 const DebouncedContext = createContext();
 
@@ -44,11 +44,14 @@ const DebouncedContextProvider = ({ children }) => {
   }, []);
 
   /* The object to be passed as the context value */
-  const value = {
-    addDebouncedFunction: add,
-    removeDebouncedFunction: remove,
-    flushAll: flushAll,
-  };
+  const value = useMemo(
+    () => ({
+      addDebouncedFunction: add,
+      removeDebouncedFunction: remove,
+      flushAll: flushAll,
+    }),
+    [add, flushAll, remove]
+  );
 
   return (
     <DebouncedContext.Provider value={value}>
