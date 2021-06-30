@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Grid,
   Button,
@@ -18,6 +18,9 @@ import { uniqueId } from "lodash";
 // Components
 import DemoBox from "../../components/DemoBox";
 import BedspaceEditor from "../../components/BedspaceEditor";
+
+// context
+import { useDebouncedContext } from "../../pages/UpdatePage/DebouncedContext";
 
 // Style
 const useStyles = makeStyles((theme) => ({
@@ -97,10 +100,10 @@ const DemoAndEditorController = ({
 
   /* Also keep a ref (for instances where a stale closure is a problem) */
   const bedspaceEditorDataRef = useRef(bedspaceEditorData);
-  const setBedspaceEditorData = (data) => {
+  const setBedspaceEditorData = useCallback((data) => {
     _setBedspaceEditorData(data);
     bedspaceEditorDataRef.current = data;
-  };
+  }, []);
 
   const [resetKey, setResetKey] = useState(uniqueId()); // value not important, just using it to trigger re-render
 
@@ -110,7 +113,7 @@ const DemoAndEditorController = ({
   const handleOnReset = useCallback(() => {
     setBedspaceEditorData(defaultBedData);
     setResetKey(uniqueId());
-  }, [defaultBedData]);
+  }, [defaultBedData, setBedspaceEditorData]);
 
   /* Keep the editor's data up to date with the truth data */
   useEffect(() => {
@@ -120,39 +123,21 @@ const DemoAndEditorController = ({
 
   /* When a change in the BedspaceEditor's data occurs, it
   sends the new bedspace JSON object here.  */
-  const handleOnEditorDataChange = useCallback((newBedspaceData) => {
-    setBedspaceEditorData(newBedspaceData);
-  }, []);
+  const handleOnEditorDataChange = useCallback(
+    (newBedspaceData) => {
+      setBedspaceEditorData(newBedspaceData);
+    },
+    [setBedspaceEditorData]
+  );
 
   /* Track the toggle state of DemoBox collapsed status,
   helpful for setting debounce interval in BedspaceEditor 
   i.e., if demobox is not visible, the debounce interval can be higher */
   const [demoBoxCollapsed, setDemoBoxCollapsed] = useState(true);
 
-  /* A ref to hold any debounced functions being used.
-  These will be flushed when necessary.
-  Example: When we try to save DURING a debounce, we first need to flush
-  to get the rest of the data in, before taking any actions */
-  const debouncedFunctions = useRef([]);
-
-  /* Give this to child components so they can add their debounced functions */
-  const addDebouncedFunction = useCallback((f) => {
-    debouncedFunctions.current.push(f);
-    console.log(debouncedFunctions.current);
-    return f;
-  }, []);
-
-  /* For each debounced function in the array, flush it--meaning
-  invoke it now without waiting for delay */
-  const flushDebouncedFunctions = () => {
-    debouncedFunctions.current.forEach((f) => {
-      try {
-        f.flush();
-      } catch (err) {
-        console.error(err);
-      }
-    });
-  };
+  /* Grab the flushAll() function so that we can flush all the debounced functions 
+  before quick saving with CTRL+S */
+  const { flushAll } = useDebouncedContext();
 
   /* 
   - - - HOTKEYS - - - 
@@ -172,12 +157,12 @@ const DemoAndEditorController = ({
         event.preventDefault(); // don't let the browser do the typical CTRL+S action
         /* If there is data that needsSave, do the save function */
         if (needsSave) {
-          flushDebouncedFunctions(); //ensure all debounced functions are finalized before saving
+          flushAll(); //ensure all debounced functions are finalized before saving
           onSave(bedspaceEditorDataRef.current);
         }
       }
     },
-    [needsSave, onSave]
+    [needsSave, onSave, flushAll]
   );
 
   /* Keydown listener */
@@ -284,7 +269,6 @@ const DemoAndEditorController = ({
             onEditorDataChange={handleOnEditorDataChange}
             setNeedsSave={setNeedsSave}
             resetKey={resetKey}
-            addDebouncedFunction={addDebouncedFunction}
             debounceInterval={demoBoxCollapsed ? 600 : 400}
           />
         </Grid>

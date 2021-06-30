@@ -18,6 +18,9 @@ import { List as MovableList, arrayMove } from "react-movable";
 import CustomTextField from "./CustomTextField";
 import QuickAddInput from "./QuickAddInput";
 
+// context
+import { useDebouncedContext } from "../../pages/UpdatePage/DebouncedContext";
+
 //lodash
 import { uniqueId, debounce } from "lodash";
 
@@ -148,6 +151,9 @@ const ContentInputForm = ({
 
   const debouncedNotifyParentFunction = useRef();
 
+  /* Keep reference to this debounced function's id so it can be tracked in DebouncedContext */
+  const debouncedFunctionId = useRef(uniqueId("ContentInputForm"));
+
   // the function we want to debounce
   debouncedNotifyParentFunction.current = (sectionData) => {
     onContentInputFormChange(sectionData);
@@ -162,6 +168,18 @@ const ContentInputForm = ({
       }),
       []
     );
+
+  const { addDebouncedFunction, removeDebouncedFunction } =
+    useDebouncedContext();
+  /* Add this debounced function to an array held by DebouncedContext so that it
+    can be flushed/canceled if needed */
+  useEffect(() => {
+    const id = debouncedFunctionId.current;
+    addDebouncedFunction(debouncedNotifyParent, id);
+    return () => {
+      removeDebouncedFunction(id);
+    };
+  }, [addDebouncedFunction, removeDebouncedFunction, debouncedNotifyParent]);
 
   const handleMoveItem = useCallback(
     ({ oldIndex, newIndex }) => {

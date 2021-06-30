@@ -20,6 +20,8 @@ import ContingencyInput from "../ContingencyInput";
 // Settings context
 import { useSettings } from "../../context/Settings";
 
+import { useDebouncedContext } from "../../pages/UpdatePage/DebouncedContext";
+
 // lodash
 import { uniqueId } from "lodash";
 
@@ -146,7 +148,6 @@ const BedspaceEditor = ({
   resetKey,
   onEditorDataChange = (f) => f,
   setNeedsSave = (f) => f,
-  addDebouncedFunction = (f) => f,
   debounceInterval,
 }) => {
   const theme = useTheme();
@@ -230,6 +231,9 @@ const BedspaceEditor = ({
 
   const debouncedOnEditorChangeFunction = useRef();
 
+  // keeping the id helps us track this specific function in DebouncedContext
+  const debouncedFunctionId = useRef(uniqueId("BedspaceEditor"));
+
   // the function we want to debounce
   debouncedOnEditorChangeFunction.current = (target, value) => {
     onEditorDataChange({
@@ -250,11 +254,17 @@ const BedspaceEditor = ({
       []
     );
 
-  /* Add this debounced function to an array held by DemoAndEditorController so that it
+  const { addDebouncedFunction, removeDebouncedFunction } =
+    useDebouncedContext();
+  /* Add this debounced function to an array held by DebouncedContext so that it
     can be flushed/canceled if needed */
   useEffect(() => {
-    addDebouncedFunction(debouncedOnEditorChange);
-  }, [addDebouncedFunction, debouncedOnEditorChange]);
+    const id = debouncedFunctionId.current;
+    addDebouncedFunction(debouncedOnEditorChange, id);
+    return () => {
+      removeDebouncedFunction(id); // remove on dismount
+    };
+  }, [addDebouncedFunction, removeDebouncedFunction, debouncedOnEditorChange]);
 
   /*  Handles the onInputChange callbacks for all the inputs, via a prop
   passed through CustomFormControlEditor component which wraps the input */

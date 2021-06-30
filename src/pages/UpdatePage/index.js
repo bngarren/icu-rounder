@@ -14,6 +14,9 @@ import TableBedList from "../../components/TableBedList";
 import DemoAndEditorController from "../../components/DemoAndEditorController";
 import { useDialog } from "../../components/Dialog";
 
+// context
+import { DebouncedContextProvider } from "./DebouncedContext";
+
 // Firebase
 import { useAuthStateContext } from "../../context/AuthState";
 import { useGridStateContext } from "../../context/GridState";
@@ -381,13 +384,15 @@ const UpdatePage = () => {
           </Grid>
           <Grid item lg md={8} sm={12} xs={12} ref={refToBedspaceEditorDiv}>
             {selectedKey != null && (
-              <DemoAndEditorController
-                defaultBedData={defaultBedData}
-                needsSave={needsSave}
-                setNeedsSave={setNeedsSave}
-                onNextBedspace={navigateNextBedspace}
-                onSave={handleOnSave}
-              />
+              <DebouncedContextProvider>
+                <DemoAndEditorController
+                  defaultBedData={defaultBedData}
+                  needsSave={needsSave}
+                  setNeedsSave={setNeedsSave}
+                  onNextBedspace={navigateNextBedspace}
+                  onSave={handleOnSave}
+                />
+              </DebouncedContextProvider>
             )}
           </Grid>
         </Grid>
