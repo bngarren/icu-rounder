@@ -7,7 +7,7 @@ import QuickAddInput from "./QuickAddInput";
 const useStyles = makeStyles((theme) => ({
   appBarRoot: {
     backgroundColor: "transparent",
-    marginBottom: "5px",
+    borderBottom: "1px solid #eee",
   },
   toolbar: {
     minHeight: "auto",

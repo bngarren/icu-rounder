@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 
-import { InputAdornment, IconButton } from "@material-ui/core";
+import { InputAdornment, IconButton, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import StopIcon from "@material-ui/icons/Stop";
 import ClearIcon from "@material-ui/icons/Clear";
@@ -17,6 +17,12 @@ const useStylesForContentInputForm = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
   },
+  header: {
+    color: theme.palette.primary.main,
+    fontSize: "11pt",
+    fontWeight: "bold",
+    textTransform: "uppercase",
+  },
   addIconButton: {
     padding: 6,
   },
@@ -25,13 +31,6 @@ const useStylesForContentInputForm = makeStyles((theme) => ({
   },
   inputItem: {
     marginLeft: "15px",
-  },
-  text: {
-    fontSize: "10pt",
-    fontWeight: "bold",
-    color: theme.palette.primary.main,
-    letterSpacing: "0.137573px",
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
   },
 }));
 
@@ -131,6 +130,9 @@ const ContentInputForm = ({
 
   return (
     <div className={classes.root}>
+      <Typography variant="h4" className={classes.header}>
+        Edit Section
+      </Typography>
       <CustomTextField
         ref={refToTitle}
         label="Title"

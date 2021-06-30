@@ -1,11 +1,10 @@
-import {forwardRef} from "react";
+import { forwardRef } from "react";
 
 import { TextField } from "@material-ui/core";
-import {makeStyles} from "@material-ui/styles";
+import { makeStyles } from "@material-ui/styles";
 
 const useStylesForCustomTextField = makeStyles((theme) => ({
   textFieldRoot: {
-    borderBottom: "1.4px dotted #e2e2e1",
     overflow: "hidden",
     backgroundColor: "white",
     "&:hover": {
@@ -17,6 +16,12 @@ const useStylesForCustomTextField = makeStyles((theme) => ({
     },
     paddingBottom: "2px",
     marginBottom: "4px",
+  },
+  textFieldNativeInput: {
+    borderBottom: "1.4px dotted #e2e2e1",
+    fontSize: "10pt",
+    paddingBottom: "2px",
+    paddingLeft: "4px",
   },
   textFieldFocused: {},
   textFieldInputLabelRoot: {
@@ -49,11 +54,7 @@ const CustomTextField = forwardRef(
           },
           disableUnderline: true,
           inputProps: {
-            style: {
-              fontSize: "10pt",
-              paddingBottom: "2px",
-              paddingLeft: "4px",
-            },
+            className: classes.textFieldNativeInput,
           },
         }}
         InputLabelProps={{

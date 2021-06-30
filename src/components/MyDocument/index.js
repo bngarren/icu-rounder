@@ -131,7 +131,8 @@ const pdfStyles = StyleSheet.create({
     padding: "2pt 5pt 5pt 2pt",
   },
   gridBoxNestedContentSectionRoot: {
-    marginTop: "2pt",
+    marginTop: "1.5pt",
+    fontSize: "6.5pt",
   },
   gridBoxNestedContentTopText: {
     minHeight: "5pt",
@@ -305,7 +306,7 @@ const GridBox = ({ bedspaceData, box, width, removeLeftBorder }) => {
           )}
           {bedspaceData.contentType === "nested" && (
             <View>
-              {bedspaceData.nestedContent.map((sectionData) => {
+              {bedspaceData.nestedContent?.map((sectionData) => {
                 return (
                   <View
                     key={sectionData.id}
@@ -317,7 +318,7 @@ const GridBox = ({ bedspaceData, box, width, removeLeftBorder }) => {
                       </Text>
                       {sectionData.top}
                     </Text>
-                    {sectionData.items.map((item) => {
+                    {sectionData?.items?.map((item) => {
                       return (
                         <View
                           key={item.id}

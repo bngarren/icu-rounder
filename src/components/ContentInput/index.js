@@ -12,6 +12,7 @@ import {
 import { makeStyles } from "@material-ui/styles";
 import StopIcon from "@material-ui/icons/Stop";
 import ClearIcon from "@material-ui/icons/Clear";
+import EditAttributesIcon from "@material-ui/icons/EditAttributes";
 
 import clsx from "clsx";
 
@@ -31,6 +32,14 @@ const useStylesForContentInput = makeStyles((theme) => ({
     margin: "2px",
     marginTop: "8px",
     minHeight: "225px",
+  },
+  gridBody: {
+    flexDirection: "row",
+    flex: "2",
+    paddingTop: "15px",
+  },
+  mainList: {
+    padding: 0,
   },
 }));
 
@@ -131,33 +140,35 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
       <Grid item xs={12}>
         <ContentInputToolbar onAddSection={handleOnAddSection} />
       </Grid>
-      <Grid item md={6} style={{ padding: "0px 4px 0px 8px" }}>
-        <List component="nav">
-          {data &&
-            data.map((element) => {
-              const selected = selectedSection?.id === element.id;
-              return (
-                <SectionContainer
-                  element={element}
-                  key={element.id}
-                  selected={selected}
-                  onClickSection={handleOnClickSectionContainer}
-                  onRemoveSection={handleRemoveSection}
-                />
-              );
-            })}
-        </List>
-      </Grid>
-      <Grid item md>
-        <Collapse in={selectedSection !== null} unmountOnExit>
-          <ContentInputForm
-            initialData={selectedSection}
-            stealFocus={shouldFocusOnContentInputForm.current}
-            onContentInputFormChange={(newData) =>
-              handleContentInputFormChange(dataRef.current, newData)
-            }
-          />
-        </Collapse>
+      <Grid item container xs={12} className={classes.gridBody}>
+        <Grid item md={6} style={{ padding: "0px 4px 0px 8px" }}>
+          <List component="nav" className={classes.mainList}>
+            {data &&
+              data.map((element) => {
+                const selected = selectedSection?.id === element.id;
+                return (
+                  <SectionContainer
+                    element={element}
+                    key={element.id}
+                    selected={selected}
+                    onClickSection={handleOnClickSectionContainer}
+                    onRemoveSection={handleRemoveSection}
+                  />
+                );
+              })}
+          </List>
+        </Grid>
+        <Grid item md>
+          <Collapse in={selectedSection !== null} unmountOnExit timeout={200}>
+            <ContentInputForm
+              initialData={selectedSection}
+              stealFocus={shouldFocusOnContentInputForm.current}
+              onContentInputFormChange={(newData) =>
+                handleContentInputFormChange(dataRef.current, newData)
+              }
+            />
+          </Collapse>
+        </Grid>
       </Grid>
     </Grid>
   );
@@ -165,21 +176,21 @@ const ContentInput = ({ value: data, onChange = (f) => f }) => {
 
 const useStylesForSectionContainer = makeStyles((theme) => ({
   sectionContainer: {
+    opacity: "0.6",
     minHeight: "20px",
     cursor: "pointer",
     borderRadius: "3px",
-    padding: "2px 0 2px 2px",
     "&:hover": {
-      border: `2px dotted ${theme.palette.secondary.veryVeryLight}`,
-      padding: 0,
+      backgroundColor: "#f8f8f8",
+      opacity: "0.7",
     },
+    transition: "background linear 0.2s",
   },
   sectionContainerSelected: {
-    border: `2px dotted ${theme.palette.primary.main}`,
+    opacity: "1",
     transition: "background-color 0.3s",
     "&:hover": {
-      borderColor: theme.palette.primary.light,
-      padding: "2px 0 2px 2px",
+      opacity: "1",
     },
   },
 }));
@@ -229,9 +240,7 @@ const useStylesForSection = makeStyles((theme) => ({
     opacity: 0,
     transition: "visibility 0s linear 0s, opacity 300ms",
   },
-  emptySection: {
-    backgroundColor: "#eee",
-  },
+  emptySection: {},
   sectionTitleText: {
     fontSize: "10pt",
     fontWeight: "bold",
@@ -255,9 +264,12 @@ const useStylesForSection = makeStyles((theme) => ({
   sectionRemoveIconButton: {
     padding: "2px",
   },
+  sectionEditIcon: {
+    color: theme.palette.primary.main,
+  },
 }));
 
-const Section = ({ data, onRemoveSection = (f) => f }) => {
+const Section = ({ data, selected, onRemoveSection = (f) => f }) => {
   const classes = useStylesForSection();
   const [open, setOpen] = useState(true);
 
@@ -283,10 +295,12 @@ const Section = ({ data, onRemoveSection = (f) => f }) => {
           <Typography className={classes.sectionTopText}>
             <Typography component="span" className={classes.sectionTitleText}>
               {title && `${title}:`}
+              {isEmpty && <i>empty section</i>}
             </Typography>
             {top}
           </Typography>
         </div>
+        {selected && <EditAttributesIcon className={classes.sectionEditIcon} />}
         <ListItemSecondaryAction
           className={classes.sectionListItemSecondaryAction}
         >

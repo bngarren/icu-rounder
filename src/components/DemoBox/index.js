@@ -49,7 +49,7 @@ const useStyles = makeStyles({
     justifyContent: "flex-start",
     flexWrap: "wrap",
     alignContent: "center",
-    marginBottom: "2px",
+    marginBottom: "4px",
   },
   demoBoxBodyContingencyItem: {
     border: "1pt solid #9a9a9a",
@@ -64,7 +64,8 @@ const useStyles = makeStyles({
     whiteSpace: "pre-line",
   },
   demoBoxNestedContentSectionRoot: {
-    marginTop: "1.5px",
+    marginTop: "3px",
+    fontSize: "6.5pt",
   },
   demoBoxNestedContentTopText: {
     minHeight: "5pt",
@@ -79,7 +80,7 @@ const useStyles = makeStyles({
     marginLeft: "4pt",
   },
   demoBoxNestedContentItemText: {
-    marginLeft: "2.5pt",
+    marginLeft: "1.5pt",
   },
   demoBoxBottomText: {
     position: "absolute",
@@ -156,7 +157,7 @@ const DemoBox = ({ data: propsData, collapsed }) => {
                       )}
                       {sectionData.top}
                     </div>
-                    {sectionData.items.map((item) => {
+                    {sectionData?.items?.map((item) => {
                       return (
                         <div
                           key={item.id}
