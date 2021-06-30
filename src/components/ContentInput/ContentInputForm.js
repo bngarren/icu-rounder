@@ -42,6 +42,7 @@ const ContentInputForm = ({
   initialData,
   stealFocus = false,
   onContentInputFormChange = (f) => f,
+  ...props
 }) => {
   const classes = useStylesForContentInputForm();
 
@@ -132,7 +133,7 @@ const ContentInputForm = ({
     );
 
   return (
-    <div className={classes.root}>
+    <div className={classes.root} {...props}>
       <Typography variant="h4" className={classes.header}>
         Edit Section
       </Typography>

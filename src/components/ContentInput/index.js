@@ -4,10 +4,10 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
   Typography,
   Collapse,
   IconButton,
+  Fade,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import StopIcon from "@material-ui/icons/Stop";
@@ -173,7 +173,7 @@ const ContentInput = ({ initialValue, value: data, onChange = (f) => f }) => {
         />
       </Grid>
       <Grid item container xs={12} className={classes.gridBody}>
-        <Grid item md={6} style={{ padding: "0px 4px 0px 8px" }}>
+        <Grid item xs={12} sm={6} style={{ padding: "0px 4px 0px 0px" }}>
           <List component="nav" className={classes.mainList}>
             {data &&
               data.map((element) => {
@@ -190,14 +190,14 @@ const ContentInput = ({ initialValue, value: data, onChange = (f) => f }) => {
               })}
           </List>
         </Grid>
-        <Grid item md>
-          <Collapse in={selectedSection !== null} unmountOnExit timeout={200}>
+        <Grid item xs={12} sm={6}>
+          <Fade in={selectedSection !== null} timeout={200}>
             <ContentInputForm
               initialData={selectedSection}
               stealFocus={shouldFocusOnContentInputForm.current}
               onContentInputFormChange={handleContentInputFormChange}
             />
-          </Collapse>
+          </Fade>
         </Grid>
       </Grid>
     </Grid>
@@ -208,6 +208,7 @@ const useStylesForSectionContainer = makeStyles((theme) => ({
   sectionContainer: {
     opacity: "0.6",
     minHeight: "20px",
+    marginBottom: "5px",
     cursor: "pointer",
     borderRadius: "3px",
     "&:hover": {
@@ -234,7 +235,7 @@ const SectionContainer = memo(function ({
   const classes = useStylesForSectionContainer();
 
   return (
-    <div
+    <li
       className={clsx(classes.sectionContainer, {
         [classes.sectionContainerSelected]: selected,
       })}
@@ -245,38 +246,48 @@ const SectionContainer = memo(function ({
         selected={selected}
         onRemoveSection={onRemoveSection}
       />
-    </div>
+    </li>
   );
 });
 
 const useStylesForSection = makeStyles((theme) => ({
   root: {
-    "&:hover $sectionListItemSecondaryAction": {
+    display: "flex",
+    flexDirection: "row",
+    "&:hover $sectionRemoveIconButton": {
       visibility: "inherit",
       opacity: 1,
     },
   },
-  sectionListItemContainer: {
-    padding: "0px",
+  buttonsDiv: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    borderRight: "3px solid transparent",
   },
-  sectionListItemRoot: {
-    padding: "0px",
+  buttonsDivSelected: {
+    borderRight: `3px dotted ${theme.palette.primary.main}`,
   },
-  sectionListItemSecondaryAction: {
-    right: "2px",
-    top: "-2px",
-    transform: "none",
-    visibility: "hidden",
-    opacity: 0,
-    transition: "visibility 0s linear 0s, opacity 300ms",
+  contentDiv: {
+    marginLeft: "3px",
   },
   emptySection: {},
   sectionTopDiv: {
     display: "flex",
     flexDirection: "row",
     flexGrow: "1",
-    justifyContent: "space-between",
-    paddingRight: "25px",
+    justifyContent: "flex-start",
+  },
+  sectionRemoveIconButton: {
+    padding: "2px",
+    color: theme.palette.secondary.light,
+    visibility: "hidden",
+    opacity: 0,
+    transition: "visibility 0s linear 0s, opacity 300ms",
+    "&:hover": {
+      backgroundColor: theme.palette.secondary.faint,
+    },
   },
   sectionTitleText: {
     fontSize: "10pt",
@@ -298,42 +309,34 @@ const useStylesForSection = makeStyles((theme) => ({
     fontSize: "9pt",
     lineHeight: "1",
   },
-  sectionRemoveIconButton: {
-    padding: "2px",
-    color: theme.palette.secondary.light,
-    "&:hover": {
-      backgroundColor: theme.palette.secondary.faint,
-    },
-  },
-  sectionEditIcon: {
-    alignSelf: "flex-start",
-    color: theme.palette.primary.main,
-  },
 }));
 
 const Section = ({ data, selected, onRemoveSection = (f) => f }) => {
   const classes = useStylesForSection();
-  const [open, setOpen] = useState(true);
 
   const { id, title, top, items } = data;
   const isEmpty = !title && !top && items.length < 1;
 
-  const handleOnClickTitle = () => {
-    setOpen((prevValue) => !prevValue);
-  };
-
   return (
     <div className={classes.root}>
-      <ListItem
-        onClick={handleOnClickTitle}
-        classes={{
-          root: classes.sectionListItemRoot,
-          container: clsx(classes.sectionListItemContainer, {
-            [classes.emptySection]: isEmpty,
-          }),
-        }}
+      <div
+        className={clsx(classes.buttonsDiv, {
+          [classes.buttonsDivSelected]: selected,
+        })}
       >
-        <div className={classes.sectionTopDiv}>
+        <IconButton
+          className={classes.sectionRemoveIconButton}
+          onClick={(e) => onRemoveSection(e, id)}
+        >
+          <ClearIcon style={{ fontSize: "20px" }} />
+        </IconButton>
+      </div>
+      <div className={classes.contentDiv}>
+        <div
+          className={clsx(classes.sectionTopDiv, {
+            [classes.emptySection]: isEmpty,
+          })}
+        >
           <Typography className={classes.sectionTopText}>
             <Typography component="span" className={classes.sectionTitleText}>
               {title && `${title}:`}
@@ -341,23 +344,7 @@ const Section = ({ data, selected, onRemoveSection = (f) => f }) => {
             </Typography>
             {top}
           </Typography>
-          {selected && (
-            <EditAttributesIcon className={classes.sectionEditIcon} />
-          )}
         </div>
-
-        <ListItemSecondaryAction
-          className={classes.sectionListItemSecondaryAction}
-        >
-          <IconButton
-            className={classes.sectionRemoveIconButton}
-            onClick={(e) => onRemoveSection(e, id)}
-          >
-            <ClearIcon style={{ fontSize: "20px" }} />
-          </IconButton>
-        </ListItemSecondaryAction>
-      </ListItem>
-      <Collapse in={true} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           {items &&
             items.length > 0 &&
@@ -380,7 +367,7 @@ const Section = ({ data, selected, onRemoveSection = (f) => f }) => {
               );
             })}
         </List>
-      </Collapse>
+      </div>
     </div>
   );
 };
