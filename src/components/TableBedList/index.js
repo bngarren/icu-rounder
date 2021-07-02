@@ -1,4 +1,4 @@
-import { useState, useContext, memo } from "react";
+import { useState, useEffect, useContext, memo } from "react";
 import {
   TableContainer,
   Table,
@@ -123,6 +123,26 @@ const TableBedList = ({ data, selectedKey }) => {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
+
+  /* Watches for changes in selectedKey and picks the correct paginated page that contains
+  that bed space. E.g. when using the navigation arrows and you move to a bedspace that is on
+  a different paginated page */
+  useEffect(() => {
+    // Page should be set so that selectedKey is within range of [page*rowsPerPage, rowsPerPage + rowsPerPage - 1]
+    const rowsTotal = data.length;
+    const numOfPage = Math.ceil(rowsTotal / rowsPerPage);
+    let newPage = 0;
+    for (let i = 0; i < numOfPage; i++) {
+      // loop through available pages
+      if (
+        selectedKey >= i * rowsPerPage &&
+        selectedKey <= i * rowsPerPage + rowsPerPage - 1
+      ) {
+        newPage = i;
+      }
+    }
+    setPage(newPage);
+  }, [selectedKey, data.length, rowsPerPage]);
 
   //
 

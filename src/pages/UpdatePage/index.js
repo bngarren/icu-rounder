@@ -265,7 +265,7 @@ const UpdatePage = () => {
             that matches the bed that has just been edited (bedspaceEditorData). */
         const objIndex = dataToSave.findIndex((obj) => {
           const bed = obj.bed + ""; // cast bed to string before comparison
-          return bed === bedspaceEditorData.bed;
+          return bed === bedspaceEditorData.bed + "";
         });
         /* If bed already exists, overwrite with new data */
         if (objIndex >= 0) {
