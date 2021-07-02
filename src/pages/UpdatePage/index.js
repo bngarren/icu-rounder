@@ -255,17 +255,19 @@ const UpdatePage = () => {
   */
   const handleOnSave = useCallback(
     (bedspaceEditorData) => {
-      const updatedData = [...gridData];
+      const updatedData = [...gridData]; // copy the current gridData
 
-      /* The actual save action that merges this new bedspaceEditorData with
-    the truth data in GridDataContext */
+      /*
+         //* The actual save action
+         that merges this new bedspaceEditorData with the truth data in GridDataContext */
       const saveBedspaceEditorData = (dataToSave) => {
-        /* For each object in data array, see if there is a bed number
-      that matches that has been edited in bedspaceEditorData. */
-        const objIndex = dataToSave.findIndex(
-          (obj) => obj.bed === bedspaceEditorData.bed
-        );
-        /* If so, return the index of this object in the array */
+        /* Find out if there is already a bed number in our grid
+            that matches the bed that has just been edited (bedspaceEditorData). */
+        const objIndex = dataToSave.findIndex((obj) => {
+          const bed = obj.bed + ""; // cast bed to string before comparison
+          return bed === bedspaceEditorData.bed;
+        });
+        /* If bed already exists, overwrite with new data */
         if (objIndex >= 0) {
           dataToSave[objIndex] = bedspaceEditorData;
         } else {
@@ -284,7 +286,7 @@ const UpdatePage = () => {
         setNeedsSave(false);
       };
 
-      // See if bedspaceEditorData has changed the bed number for this patient
+      //! See if bedspaceEditorData has changed the bed number for this patient
       if (bedspaceEditorData.bed !== gridData[selectedKey].bed) {
         // create the warning message
         const content = (
@@ -292,7 +294,11 @@ const UpdatePage = () => {
             <div>
               You are changing the bedspace for this patient.{" "}
               <b>
-                <span style={{ color: theme.palette.warning.main }}>
+                <span
+                  style={{
+                    color: theme.palette.warning.main,
+                  }}
+                >
                   WARNING:{" "}
                 </span>
               </b>
@@ -311,9 +317,13 @@ const UpdatePage = () => {
           content,
           () => {
             //should change bed
-            // delete old bedspace data since we changed to a different bedspace
-            updatedData.splice(selectedKey, 1);
-            // commit the save action
+
+            //* clear the previous bed, but keep it (don't delete)
+            updatedData[selectedKey] = {
+              bed: updatedData[selectedKey].bed, // only keep the bed
+            };
+
+            //* Commit the save action
             saveBedspaceEditorData(updatedData);
           },
           () => {
@@ -324,7 +334,7 @@ const UpdatePage = () => {
       } else {
         // Not changing the bedspace, just other patient data
 
-        // Commit the save action
+        //* Commit the save action
         saveBedspaceEditorData(updatedData);
       }
     },
