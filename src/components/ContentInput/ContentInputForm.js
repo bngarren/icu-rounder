@@ -222,64 +222,66 @@ const ContentInputForm = ({
         value={topText}
         onChange={(e) => handleOnTopTextChange(e.target.value)}
       />
-      <MovableList
-        values={items}
-        onChange={handleMoveItem}
-        lockVertically={true}
-        renderList={({ children, props }) => (
-          <List className={classes.itemList} {...props}>
-            {children}
-          </List>
-        )}
-        renderItem={({ value, props, isDragged }) => (
-          <li
-            {...props}
-            style={{
-              ...props.style,
-              listStyleType: "none",
-            }}
-          >
-            <CustomTextField
-              className={classes.inputItem}
-              key={value.id}
-              value={value.value}
-              onChange={(e) => handleOnItemChange(e.target.value, value.id)}
-              multiline
-              rows={1}
-              rowsMax={3}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment
-                    position="start"
-                    style={{
-                      marginRight: "2px",
-                      alignSelf: "flex-start",
-                      marginTop: "10px",
-                    }}
-                  >
-                    <StopIcon className={classes.bullet} />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <DragIndicatorIcon
-                      className={classes.dragIcon}
-                      data-movable-handle
-                      style={{ cursor: isDragged ? "grabbing" : "grab" }}
-                    />
-                    <IconButton
-                      onClick={() => handleRemoveItem(value.id)}
-                      className={classes.removeIconButton}
-                    >
-                      <ClearIcon className={classes.removeIcon} />
-                    </IconButton>
-                  </InputAdornment>
-                ),
+      {items?.length > 0 && (
+        <MovableList
+          values={items}
+          onChange={handleMoveItem}
+          lockVertically={true}
+          renderList={({ children, props }) => (
+            <List className={classes.itemList} {...props}>
+              {children}
+            </List>
+          )}
+          renderItem={({ value, props, isDragged }) => (
+            <li
+              {...props}
+              style={{
+                ...props.style,
+                listStyleType: "none",
               }}
-            />
-          </li>
-        )}
-      />
+            >
+              <CustomTextField
+                className={classes.inputItem}
+                key={value.id}
+                value={value.value}
+                onChange={(e) => handleOnItemChange(e.target.value, value.id)}
+                multiline
+                rows={1}
+                rowsMax={3}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment
+                      position="start"
+                      style={{
+                        marginRight: "2px",
+                        alignSelf: "flex-start",
+                        marginTop: "10px",
+                      }}
+                    >
+                      <StopIcon className={classes.bullet} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <DragIndicatorIcon
+                        className={classes.dragIcon}
+                        data-movable-handle
+                        style={{ cursor: isDragged ? "grabbing" : "grab" }}
+                      />
+                      <IconButton
+                        onClick={() => handleRemoveItem(value.id)}
+                        className={classes.removeIconButton}
+                      >
+                        <ClearIcon className={classes.removeIcon} />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </li>
+          )}
+        />
+      )}
 
       <div style={{ marginLeft: 10 }}>
         <QuickAddInput

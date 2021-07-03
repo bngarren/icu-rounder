@@ -19,7 +19,7 @@ const ToggleContentType = ({ value, onChange = (f) => f }) => {
       aria-label="content type"
       value={value}
       onChange={handleOnChange}
-      style={{ backgroundColor: "white" }}
+      style={{ backgroundColor: "white", margin: "8px 0px 0px 2px" }}
     >
       <ToggleButton value="simple" aria-label="simple input" size="small">
         <NotesIcon style={{ fontSize: "12pt" }} />

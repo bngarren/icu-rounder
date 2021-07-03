@@ -68,6 +68,7 @@ const CustomTextField = forwardRef(
           },
           style: {
             overflow: overflow,
+            ...props.style,
           },
           disableUnderline: true,
           inputProps: {

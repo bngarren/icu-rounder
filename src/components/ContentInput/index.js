@@ -19,6 +19,7 @@ import clsx from "clsx";
 import { List as MovableList, arrayMove } from "react-movable";
 
 // Components
+import CustomTextField from "./CustomTextField";
 import ContentInputForm from "./ContentInputForm";
 import ContentInputToolbar from "./ContentInputToolbar";
 
@@ -38,8 +39,10 @@ const useStylesForContentInput = makeStyles((theme) => ({
   },
   label: {
     color: theme.palette.secondary.main,
-    fontSize: "9pt",
-    fontWeight: "600",
+    fontSize: "8.5pt",
+    //fontWeight: "600",
+    paddingTop: "6px",
+    paddingLeft: "10px",
   },
   gridBody: {
     flexDirection: "row",
@@ -59,7 +62,12 @@ const useStylesForContentInput = makeStyles((theme) => ({
   },
 }));
 
-const ContentInput = ({ initialValue, value: data, onChange = (f) => f }) => {
+const ContentInput = ({
+  id,
+  initialValue,
+  value: data,
+  onChange = (f) => f,
+}) => {
   const classes = useStylesForContentInput();
 
   /* we use the initialValue prop to know when to reset the content input,
@@ -192,46 +200,70 @@ const ContentInput = ({ initialValue, value: data, onChange = (f) => f }) => {
         <Typography variant="h6" className={classes.label}>
           Content
         </Typography>
-        <ContentInputToolbar
-          onAddSection={handleOnAddSection}
-          onSelectTemplate={handleOnSelectTemplate}
-        />
+        {id === "nestedContent" && (
+          <ContentInputToolbar
+            onAddSection={handleOnAddSection}
+            onSelectTemplate={handleOnSelectTemplate}
+          />
+        )}
       </Grid>
       <Grid item container xs={12} className={classes.gridBody}>
-        <Grid item xs={12} sm={6} style={{ padding: "0px 4px 0px 0px" }}>
-          {data?.length > 0 && (
-            <MovableList
-              values={data}
-              onChange={handleMoveSection}
-              lockVertically={true}
-              renderList={({ children, props }) => (
-                <List component="nav" className={classes.mainList} {...props}>
-                  {children}
-                </List>
+        {id === "simpleContent" ? (
+          <CustomTextField
+            variant="filled"
+            multiline
+            rows={10}
+            value={data}
+            onChange={onChange}
+            style={{
+              width: "100%",
+              padding: "0 2px",
+              fontSize: "8pt",
+              lineHeight: "1.5em",
+            }}
+          />
+        ) : (
+          <>
+            <Grid item xs={12} sm={6} style={{ padding: "0px 4px 0px 0px" }}>
+              {data instanceof Array && data?.length > 0 && (
+                <MovableList
+                  values={data}
+                  onChange={handleMoveSection}
+                  lockVertically={true}
+                  renderList={({ children, props }) => (
+                    <List
+                      component="nav"
+                      className={classes.mainList}
+                      {...props}
+                    >
+                      {children}
+                    </List>
+                  )}
+                  renderItem={({ value, props, isDragged }) => (
+                    <li className={classes.movableLi} {...props}>
+                      <SectionContainer
+                        element={value}
+                        selected={selectedSection?.id === value.id}
+                        isDragged={isDragged}
+                        onClickSection={handleOnClickSectionContainer}
+                        onRemoveSection={handleRemoveSection}
+                      />
+                    </li>
+                  )}
+                />
               )}
-              renderItem={({ value, props, isDragged }) => (
-                <li className={classes.movableLi} {...props}>
-                  <SectionContainer
-                    element={value}
-                    selected={selectedSection?.id === value.id}
-                    isDragged={isDragged}
-                    onClickSection={handleOnClickSectionContainer}
-                    onRemoveSection={handleRemoveSection}
-                  />
-                </li>
-              )}
-            />
-          )}
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <Fade in={selectedSection !== null} timeout={200}>
-            <ContentInputForm
-              initialData={selectedSection}
-              stealFocus={shouldFocusOnContentInputForm.current}
-              onContentInputFormChange={handleContentInputFormChange}
-            />
-          </Fade>
-        </Grid>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Fade in={selectedSection !== null} timeout={200}>
+                <ContentInputForm
+                  initialData={selectedSection}
+                  stealFocus={shouldFocusOnContentInputForm.current}
+                  onContentInputFormChange={handleContentInputFormChange}
+                />
+              </Fade>
+            </Grid>
+          </>
+        )}
       </Grid>
     </Grid>
   );

@@ -39,6 +39,7 @@ const useStyles = makeStyles({
     borderLeft: "1px solid black",
   },
   demoBoxBodyOneLiner: {
+    fontSize: "8.25pt",
     marginBottom: "2px",
   },
   demoBoxBodyContingencies: {
@@ -59,16 +60,16 @@ const useStyles = makeStyles({
     marginRight: "2pt",
   },
   demoBoxBody: {
-    fontSize: "8pt",
+    fontSize: "7.5pt",
     padding: "3px 7px 7px 3px",
     whiteSpace: "pre-line",
   },
   demoBoxNestedContentSectionRoot: {
     marginTop: "3px",
-    fontSize: "6.5pt",
+    fontSize: "8pt",
   },
   demoBoxNestedContentTopText: {
-    minHeight: "5pt",
+    minHeight: "6.25pt",
   },
   demoBoxNestedContentTitle: {
     fontWeight: "bold",

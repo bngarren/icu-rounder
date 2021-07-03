@@ -486,40 +486,33 @@ const BedspaceEditor = ({
               >
                 <ToggleContentType />
               </CustomFormControlEditor>
-              {(data.contentType == null || data.contentType === "simple") && (
-                <CustomFormControlEditor
-                  id="simpleContent"
-                  initialValue={defaultValues.simpleContent || ""}
-                  onInputChange={handleInputChange}
-                  onDiffChange={onDiffChange}
-                  onBlur={handleInputOnBlur}
-                >
-                  <CustomTextField
-                    className={classes.textFieldBody}
-                    label="Content"
-                    variant="filled"
-                    multiline
-                    rows={10}
-                    customStyle={classes}
-                  />
-                </CustomFormControlEditor>
-              )}
-              {data.contentType === "nested" && (
-                <CustomFormControlEditor
-                  id="nestedContent"
-                  initialValue={defaultValues.nestedContent || ""}
-                  onInputChange={handleInputChange}
-                  onDiffChange={onDiffChange}
-                  onBlur={handleInputOnBlur}
-                  onChangeArgument={1}
-                >
-                  {/* also pass the initialValue prop here so that ContentInput
+
+              <CustomFormControlEditor
+                id={
+                  data.contentType === "nested"
+                    ? "nestedContent"
+                    : "simpleContent"
+                }
+                initialValue={
+                  data.contentType === "nested"
+                    ? defaultValues.nestedContent || ""
+                    : defaultValues.simpleContent || ""
+                }
+                onInputChange={handleInputChange}
+                onDiffChange={onDiffChange}
+                onBlur={handleInputOnBlur}
+                onChangeArgument={data.contentType === "nested" ? 1 : 0}
+              >
+                {/* also pass the initialValue prop here so that ContentInput
                   knows when to reset itself, i.e. after a bed change */}
-                  <ContentInput
-                    initialValue={defaultValues.nestedContent || ""}
-                  />
-                </CustomFormControlEditor>
-              )}
+                <ContentInput
+                  initialValue={
+                    data.contentType === "nested"
+                      ? defaultValues.nestedContent || ""
+                      : defaultValues.simpleContent || ""
+                  }
+                />
+              </CustomFormControlEditor>
             </div>
 
             <CustomFormControlEditor

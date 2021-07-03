@@ -107,6 +107,7 @@ const pdfStyles = StyleSheet.create({
     fontSize: "8.5pt",
   },
   gridBoxBodyOneLiner: {
+    fontSize: "7pt",
     marginBottom: "1.5pt",
   },
   gridBoxBodyContingencies: {
@@ -127,7 +128,7 @@ const pdfStyles = StyleSheet.create({
     marginRight: "2pt",
   },
   gridBoxBody: {
-    fontSize: "7pt",
+    fontSize: "6pt",
     padding: "2pt 5pt 5pt 2pt",
   },
   gridBoxNestedContentSectionRoot: {
