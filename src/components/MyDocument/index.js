@@ -214,8 +214,8 @@ const MyDocument = ({ bedLayout, title, colsPerPage, data, census }) => {
               <>
                 <Text>
                   {`${census.filledTotal}/${census.total}`}{" "}
-                  {census.emptyBeds.length > 0 &&
-                    `[${census.emptyBeds.toString()}]`}
+                  {/* census.emptyBeds.length > 0 &&
+                    `[${census.emptyBeds.toString()}]` */}
                 </Text>
                 {census.teamTotals.map((t) => {
                   return (
