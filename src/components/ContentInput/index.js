@@ -40,14 +40,15 @@ const useStylesForContentInput = makeStyles((theme) => ({
   gridHeader: {
     display: "flex",
     flexDirection: "row",
+    alignItems: "center",
     borderBottom: "1px solid #eee",
-    minHeight: "30px",
+    minHeight: "45px",
   },
   label: {
     color: theme.palette.secondary.main,
     fontSize: "8.5pt",
     //fontWeight: "600",
-    paddingTop: "6px",
+    paddingTop: "0px",
     paddingLeft: "10px",
     paddingRight: "10px",
   },
@@ -59,7 +60,7 @@ const useStylesForContentInput = makeStyles((theme) => ({
     paddingRight: "8px",
   },
   gridNestedContent: {
-    padding: "10px 4px 0px 0px",
+    padding: "15px 4px 0px 0px",
   },
   mainList: {
     padding: 0,
@@ -72,11 +73,27 @@ const useStylesForContentInput = makeStyles((theme) => ({
   },
 }));
 
+/* 
+
+ContentInput
+
+This component renders either the "simpleContent" input--which is just a standard textfield input, or
+the "nestedContent" input--which is a more complex component that allows for structuring the input data
+into sections and items, to make for a more compact layout in the actual grid.
+
+The data of this component is managed by its parent CustomFormControlEditor component (similar to the other
+inputs in BedspaceEditor). This component receives this data via props and also updates this
+data via onChange callback in props as well. Therefore, in essence, both "simpleContent" and "nestedContent"
+are still 'controlled' inputs.
+
+*/
+
 const ContentInput = ({
   id,
   initialValue,
   value: data,
   onChange = (f) => f,
+  children,
 }) => {
   const classes = useStylesForContentInput();
 
@@ -210,6 +227,7 @@ const ContentInput = ({
         <Typography variant="h6" className={classes.label}>
           Content
         </Typography>
+        {children}
         <ContentInputToolbar
           contentType={id}
           onAddSection={handleOnAddSection}
@@ -352,7 +370,6 @@ const useStylesForSection = makeStyles((theme) => ({
   },
   buttonsDivSelected: {},
   contentDiv: {
-    marginLeft: "6px",
     flexGrow: 1,
   },
   emptySection: {},

@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  AppBar,
-  Toolbar,
-  Divider,
-  Select,
-  InputBase,
-  MenuItem,
-} from "@material-ui/core";
+import { AppBar, Toolbar, Divider, MenuItem } from "@material-ui/core";
 
 import { makeStyles } from "@material-ui/styles";
 
@@ -73,7 +66,7 @@ const useStylesForSelectTemplate = makeStyles((theme) => ({
     minWidth: "100px",
     background: "white",
     color: "#676767",
-    border: "none",
+    borderBottom: "1px dotted transparent",
     borderRadius: "0px",
     "&:hover": {
       color: "black",

@@ -478,16 +478,6 @@ const BedspaceEditor = ({
             </div>
             <div>
               <CustomFormControlEditor
-                id="contentType"
-                initialValue={defaultValues.contentType || "simple"}
-                onInputChange={handleOnToggleContentType}
-                onDiffChange={onDiffChange}
-                onChangeArgument={1}
-              >
-                <ToggleContentType />
-              </CustomFormControlEditor>
-
-              <CustomFormControlEditor
                 id={
                   data.contentType === "nested"
                     ? "nestedContent"
@@ -503,7 +493,7 @@ const BedspaceEditor = ({
                 onBlur={handleInputOnBlur}
                 onChangeArgument={data.contentType === "nested" ? 1 : 0}
               >
-                {/* also pass the initialValue prop here so that ContentInput
+                {/* Pass the initialValue prop here as well, so that ContentInput
                   knows when to reset itself, i.e. after a bed change */}
                 <ContentInput
                   initialValue={
@@ -511,7 +501,20 @@ const BedspaceEditor = ({
                       ? defaultValues.nestedContent || ""
                       : defaultValues.simpleContent || ""
                   }
-                />
+                >
+                  {/* The ToggleContentType component and its surrounding
+                  CustomFormControlEditor will be passed as a child to
+                  ContentInput so that it can be rendered in this layout */}
+                  <CustomFormControlEditor
+                    id="contentType"
+                    initialValue={defaultValues.contentType || "simple"}
+                    onInputChange={handleOnToggleContentType}
+                    onDiffChange={onDiffChange}
+                    onChangeArgument={1}
+                  >
+                    <ToggleContentType />
+                  </CustomFormControlEditor>
+                </ContentInput>
               </CustomFormControlEditor>
             </div>
 
