@@ -5,11 +5,13 @@ import {
   InputAdornment,
   IconButton,
   Typography,
+  Tooltip,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import StopIcon from "@material-ui/icons/Stop";
 import ClearIcon from "@material-ui/icons/Clear";
 import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
+import CancelIcon from "@material-ui/icons/Cancel";
 
 // React Movable
 import { List as MovableList, arrayMove } from "react-movable";
@@ -29,18 +31,35 @@ const useStylesForContentInputForm = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     borderLeft: `3px solid ${theme.palette.secondary.light}`,
-    padding: "10px 4px 30px 4px",
+    padding: "2px 4px 30px 4px",
     boxShadow:
       "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px",
   },
   header: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  headerText: {
     color: theme.palette.primary.main,
-    fontSize: "10pt",
+    fontSize: "11pt",
     fontWeight: "bold",
     textTransform: "uppercase",
     marginBottom: "4px",
+    flexGrow: "1",
     textAlign: "center",
     letterSpacing: "1px",
+  },
+  closeButton: {
+    padding: "4px",
+    transform: "translate(6px, -2px)",
+    color: theme.palette.primary.main,
+    "&:hover": {
+      color: theme.palette.primary.light,
+    },
+  },
+  closeButtonIcon: {
+    fontSize: "14pt",
   },
   itemList: {
     padding: "0px 0px 10px 12px",
@@ -79,6 +98,7 @@ const ContentInputForm = ({
   initialData,
   stealFocus = false,
   onContentInputFormChange = (f) => f,
+  onClose = (f) => f,
   ...props
 }) => {
   const classes = useStylesForContentInputForm();
@@ -200,9 +220,16 @@ const ContentInputForm = ({
 
   return (
     <div className={classes.root} {...props}>
-      <Typography variant="h4" className={classes.header}>
-        Edit Section
-      </Typography>
+      <div className={classes.header}>
+        <Typography variant="h4" className={classes.headerText}>
+          Edit Section
+        </Typography>
+        <Tooltip title="Close">
+          <IconButton className={classes.closeButton} onClick={onClose}>
+            <CancelIcon className={classes.closeButtonIcon} />
+          </IconButton>
+        </Tooltip>
+      </div>
       <CustomTextField
         ref={refToTitle}
         placeholder="Title"
@@ -210,17 +237,18 @@ const ContentInputForm = ({
         value={title}
         onChange={(e) => handleOnTitleChange(e.target.value)}
         inputProps={{
-          style: { fontWeight: "bold" },
+          style: { fontWeight: "bold", fontSize: "11pt" },
         }}
       />
       <CustomTextField
         placeholder="Content"
         tooltip="Content"
         multiline
-        rows={1}
+        rows={2}
         rowsMax={3}
         value={topText}
         onChange={(e) => handleOnTopTextChange(e.target.value)}
+        style={{ paddingTop: "5px" }}
       />
       {items?.length > 0 && (
         <MovableList
@@ -248,6 +276,7 @@ const ContentInputForm = ({
                 multiline
                 rows={1}
                 rowsMax={3}
+                style={{ padding: 0 }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment
@@ -283,7 +312,7 @@ const ContentInputForm = ({
         />
       )}
 
-      <div style={{ marginLeft: 10 }}>
+      <div style={{ marginTop: 10, marginLeft: 10 }}>
         <QuickAddInput
           className={classes.quickAddInput}
           placeholder="Add Item"

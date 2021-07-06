@@ -1,12 +1,11 @@
-import {useState} from "react";
+import { useState } from "react";
 
 import { InputAdornment, IconButton } from "@material-ui/core";
-import {makeStyles} from "@material-ui/styles";
+import { makeStyles } from "@material-ui/styles";
 import AddBoxIcon from "@material-ui/icons/AddBox";
 
 //components
 import CustomTextField from "./CustomTextField";
-
 
 const useStylesForQuickAddInput = makeStyles((theme) => ({
   iconButton: {
@@ -47,8 +46,8 @@ const QuickAddInput = ({ onSubmit = (f) => f, ...props }) => {
         onChange={handleOnChange}
         onKeyDown={handleKeyDown}
         InputProps={{
-          startAdornment: (
-            <InputAdornment>
+          endAdornment: (
+            <InputAdornment position="end">
               <IconButton onClick={handleSubmit} className={classes.iconButton}>
                 <AddBoxIcon className={classes.icon} />
               </IconButton>

@@ -221,6 +221,10 @@ const ContentInput = ({
     [onChange]
   );
 
+  const handleCloseContentInputForm = useCallback(() => {
+    setSelectedSection(null);
+  }, []);
+
   return (
     <Grid container className={classes.root}>
       <Grid item xs={12} className={classes.gridHeader}>
@@ -286,6 +290,7 @@ const ContentInput = ({
                   initialData={selectedSection}
                   stealFocus={shouldFocusOnContentInputForm.current}
                   onContentInputFormChange={handleContentInputFormChange}
+                  onClose={handleCloseContentInputForm}
                 />
               </Fade>
             </Grid>
