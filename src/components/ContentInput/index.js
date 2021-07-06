@@ -37,19 +37,29 @@ const useStylesForContentInput = makeStyles((theme) => ({
     marginTop: "8px",
     minHeight: "225px",
   },
+  gridHeader: {
+    display: "flex",
+    flexDirection: "row",
+    borderBottom: "1px solid #eee",
+    minHeight: "30px",
+  },
   label: {
     color: theme.palette.secondary.main,
     fontSize: "8.5pt",
     //fontWeight: "600",
     paddingTop: "6px",
     paddingLeft: "10px",
+    paddingRight: "10px",
   },
   gridBody: {
     flexDirection: "row",
     flex: "2",
-    paddingTop: "15px",
+    paddingTop: "0px",
     paddingLeft: "4px",
     paddingRight: "8px",
+  },
+  gridNestedContent: {
+    padding: "10px 4px 0px 0px",
   },
   mainList: {
     padding: 0,
@@ -196,16 +206,15 @@ const ContentInput = ({
 
   return (
     <Grid container className={classes.root}>
-      <Grid item xs={12}>
+      <Grid item xs={12} className={classes.gridHeader}>
         <Typography variant="h6" className={classes.label}>
           Content
         </Typography>
-        {id === "nestedContent" && (
-          <ContentInputToolbar
-            onAddSection={handleOnAddSection}
-            onSelectTemplate={handleOnSelectTemplate}
-          />
-        )}
+        <ContentInputToolbar
+          contentType={id}
+          onAddSection={handleOnAddSection}
+          onSelectTemplate={handleOnSelectTemplate}
+        />
       </Grid>
       <Grid item container xs={12} className={classes.gridBody}>
         {id === "simpleContent" ? (
@@ -217,14 +226,14 @@ const ContentInput = ({
             onChange={onChange}
             style={{
               width: "100%",
-              padding: "0 2px",
+              padding: "5px 2px 0 2px",
               fontSize: "8pt",
               lineHeight: "1.5em",
             }}
           />
         ) : (
           <>
-            <Grid item xs={12} sm={6} style={{ padding: "0px 4px 0px 0px" }}>
+            <Grid item xs={12} sm={6} className={classes.gridNestedContent}>
               {data instanceof Array && data?.length > 0 && (
                 <MovableList
                   values={data}

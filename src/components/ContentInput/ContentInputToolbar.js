@@ -16,7 +16,7 @@ import QuickAddInput from "./QuickAddInput";
 const useStylesForContentInputToolbar = makeStyles((theme) => ({
   appBarRoot: {
     backgroundColor: "transparent",
-    borderBottom: "1px solid #eee",
+    flexShrink: "inherit",
   },
   toolbar: {
     minHeight: "auto",
@@ -28,6 +28,7 @@ const useStylesForContentInputToolbar = makeStyles((theme) => ({
 }));
 
 const ContentInputToolbar = ({
+  contentType,
   onAddSection = (f) => f,
   onSelectTemplate = (f) => f,
 }) => {
@@ -46,9 +47,22 @@ const ContentInputToolbar = ({
           dense: classes.toolbar,
         }}
       >
-        <QuickAddInput label="Add Section" onSubmit={onAddSection} />
-        <Divider orientation="vertical" flexItem className={classes.divider} />
-        <SelectTemplate onSelect={onSelectTemplate} />
+        {contentType === "nestedContent" && (
+          <>
+            <Divider
+              orientation="vertical"
+              flexItem
+              className={classes.divider}
+            />
+            <QuickAddInput label="Add Section" onSubmit={onAddSection} />
+            <Divider
+              orientation="vertical"
+              flexItem
+              className={classes.divider}
+            />
+            <SelectTemplate onSelect={onSelectTemplate} />
+          </>
+        )}
       </Toolbar>
     </AppBar>
   );
