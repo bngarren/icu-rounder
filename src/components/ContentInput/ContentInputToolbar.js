@@ -87,7 +87,7 @@ const useStylesForSelectTemplate = makeStyles((theme) => ({
   menuList: {
     paddingTop: 0,
     paddingBottom: 0,
-    background: "white",
+    background: "#f6f8fa",
     "& li.Mui-selected": {
       fontWeight: 700,
     },
@@ -139,6 +139,7 @@ const SelectTemplate = ({ onSelect = (f) => f }) => {
           },
           PaperProps: {
             className: classes.menuPaper,
+            elevation: 2,
           },
           anchorOrigin: {
             vertical: "bottom",
