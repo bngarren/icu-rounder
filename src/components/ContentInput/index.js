@@ -57,7 +57,7 @@ const useStylesForContentInput = makeStyles((theme) => ({
     flex: "2",
     paddingTop: "0px",
     paddingLeft: "4px",
-    paddingRight: "8px",
+    paddingRight: "4px",
   },
   gridNestedContent: {
     padding: "15px 4px 0px 0px",

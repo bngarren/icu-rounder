@@ -24,7 +24,7 @@ const useStylesForCustomTextField = makeStyles((theme) => ({
     },
     "&:focus": {
       borderStyle: "solid",
-      borderColor: theme.palette.secondary.light,
+      borderColor: "#a9a9a9",
     },
   },
   textFieldFocused: {},

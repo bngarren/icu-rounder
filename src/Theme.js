@@ -6,6 +6,8 @@ export const theme = createMuiTheme({
       main: "#00A90B",
       light: "#1AC625",
       dark: "#008A09",
+      verticalGradient:
+        "linear-gradient(to bottom, #00a90b73 0%,#1ac6256b 50%,#00a90b69 92%,#1ac6256b 100%)",
     },
     secondary: {
       main: "#017C82",

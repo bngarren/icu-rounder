@@ -30,10 +30,14 @@ const useStylesForContentInputForm = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexDirection: "column",
-    borderLeft: `3px solid ${theme.palette.secondary.light}`,
+    borderLeft: `4px solid ${theme.palette.secondary.light}`,
+    borderImageSource: theme.palette.primary.verticalGradient,
+    borderImageSlice: 1,
+    marginTop: "4px",
     padding: "2px 4px 30px 4px",
     boxShadow:
-      "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px",
+      "rgb(0 0 0 / 7%) 0px 6px 24px 0px, rgb(0 0 0 / 35%) 0px 0px 0px 1px",
+    borderRadius: "4px",
   },
   header: {
     display: "flex",
@@ -237,7 +241,7 @@ const ContentInputForm = ({
         value={title}
         onChange={(e) => handleOnTitleChange(e.target.value)}
         inputProps={{
-          style: { fontWeight: "bold", fontSize: "11pt" },
+          style: { fontWeight: "bold", fontSize: "11.5pt" },
         }}
       />
       <CustomTextField
