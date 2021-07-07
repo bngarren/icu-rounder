@@ -10,6 +10,7 @@ const useStylesForContentInputToolbar = makeStyles((theme) => ({
   appBarRoot: {
     backgroundColor: "transparent",
     flexShrink: "inherit",
+    zIndex: "100",
   },
   toolbar: {
     minHeight: "auto",

@@ -68,6 +68,11 @@ const useStylesForContentInputForm = makeStyles((theme) => ({
   itemList: {
     padding: "0px 0px 10px 12px",
   },
+  endAdornment: {
+    visibility: "hidden",
+    opacity: 0,
+    transition: "opacity linear 0.2s",
+  },
   addIconButton: {
     padding: 6,
   },
@@ -87,6 +92,10 @@ const useStylesForContentInputForm = makeStyles((theme) => ({
   },
   inputItem: {
     width: "100%",
+    "&:hover $endAdornment": {
+      visibility: "inherit",
+      opacity: 1,
+    },
   },
   bullet: {
     fontSize: "10px",
@@ -295,7 +304,10 @@ const ContentInputForm = ({
                     </InputAdornment>
                   ),
                   endAdornment: (
-                    <InputAdornment position="end">
+                    <InputAdornment
+                      position="end"
+                      className={classes.endAdornment}
+                    >
                       <DragIndicatorIcon
                         className={classes.dragIcon}
                         data-movable-handle
@@ -319,9 +331,10 @@ const ContentInputForm = ({
       <div style={{ marginTop: 10, marginLeft: 10 }}>
         <QuickAddInput
           className={classes.quickAddInput}
-          placeholder="Add Item"
+          placeholder="+ Add Item"
           tooltip="Add Item"
           onSubmit={handleAddItem}
+          reset={initialData}
         />
       </div>
     </div>

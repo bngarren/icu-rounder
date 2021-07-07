@@ -12,7 +12,7 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
 const useStyles = makeStyles((theme) => ({
   popper: {
     width: "300px !important",
-    zIndex: 1200,
+    zIndex: 200,
     fontSize: 13,
     color: "#586069",
     backgroundColor: "#f6f8fa",

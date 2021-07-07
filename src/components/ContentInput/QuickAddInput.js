@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-import { InputAdornment, IconButton } from "@material-ui/core";
+import { InputAdornment, IconButton, Fade } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import AddBoxIcon from "@material-ui/icons/AddBox";
 
@@ -19,7 +19,7 @@ const useStylesForQuickAddInput = makeStyles((theme) => ({
   },
 }));
 
-const QuickAddInput = ({ onSubmit = (f) => f, ...props }) => {
+const QuickAddInput = ({ onSubmit = (f) => f, reset, ...props }) => {
   const classes = useStylesForQuickAddInput();
   const [value, setValue] = useState("");
 
@@ -39,6 +39,12 @@ const QuickAddInput = ({ onSubmit = (f) => f, ...props }) => {
     }
   };
 
+  /* Use the reset prop to know when the input should clear,
+  E.g., a new section has been selected */
+  useEffect(() => {
+    setValue("");
+  }, [reset]);
+
   return (
     <div>
       <CustomTextField
@@ -48,9 +54,14 @@ const QuickAddInput = ({ onSubmit = (f) => f, ...props }) => {
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
-              <IconButton onClick={handleSubmit} className={classes.iconButton}>
-                <AddBoxIcon className={classes.icon} />
-              </IconButton>
+              <Fade in={value !== null && value !== ""}>
+                <IconButton
+                  onClick={handleSubmit}
+                  className={classes.iconButton}
+                >
+                  <AddBoxIcon className={classes.icon} />
+                </IconButton>
+              </Fade>
             </InputAdornment>
           ),
         }}
