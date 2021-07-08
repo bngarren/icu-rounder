@@ -13,10 +13,17 @@ import SnippetPopover from "../SnippetPopover";
 
 // Components
 import CustomFormControlEditor from "../../components/CustomFormControl/CustomFormControlEditor";
+import ToggleContentType from "../ToggleContentType";
+import ContentInput from "../ContentInput";
 import ContingencyInput from "../ContingencyInput";
 
 // Settings context
 import { useSettings } from "../../context/Settings";
+
+import { useDebouncedContext } from "../../pages/UpdatePage/DebouncedContext";
+
+// lodash
+import { uniqueId } from "lodash";
 
 const useStyles = makeStyles((theme) => ({
   editorRoot: {
@@ -141,7 +148,6 @@ const BedspaceEditor = ({
   resetKey,
   onEditorDataChange = (f) => f,
   setNeedsSave = (f) => f,
-  addDebouncedFunction = (f) => f,
   debounceInterval,
 }) => {
   const theme = useTheme();
@@ -225,6 +231,9 @@ const BedspaceEditor = ({
 
   const debouncedOnEditorChangeFunction = useRef();
 
+  // keeping the id helps us track this specific function in DebouncedContext
+  const debouncedFunctionId = useRef(uniqueId("BedspaceEditor"));
+
   // the function we want to debounce
   debouncedOnEditorChangeFunction.current = (target, value) => {
     onEditorDataChange({
@@ -245,11 +254,17 @@ const BedspaceEditor = ({
       []
     );
 
-  /* Add this debounced function to an array held by DemoAndEditorController so that it
+  const { addDebouncedFunction, removeDebouncedFunction } =
+    useDebouncedContext();
+  /* Add this debounced function to an array held by DebouncedContext so that it
     can be flushed/canceled if needed */
   useEffect(() => {
-    addDebouncedFunction(debouncedOnEditorChange);
-  }, [addDebouncedFunction, debouncedOnEditorChange]);
+    const id = debouncedFunctionId.current;
+    addDebouncedFunction(debouncedOnEditorChange, id);
+    return () => {
+      removeDebouncedFunction(id); // remove on dismount
+    };
+  }, [addDebouncedFunction, removeDebouncedFunction, debouncedOnEditorChange]);
 
   /*  Handles the onInputChange callbacks for all the inputs, via a prop
   passed through CustomFormControlEditor component which wraps the input */
@@ -350,6 +365,10 @@ const BedspaceEditor = ({
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [handleKeyDown]);
+
+  const handleOnToggleContentType = (target, value) => {
+    handleInputChange(target, value);
+  };
 
   /*  - - - - - RETURN - - - -  */
   if (data) {
@@ -457,22 +476,48 @@ const BedspaceEditor = ({
                 />
               </CustomFormControlEditor>
             </div>
-            <CustomFormControlEditor
-              id="body"
-              initialValue={defaultValues.body || ""}
-              onInputChange={handleInputChange}
-              onDiffChange={onDiffChange}
-              onBlur={handleInputOnBlur}
-            >
-              <CustomTextField
-                className={classes.textFieldBody}
-                label="Content"
-                variant="filled"
-                multiline
-                rows={10}
-                customStyle={classes}
-              />
-            </CustomFormControlEditor>
+            <div>
+              <CustomFormControlEditor
+                id={
+                  data.contentType === "nested"
+                    ? "nestedContent"
+                    : "simpleContent"
+                }
+                initialValue={
+                  data.contentType === "nested"
+                    ? defaultValues.nestedContent || ""
+                    : defaultValues.simpleContent || ""
+                }
+                onInputChange={handleInputChange}
+                onDiffChange={onDiffChange}
+                onBlur={handleInputOnBlur}
+                onChangeArgument={data.contentType === "nested" ? 1 : 0}
+              >
+                {/* Pass the initialValue prop here as well, so that ContentInput
+                  knows when to reset itself, i.e. after a bed change */}
+                <ContentInput
+                  initialValue={
+                    data.contentType === "nested"
+                      ? defaultValues.nestedContent || ""
+                      : defaultValues.simpleContent || ""
+                  }
+                >
+                  {/* The ToggleContentType component and its surrounding
+                  CustomFormControlEditor will be passed as a child to
+                  ContentInput so that it can be rendered in this layout */}
+                  <CustomFormControlEditor
+                    id="contentType"
+                    initialValue={defaultValues.contentType || "simple"}
+                    onInputChange={handleOnToggleContentType}
+                    onDiffChange={onDiffChange}
+                    onChangeArgument={1}
+                  >
+                    <ToggleContentType />
+                  </CustomFormControlEditor>
+                </ContentInput>
+              </CustomFormControlEditor>
+            </div>
+
             <CustomFormControlEditor
               id="bottomText"
               initialValue={defaultValues.bottomText}
