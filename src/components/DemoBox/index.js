@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Paper, makeStyles, Collapse } from "@material-ui/core";
+import StopIcon from "@material-ui/icons/Stop";
 
 import { useSettings } from "../../context/Settings";
 
@@ -37,12 +38,8 @@ const useStyles = makeStyles({
     paddingRight: "0.5em",
     borderLeft: "1px solid black",
   },
-  demoBoxBody: {
-    fontSize: "8pt",
-    padding: "3px 7px 7px 3px",
-    whiteSpace: "pre-line",
-  },
   demoBoxBodyOneLiner: {
+    fontSize: "8.25pt",
     marginBottom: "2px",
   },
   demoBoxBodyContingencies: {
@@ -53,7 +50,7 @@ const useStyles = makeStyles({
     justifyContent: "flex-start",
     flexWrap: "wrap",
     alignContent: "center",
-    marginBottom: "2px",
+    marginBottom: "4px",
   },
   demoBoxBodyContingencyItem: {
     border: "1pt solid #9a9a9a",
@@ -61,6 +58,30 @@ const useStyles = makeStyles({
     padding: "0 2px 0px 2px",
     marginTop: "1pt",
     marginRight: "2pt",
+  },
+  demoBoxBody: {
+    fontSize: "7.5pt",
+    padding: "3px 7px 7px 3px",
+    whiteSpace: "pre-line",
+  },
+  demoBoxNestedContentSectionRoot: {
+    marginTop: "3px",
+    fontSize: "8pt",
+  },
+  demoBoxNestedContentTopText: {
+    minHeight: "6.25pt",
+  },
+  demoBoxNestedContentTitle: {
+    fontWeight: "bold",
+    marginRight: "2px",
+  },
+  demoBoxNestedContentItemRoot: {
+    display: "flex",
+    flexDirection: "row",
+    marginLeft: "4pt",
+  },
+  demoBoxNestedContentItemText: {
+    marginLeft: "1.5pt",
   },
   demoBoxBottomText: {
     position: "absolute",
@@ -121,7 +142,40 @@ const DemoBox = ({ data: propsData, collapsed }) => {
                   );
                 })}
             </div>
-            {data.body}
+            {data.contentType === "simple" && data.simpleContent}
+            {data.contentType === "nested" &&
+              data.nestedContent?.map((sectionData) => {
+                return (
+                  <div
+                    key={sectionData.id}
+                    className={classes.demoBoxNestedContentSectionRoot}
+                  >
+                    <div className={classes.demoBoxNestedContentTopText}>
+                      {sectionData.title && (
+                        <span className={classes.demoBoxNestedContentTitle}>
+                          {`${sectionData.title}:`}
+                        </span>
+                      )}
+                      {sectionData.top}
+                    </div>
+                    {sectionData?.items?.map((item) => {
+                      return (
+                        <div
+                          key={item.id}
+                          className={classes.demoBoxNestedContentItemRoot}
+                        >
+                          <StopIcon style={{ fontSize: "8pt" }} />
+                          <span
+                            className={classes.demoBoxNestedContentItemText}
+                          >
+                            {item.value}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
           </div>
           <div className={classes.demoBoxBottomText}>{data.bottomText}</div>
         </Paper>

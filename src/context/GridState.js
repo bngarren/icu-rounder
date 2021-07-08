@@ -7,7 +7,7 @@ import {
 } from "react";
 
 // Utility
-import { sortByBed } from "../utils/Utility";
+import { sortByBed, isBedEmpty } from "../utils/Utility";
 
 /* Takes the array of non-empty beds (i.e. the data)
     and merges with a "bedLayout" which is the array of available bedspaces. */
@@ -53,6 +53,7 @@ export default function GridStateProvider({ children, Firebase }) {
   const [bedLayout, setBedLayout] = useState();
   const [gridData, setGridData] = useState();
   const [gridDataJson, setGridDataJson] = useState();
+  const [census, setCensus] = useState();
 
   /* Takes input data (full grid) and stores it in state as gridData.
   If a bedLayout parameter is passed, the data will conform to this. If bedLayout is null,
@@ -132,9 +133,48 @@ export default function GridStateProvider({ children, Firebase }) {
     }
   }, [gridData]);
 
+  /* Create bed census object each time gridData changes */
+  useEffect(() => {
+    let totalBeds = 0;
+    let emptyTotal = 0;
+    let emptyBeds = [];
+    let teamTotals = [];
+
+    gridData?.forEach((e) => {
+      // if the bed has a bed number
+      if (e.bed) {
+        totalBeds += 1;
+        // if the bed is empty
+        if (isBedEmpty(e)) {
+          emptyTotal += 1;
+          emptyBeds.push(e.bed);
+        }
+
+        // team number exists
+        if (e.teamNumber) {
+          const team = e.teamNumber + ""; // cast to String
+          const index = teamTotals.findIndex((element) => element.id === team);
+          if (index !== -1) {
+            teamTotals[index].value = teamTotals[index].value + 1;
+          } else {
+            teamTotals.push({ id: team, value: 1 });
+          }
+        }
+      }
+    });
+
+    setCensus({
+      total: totalBeds,
+      emptyTotal: emptyTotal,
+      emptyBeds: emptyBeds,
+      filledTotal: totalBeds - emptyTotal,
+      teamTotals: teamTotals,
+    });
+  }, [gridData]);
+
   return (
     <GridStateContext.Provider
-      value={{ bedLayout, gridData, gridDataJson, updateGridData }}
+      value={{ bedLayout, gridData, census, gridDataJson, updateGridData }}
     >
       {children}
     </GridStateContext.Provider>

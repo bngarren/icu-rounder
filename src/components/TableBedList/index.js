@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useEffect, useContext, memo } from "react";
 import {
   TableContainer,
   Table,
@@ -57,13 +57,19 @@ const useStyles = makeStyles((theme) => ({
     color: "#626060",
     fontWeight: "bold",
   },
-  tableEditButton: {
+  tableEditIconButton: {
+    padding: "6px",
+  },
+  tableEditIcon: {
     cursor: "pointer",
     color: "#626060",
     fontSize: "22px",
   },
-  tableEditButtonSelected: {
+  tableEditIconSelected: {
     color: theme.palette.secondary.main,
+  },
+  tableMenuIconButton: {
+    padding: "6px",
   },
   tableDeleteButton: {
     cursor: "pointer",
@@ -117,6 +123,26 @@ const TableBedList = ({ data, selectedKey }) => {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
+
+  /* Watches for changes in selectedKey and picks the correct paginated page that contains
+  that bed space. E.g. when using the navigation arrows and you move to a bedspace that is on
+  a different paginated page */
+  useEffect(() => {
+    // Page should be set so that selectedKey is within range of [page*rowsPerPage, rowsPerPage + rowsPerPage - 1]
+    const rowsTotal = data.length;
+    const numOfPage = Math.ceil(rowsTotal / rowsPerPage);
+    let newPage = 0;
+    for (let i = 0; i < numOfPage; i++) {
+      // loop through available pages
+      if (
+        selectedKey >= i * rowsPerPage &&
+        selectedKey <= i * rowsPerPage + rowsPerPage - 1
+      ) {
+        newPage = i;
+      }
+    }
+    setPage(newPage);
+  }, [selectedKey, data.length, rowsPerPage]);
 
   //
 
@@ -222,49 +248,17 @@ const MyTableBody = ({ classes, data, page, rowsPerPage, selectedKey }) => {
           .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
           .map((value, key) => {
             let adjustedKey = key + page * rowsPerPage; // the key resets to index 0 for every pagination page
-            let isSelected = adjustedKey === selectedKey;
-            const emptyBed = isBedEmpty(value);
+            const isSelected = adjustedKey === selectedKey;
             return (
-              <TableRow
-                className={clsx(classes.tableRow, {
-                  [classes.highlightRowIn]: highlight === adjustedKey,
-                })}
-                key={value.bed}
-                hover
-                selected={isSelected}
-              >
-                <TableCell
-                  component="th"
-                  scope="row"
-                  align="left"
-                  className={tableCellClasses}
-                >
-                  <Typography
-                    variant="h5"
-                    className={classes.tableHeaderBedNumber}
-                  >
-                    {value.bed}
-                  </Typography>
-                </TableCell>
-                <TableCell align="left" className={tableCellClasses}>
-                  <span>
-                    {value["lastName"]}
-                    {value["lastName"] && value["firstName"] && ", "}
-                    {value["firstName"]}
-                  </span>
-                </TableCell>
-                <TableCell align="center" className={tableCellClasses}>
-                  <span>{value["teamNumber"]}</span>
-                </TableCell>
-                <TableCell className={tableCellClasses}>
-                  <BedActions
-                    classes={classes}
-                    isSelected={isSelected}
-                    bedKey={adjustedKey}
-                    emptyBed={emptyBed}
-                  />
-                </TableCell>
-              </TableRow>
+              <MyTableRow
+                classes={classes}
+                tableCellClasses={tableCellClasses}
+                highlight={highlight}
+                adjustedKey={adjustedKey}
+                isSelected={isSelected}
+                key={`MyTableRow-${value.bed}-${key}`}
+                value={value}
+              />
             );
           })}
         {MyInputTableRow}
@@ -273,7 +267,59 @@ const MyTableBody = ({ classes, data, page, rowsPerPage, selectedKey }) => {
   );
 };
 
-const BedActions = ({ classes, isSelected, bedKey, emptyBed }) => {
+const MyTableRow = memo(
+  ({
+    classes,
+    tableCellClasses,
+    highlight,
+    adjustedKey,
+    isSelected,
+    value,
+  }) => {
+    const emptyBed = isBedEmpty(value);
+    return (
+      <TableRow
+        className={clsx(classes.tableRow, {
+          [classes.highlightRowIn]: highlight === adjustedKey,
+        })}
+        key={value.bed}
+        hover
+        selected={isSelected}
+      >
+        <TableCell
+          component="th"
+          scope="row"
+          align="left"
+          className={tableCellClasses}
+        >
+          <Typography variant="h5" className={classes.tableHeaderBedNumber}>
+            {value.bed}
+          </Typography>
+        </TableCell>
+        <TableCell align="left" className={tableCellClasses}>
+          <span>
+            {value["lastName"]}
+            {value["lastName"] && value["firstName"] && ", "}
+            {value["firstName"]}
+          </span>
+        </TableCell>
+        <TableCell align="center" className={tableCellClasses}>
+          <span>{value["teamNumber"]}</span>
+        </TableCell>
+        <TableCell className={tableCellClasses}>
+          <BedActions
+            classes={classes}
+            isSelected={isSelected}
+            bedKey={adjustedKey}
+            emptyBed={emptyBed}
+          />
+        </TableCell>
+      </TableRow>
+    );
+  }
+);
+
+const BedActions = memo(({ classes, isSelected, bedKey, emptyBed }) => {
   const { bedActionEdit, bedActionClear, bedActionDelete } =
     useContext(BedActionsContext);
 
@@ -296,20 +342,26 @@ const BedActions = ({ classes, isSelected, bedKey, emptyBed }) => {
       }}
     >
       {
-        <Tooltip title="Edit">
-          <IconButton onClick={() => bedActionEdit(bedKey)}>
+        <div title="Edit">
+          <IconButton
+            className={classes.tableEditIconButton}
+            onClick={() => bedActionEdit(bedKey)}
+          >
             <EditIcon
               fontSize="small"
               className={[
-                classes.tableEditButton,
-                isSelected && classes.tableEditButtonSelected,
+                classes.tableEditIcon,
+                isSelected && classes.tableEditIconSelected,
               ].join(" ")}
             />
           </IconButton>
-        </Tooltip>
+        </div>
       }
       {
-        <IconButton onClick={(e) => handleOnClickMenu(e, bedKey)}>
+        <IconButton
+          className={classes.tableMenuIconButton}
+          onClick={(e) => handleOnClickMenu(e, bedKey)}
+        >
           {popupState.isOpen ? (
             <MenuOpenIcon fontSize="small" />
           ) : (
@@ -326,6 +378,6 @@ const BedActions = ({ classes, isSelected, bedKey, emptyBed }) => {
       />
     </div>
   );
-};
+});
 
 export default TableBedList;

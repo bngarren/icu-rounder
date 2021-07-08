@@ -8,7 +8,6 @@ import {
   AppBar,
   Toolbar,
   IconButton,
-  Typography,
   useScrollTrigger,
   Menu,
   MenuItem,
@@ -24,13 +23,18 @@ import ViewListIcon from "@material-ui/icons/ViewList";
 import SettingsIcon from "@material-ui/icons/Settings";
 import MenuIcon from "@material-ui/icons/Menu";
 
+// lodash
+import { uniqueId } from "lodash";
+
 // React Router
 import { useHistory, useRouteMatch } from "react-router-dom";
 
 // Context
 import { useAuthStateContext } from "../../context/AuthState";
 import { useSettings } from "../../context/Settings";
-import { useGridStateContext } from "../../context/GridState";
+
+// hooks
+import usePdfMaker from "../../hooks/usePdfMaker";
 
 // Login
 import { useLoginDialog } from "../../components/Login";
@@ -98,25 +102,9 @@ const Header = () => {
   const theme = useTheme();
   const classes = useStyles(theme);
 
-  const { settings } = useSettings();
-  const { bedLayout, gridData } = useGridStateContext();
-
   const { showLogin, LoginDialog } = useLoginDialog();
 
-  const getPdf = async () => {
-    await pdf(
-      <MyDocument
-        bedLayout={bedLayout}
-        title={settings.document_title}
-        colsPerPage={settings.document_cols_per_page}
-        data={gridData}
-      />
-    )
-      .toBlob()
-      .then((blob) => {
-        saveAs(blob, "grid.pdf");
-      });
-  };
+  const { getPdf } = usePdfMaker();
 
   const handleClickLogin = () => {
     showLogin((prevValue) => !prevValue);
@@ -222,11 +210,7 @@ const HeaderMenu = ({
     : "grid";
 
   const loggedInMenu = [
-    <MenuItem
-      onClick={handleEdit}
-      disabled={Boolean(useRouteMatch("/update"))}
-      key="menuItemEdit"
-    >
+    <MenuItem onClick={handleEdit} disabled={Boolean(useRouteMatch("/update"))}>
       <ListItemIcon>
         <ViewListIcon />
       </ListItemIcon>
@@ -235,30 +219,29 @@ const HeaderMenu = ({
     <MenuItem
       onClick={handleSettings}
       disabled={Boolean(useRouteMatch("/settings"))}
-      key="menuItemSettings"
     >
       <ListItemIcon>
         <SettingsIcon />
       </ListItemIcon>
       <CustomListItemText>Settings</CustomListItemText>
     </MenuItem>,
-    <Divider key="menuItemDivider1" />,
-    <MenuItem onClick={handleDownloadPdf} key="menuItemDownloadPdf">
+    <Divider />,
+    <MenuItem onClick={handleDownloadPdf}>
       <ListItemIcon>
         <PictureAsPdfIcon />
       </ListItemIcon>
       <CustomListItemText>Download PDF</CustomListItemText>
     </MenuItem>,
     <Exporter onExported={handleOnExported} filename={exportFilename}>
-      <MenuItem key="menuItemExportJson">
+      <MenuItem>
         <ListItemIcon>
           <GetAppIcon />
         </ListItemIcon>
         <CustomListItemText>Export Grid</CustomListItemText>
       </MenuItem>
     </Exporter>,
-    <Divider key="menuItemDivider2" />,
-    <MenuItem onClick={handleLogout} key="menuItemLogout">
+    <Divider />,
+    <MenuItem onClick={handleLogout}>
       <ListItemIcon>
         <ExitToAppIcon />
       </ListItemIcon>
@@ -267,7 +250,7 @@ const HeaderMenu = ({
   ];
 
   const loggedOutMenu = [
-    <MenuItem onClick={handleLogin} key="menuItemLogin">
+    <MenuItem onClick={handleLogin}>
       <ListItemIcon>
         <AccountBoxIcon />
       </ListItemIcon>
@@ -298,8 +281,12 @@ const HeaderMenu = ({
         onClose={handleClose}
       >
         {userIsLoggedIn
-          ? loggedInMenu.map((i) => i)
-          : loggedOutMenu.map((i) => i)}
+          ? loggedInMenu.map((i) =>
+              cloneElement(i, { key: uniqueId("menuItem-") })
+            )
+          : loggedOutMenu.map((i) =>
+              cloneElement(i, { key: uniqueId("menuItem-") })
+            )}
       </Menu>
     </div>
   );

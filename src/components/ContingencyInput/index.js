@@ -9,10 +9,10 @@ import CheckBoxIcon from "@material-ui/icons/CheckBox";
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   popper: {
     width: "300px !important",
-    zIndex: 1,
+    zIndex: 200,
     fontSize: 13,
     color: "#586069",
     backgroundColor: "#f6f8fa",
@@ -27,10 +27,13 @@ const useStyles = makeStyles({
     minHeight: "auto",
     alignItems: "center",
     padding: 3,
-    '&[aria-selected="true"]': {
-      backgroundColor: "transparent",
+    // Selected
+    '&[aria-selected="true"]': {},
+    // Hover
+    '&[data-focus="true"]': {
+      backgroundColor: theme.palette.secondary.light,
+      color: theme.palette.secondary.contrastText,
     },
-    '&[data-focus="true"]': {},
   },
   checkboxRoot: {
     padding: "3px",
@@ -40,18 +43,19 @@ const useStyles = makeStyles({
   },
   checkboxColorSecondary: {
     "&.Mui-checked": {
-      color: "#b7d100",
+      color: theme.palette.secondary,
       "&:hover": {
         backgroundColor: "rgba(183, 209, 0, 0.1)",
       },
     },
   },
-});
+}));
 
 const ContingencyInput = ({
   customStyle: textFieldClasses,
   options,
   value,
+  diff,
   ...props
 }) => {
   const classes = useStyles();
@@ -69,8 +73,8 @@ const ContingencyInput = ({
       limitTags={5}
       multiple
       freeSolo
-      autoHighlight
       clearOnBlur
+      filterSelectedOptions
       options={options}
       renderInput={(params) => {
         return (
@@ -89,6 +93,7 @@ const ContingencyInput = ({
             }}
             InputLabelProps={{
               ...params.InputLabelProps,
+              shrink: true,
               classes: {
                 root: textFieldClasses.textFieldInputLabelRoot,
                 focused: textFieldClasses.textFieldInputLabelFocused,

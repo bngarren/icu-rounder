@@ -5,6 +5,8 @@ import {
   View,
   StyleSheet,
   Font,
+  Svg,
+  Rect,
 } from "@react-pdf/renderer";
 
 import RobotoRegular from "../../fonts/roboto/roboto-v27-latin-regular.woff";
@@ -33,7 +35,21 @@ const pdfStyles = StyleSheet.create({
   },
   header: {
     fontSize: "13pt",
+    display: "flex",
+    flexDirection: "row",
+  },
+  titleRoot: {
+    flexGrow: 1,
     textAlign: "center",
+  },
+  censusRoot: {
+    fontSize: "8pt",
+    alignSelf: "center",
+    flexBasis: "20%",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingRight: "5pt",
   },
   gridListRoot: {
     display: "flex",
@@ -91,6 +107,7 @@ const pdfStyles = StyleSheet.create({
     fontSize: "8.5pt",
   },
   gridBoxBodyOneLiner: {
+    fontSize: "7pt",
     marginBottom: "1.5pt",
   },
   gridBoxBodyContingencies: {
@@ -111,8 +128,26 @@ const pdfStyles = StyleSheet.create({
     marginRight: "2pt",
   },
   gridBoxBody: {
-    fontSize: "7pt",
+    fontSize: "6pt",
     padding: "2pt 5pt 5pt 2pt",
+  },
+  gridBoxNestedContentSectionRoot: {
+    marginTop: "1.5pt",
+    fontSize: "6.5pt",
+  },
+  gridBoxNestedContentTopText: {
+    minHeight: "5pt",
+  },
+  gridBoxNestedContentTitle: {
+    fontWeight: "bold",
+  },
+  gridBoxNestedContentItemRoot: {
+    display: "flex",
+    flexDirection: "row",
+    marginLeft: "5pt",
+  },
+  gridBoxNestedContentItemText: {
+    marginLeft: "3pt",
   },
   gridBoxBottomText: {
     position: "absolute",
@@ -120,6 +155,9 @@ const pdfStyles = StyleSheet.create({
     textAlign: "right",
     fontSize: "7pt",
     padding: "2pt 4pt 2pt 2pt",
+  },
+  bold: {
+    fontWeight: "bold",
   },
 });
 
@@ -143,7 +181,7 @@ export const getWidth = (colsPerPage, factor = 1) => {
   return res.toString() + "pt";
 };
 
-const MyDocument = ({ bedLayout, title, colsPerPage, data }) => {
+const MyDocument = ({ bedLayout, title, colsPerPage, data, census }) => {
   const beds = bedLayout.length;
 
   const getMatrix = (r, c) => {
@@ -167,7 +205,31 @@ const MyDocument = ({ bedLayout, title, colsPerPage, data }) => {
     <Document>
       <Page size="letter" style={pdfStyles.page}>
         <View style={pdfStyles.header}>
-          <Text>{title}</Text>
+          <View style={pdfStyles.titleRoot}>
+            <Text>{title}</Text>
+          </View>
+
+          <View style={pdfStyles.censusRoot}>
+            {census ? (
+              <>
+                <Text>
+                  {`${census.filledTotal}/${census.total}`}{" "}
+                  {/* census.emptyBeds.length > 0 &&
+                    `[${census.emptyBeds.toString()}]` */}
+                </Text>
+                {census.teamTotals.map((t) => {
+                  return (
+                    <Text key={t.id}>
+                      <Text style={pdfStyles.bold}>{t.id}</Text>
+                      {`: ${t.value}`}
+                    </Text>
+                  );
+                })}
+              </>
+            ) : (
+              <></>
+            )}
+          </View>
         </View>
         <View style={pdfStyles.gridListRoot}>
           {matrix.map((row, rIndex) => {
@@ -240,7 +302,50 @@ const GridBox = ({ bedspaceData, box, width, removeLeftBorder }) => {
                 );
               })}
           </View>
-          <Text>{bedspaceData.body}</Text>
+          {bedspaceData.contentType === "simple" && (
+            <Text>{bedspaceData.simpleContent}</Text>
+          )}
+          {bedspaceData.contentType === "nested" && (
+            <View>
+              {bedspaceData.nestedContent?.map((sectionData) => {
+                return (
+                  <View
+                    key={sectionData.id}
+                    style={pdfStyles.gridBoxNestedContentSectionRoot}
+                  >
+                    <Text style={pdfStyles.gridBoxNestedContentTopText}>
+                      <Text style={pdfStyles.gridBoxNestedContentTitle}>
+                        {sectionData.title && `${sectionData.title}: `}
+                      </Text>
+                      {sectionData.top}
+                    </Text>
+                    {sectionData?.items?.map((item) => {
+                      return (
+                        <View
+                          key={item.id}
+                          style={pdfStyles.gridBoxNestedContentItemRoot}
+                        >
+                          <Svg width="4pt" height="5.5pt">
+                            <Rect
+                              x="0"
+                              y="2pt"
+                              width="3pt"
+                              height="3pt"
+                              stroke="black"
+                              fill="black"
+                            />
+                          </Svg>
+                          <Text style={pdfStyles.gridBoxNestedContentItemText}>
+                            {item.value}
+                          </Text>
+                        </View>
+                      );
+                    })}
+                  </View>
+                );
+              })}
+            </View>
+          )}
         </View>
         <View style={pdfStyles.gridBoxBottomText}>
           <Text>{bedspaceData.bottomText}</Text>
