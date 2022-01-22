@@ -37,14 +37,22 @@ const mergeWithBedLayout = (arr, bedLayout) => {
   return resultArray;
 };
 
-/* Used for importing/exporting actual .Json to file */
+/* Helper used for importing/exporting actual .Json to file */
 const getJsonObjectFromSortedArray = (arr) => {
   // converts the array back to a JSON "object of objects"
-  const result = {};
-  arr.forEach((b) => {
-    result[b.bed] = b;
+
+  //? using a map here because i had difficulty adding to an Object directly
+  const map = new Map();
+
+  /* Go through each bed in the array and create a key/value pair
+  in this new map. A map keeps the order of the elements */
+  arr.forEach((el) => {
+    map.set(el.bed, el);
   });
-  return result;
+
+  // Convert the map to JSON
+  const json = JSON.stringify(Object.fromEntries(map), null, 2)
+  return json;
 };
 
 const GridStateContext = createContext();
