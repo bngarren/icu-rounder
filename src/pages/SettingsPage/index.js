@@ -1,24 +1,13 @@
-import { useState, useCallback, forwardRef } from "react";
-
-import WarningIcon from "@material-ui/icons/Warning";
-import CheckBoxIcon from "@material-ui/icons/CheckBox";
-import {
-  Container,
-  Grid,
-  Typography,
-  Select,
-  MenuItem,
-  InputBase,
-  Divider,
-  Button,
-} from "@material-ui/core";
+import { Container, Grid, Typography, Divider } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 
 // custom components
-import Exporter from "../../components/Exporter";
-import Importer from "../../components/Importer";
-import ContingencyOptionsEditor from "../../components/ContingencyOptionsEditor";
-import CustomFormControlSetting from "../../components/CustomFormControl/CustomFormControlSetting";
+import SettingsPageSection from "./SettingsPageSection";
+import GeneralSection from "./GeneralSection";
+import DocumentSection from "./DocumentSection";
+import ExportSection from "./ExportSection";
+import ImportSection from "./ImportSection";
+import ContingenciesSection from "./ContingenciesSection";
 import { useDialog } from "../../components/Dialog";
 
 // context
@@ -38,32 +27,13 @@ const useStyles = makeStyles((theme) => ({
   title: {
     marginBottom: 15,
   },
-  sectionTitle: {
-    marginTop: "5px",
-    marginBottom: "10px",
-  },
-  inputsGridContainer: {
+  mainGridContainer: {
     flexDirection: "column",
   },
-  inputsGridItem: {
+  sectionGridItem: {
     marginBottom: "20px",
     width: "100%",
   },
-  textFieldRoot: {
-    border: "1px solid #e2e2e1",
-    overflow: "hidden",
-    borderRadius: "3px",
-    backgroundColor: "white",
-    paddingLeft: "6px",
-    "&:hover": {
-      backgroundColor: "white",
-    },
-    "&$textFieldFocused": {
-      backgroundColor: "#fff",
-      borderColor: theme.palette.secondary.main,
-    },
-  },
-  textFieldFocused: {},
   selectInputRoot: {
     paddingLeft: "5px",
   },
@@ -72,51 +42,16 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: "transparent",
     },
   },
-  exportFilenameTextfieldInput: {
-    textAlign: "right",
-    paddingRight: "4px",
-  },
-  textEndAdornment: {
-    backgroundColor: "#dcdcdc",
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignContent: "center",
-    padding: "6px 3px",
-  },
-  confirmImportButton: {
-    color: "white",
-    backgroundColor: theme.palette.warning.main,
-  },
-  confirmImportText: {
-    color: theme.palette.warning.main,
-  },
-  followingImportText: {
-    color: theme.palette.primary.main,
-    fontSize: "11pt",
-  },
-  followingImportIcon: {
-    color: theme.palette.primary.main,
-    fontSize: "13pt",
-    marginRight: "2px",
-  },
 }));
 
 const SettingsPage = () => {
   const classes = useStyles();
 
   /* Get Settings context */
-  const { settings, dispatchSettings } = useSettings();
+  const { dispatchSettings } = useSettings();
 
   /* Get GridData and BedLayout from context */
   const { bedLayout, gridData, updateGridData } = useGridStateContext();
-
-  const contingencyOptions = settings.contingencyOptions || [];
-
-  /* Our import .json functionality */
-  const [pendingDataImport, setPendingDataImport] = useState(null);
-  const [confirmedDataImport, setConfirmedDataImport] = useState(false);
 
   /* Hook for our Dialog modal */
   const { dialogIsOpen, dialog, showYesNoDialog } = useDialog();
@@ -211,268 +146,53 @@ const SettingsPage = () => {
     }
   };
 
-  /* New data has been uploaded using the Importer component,
-  now awaiting confirmation */
-  const handleNewDataImported = useCallback((data) => {
-    if (!data) return;
-    setPendingDataImport(data);
-    setConfirmedDataImport(false);
-  }, []);
-
-  /* Imported data has been confirmed to overwrite the existing gridData */
-  const handleUpdateGridData = (data) => {
-    updateGridData(data);
-    setPendingDataImport(null);
-    setConfirmedDataImport(true);
-  };
-
-  const handleOnExport = () => {};
-
-  /* New contingency option added */
-  const handleNewContingencyOption = (val) => {
-    dispatchSettings({
-      type: "UPDATE",
-      payload: {
-        contingencyOptions: [...contingencyOptions, val],
-      },
-    });
-  };
-
-  /* Removed a contingency option  */
-  const handleRemoveContingenyOption = (i) => {
-    let newArray = [...contingencyOptions];
-    newArray.splice(i, 1);
-    dispatchSettings({
-      type: "UPDATE",
-      payload: {
-        contingencyOptions: newArray,
-      },
-    });
-  };
-
   return (
     <Container maxWidth="sm">
       <Grid container className={classes.header}>
-        <Typography className={classes.title} variant="h4">
+        <Typography className={classes.title} variant="h5">
           Settings
         </Typography>
       </Grid>
 
-      <Grid container className={classes.inputsGridContainer}>
-        <Typography className={classes.sectionTitle} variant="h5">
-          General
-        </Typography>
-        <Grid item className={classes.inputsGridItem}>
-          <CustomFormControlSetting
-            label="Bed Layout"
-            id="bedLayout"
-            initialValue={getPrettyBedLayout(bedLayout)}
-            onSave={handleOnSave}
-          >
-            <CustomTextField
-              id="bedLayoutTextField"
-              customStyle={classes}
-              fullWidth
-              multiline
-            />
-          </CustomFormControlSetting>
-        </Grid>
+      <Grid container className={classes.mainGridContainer}>
+        {/* - - - - - section GENERAL - - - - - */}
+        <SettingsPageSection title="General">
+          <GeneralSection parentCss={classes} onSave={handleOnSave} />
+        </SettingsPageSection>
         <Divider />
-        <Typography className={classes.sectionTitle} variant="h5">
-          Document
-        </Typography>
-        <Grid item className={classes.inputsGridItem}>
-          <CustomFormControlSetting
-            label="Title"
-            id="document_title"
-            initialValue={settings.document_title}
-            onSave={handleOnSave}
-          >
-            <CustomTextField
-              id="documentTitleTextField"
-              customStyle={classes}
-              fullWidth
-            />
-          </CustomFormControlSetting>
-        </Grid>
-        <Grid item className={classes.inputsGridItem}>
-          <CustomFormControlSetting
-            label="Grids per Row"
-            id="document_cols_per_page"
-            initialValue={settings.document_cols_per_page}
-            onSave={handleOnSave}
-          >
-            <Select
-              id="document_cols_per_page"
-              classes={{
-                root: classes.selectInputRoot,
-                select: classes.selectInputSelect,
-              }}
-              disableUnderline={true}
-            >
-              <MenuItem value={1}>1</MenuItem>
-              <MenuItem value={2}>2</MenuItem>
-              <MenuItem value={3}>3</MenuItem>
-              <MenuItem value={4}>4</MenuItem>
-              <MenuItem value={5}>5</MenuItem>
-            </Select>
-          </CustomFormControlSetting>
-        </Grid>
+        {/* - - - - - section DOCUMENT - - - - - */}
+        <SettingsPageSection title="Document">
+          <DocumentSection parentCss={classes} onSave={handleOnSave} />
+        </SettingsPageSection>
         <Divider />
-        <Grid item className={classes.inputsGridItem}>
-          <Typography className={classes.sectionTitle} variant="h5">
-            Export
-          </Typography>
-          <Typography variant="body2">
-            Download the current grid as a .json file.
-          </Typography>
-          <br />
-          <CustomFormControlSetting
-            label="Filename"
-            id="export_filename"
-            initialValue={settings.export_filename}
-            onSave={handleOnSave}
-          >
-            <CustomTextField
-              id="exportFilenameTextField"
-              customStyle={classes}
-              style={{ maxWidth: "300px", minWidth: "100px" }}
-              endAdornment={
-                <div className={classes.textEndAdornment}>
-                  <Typography variant="caption">.json</Typography>
-                </div>
-              }
-              inputProps={{
-                className: classes.exportFilenameTextfieldInput,
-              }}
-            />
-          </CustomFormControlSetting>
-          <br />
-          <Exporter
-            filename={settings.export_filename}
-            onExported={handleOnExport}
-          >
-            <Button
-              variant="contained"
-              color="secondary"
-              disableElevation
-              size="small"
-            >
-              Export Grid
-            </Button>
-          </Exporter>
-        </Grid>
+        {/* - - - - - section EXPORT - - - - - */}
+        <SettingsPageSection
+          title="Export"
+          subtitle="Download the current grid as a .json file."
+        >
+          <ExportSection parentCss={classes} onSave={handleOnSave} />
+        </SettingsPageSection>
+
         <Divider />
-        <Grid item className={classes.inputsGridItem}>
-          <Typography className={classes.sectionTitle} variant="h5">
-            Import
-          </Typography>
-          <Typography variant="body2">
-            Upload a previously saved .json file to populate the grid.
-          </Typography>
-          <br />
-          <Importer onNewDataSelected={handleNewDataImported} />
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-around",
-              flexWrap: "wrap",
-              alignItems: "center",
-              margin: "5px 0px",
-            }}
-          >
-            {pendingDataImport ? (
-              <div align="center">
-                <Button
-                  className={classes.confirmImportButton}
-                  variant="contained"
-                  size="small"
-                  onClick={() => handleUpdateGridData(pendingDataImport)}
-                  startIcon={<WarningIcon />}
-                >
-                  Use this data?
-                </Button>
-                <Typography
-                  variant="caption"
-                  className={classes.confirmImportText}
-                >
-                  <br />
-                  (This will overwrite your current grid. Consider exporting it
-                  first.)
-                </Typography>
-              </div>
-            ) : (
-              <div>
-                {confirmedDataImport && (
-                  <div style={{ display: "inline-flex", alignItems: "center" }}>
-                    <CheckBoxIcon className={classes.followingImportIcon} />
-                    <Typography
-                      variant="caption"
-                      className={classes.followingImportText}
-                    >
-                      Successfully imported.
-                    </Typography>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </Grid>
+        {/* - - - - - section IMPORT - - - - - */}
+        <SettingsPageSection
+          title="Import"
+          subtitle="Upload a previously saved .json file to populate the grid."
+        >
+          <ImportSection parentCss={classes} />
+        </SettingsPageSection>
         <Divider />
-        <Grid item className={classes.inputsGridItem}>
-          <Typography className={classes.sectionTitle} variant="h5">
-            Contingencies
-          </Typography>
-          <Typography variant="body2">
-            Save your custom contingencies for later use.
-          </Typography>
-          <ContingencyOptionsEditor
-            data={contingencyOptions}
-            onSubmit={handleNewContingencyOption}
-            onRemove={handleRemoveContingenyOption}
-          />
-        </Grid>
+        {/* - - - - - section CONTINGENCIES - - - - - */}
+        <SettingsPageSection
+          title="Contingencies"
+          subtitle="Save your custom contingencies for later use."
+        >
+          <ContingenciesSection parentCss={classes} onSave={handleOnSave} />
+        </SettingsPageSection>
       </Grid>
       {dialogIsOpen && dialog}
     </Container>
   );
-};
-
-const CustomTextField = forwardRef(
-  ({ customStyle: classes, inputProps, ...props }, ref) => {
-    return (
-      <InputBase
-        inputRef={ref}
-        classes={{
-          root: classes.textFieldRoot,
-          focused: classes.textFieldFocused,
-        }}
-        inputProps={{
-          ...inputProps,
-          style: { fontSize: "11pt" },
-        }}
-        {...props}
-      />
-    );
-  }
-);
-
-/* Helper function - Since bedLayout is stored as an array, we use the
-    reduce function to prettify it for the text input */
-const getPrettyBedLayout = (bl) => {
-  let prettyBedLayout;
-  if (bl && bl.length > 0) {
-    bl.sort((el1, el2) => {
-      el1 = String(el1);
-      return el1.localeCompare(el2, "en", { numeric: true });
-    });
-    prettyBedLayout = bl.reduce((accum, current) => {
-      return `${accum}, ${current}`;
-    });
-  } else {
-    prettyBedLayout = bl;
-  }
-  return prettyBedLayout;
 };
 
 /* Helper function for taking the input bedLayout (CSV format) and 
