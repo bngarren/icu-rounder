@@ -1,7 +1,7 @@
 {
   "name": "icu-rounder",
   "homepage": "https://bngarren.github.io/icu-rounder/",
-  "version": "1.0",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.11.4",
@@ -11,7 +11,6 @@
     "@testing-library/jest-dom": "^5.12.0",
     "@testing-library/react": "^11.2.6",
     "@testing-library/user-event": "^12.8.3",
-    "classnames": "^2.3.1",
     "file-saver": "^2.0.5",
     "firebase": "^8.6.1",
     "gh-pages": "^3.2.1",
@@ -22,8 +21,7 @@
     "react-movable": "^2.5.4",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
-    "source-map-explorer": "^2.5.2",
-    "web-vitals": "^1.1.2"
+    "source-map-explorer": "^2.5.2"
   },
   "scripts": {
     "start": "react-scripts start",
