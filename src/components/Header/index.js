@@ -3,7 +3,8 @@ import MyDocument from "../MyDocument";
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import {
   AppBar,
   Toolbar,
@@ -14,14 +15,14 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
-} from "@material-ui/core";
-import AccountBoxIcon from "@material-ui/icons/AccountBox";
-import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import PictureAsPdfIcon from "@material-ui/icons/PictureAsPdf";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import ViewListIcon from "@material-ui/icons/ViewList";
-import SettingsIcon from "@material-ui/icons/Settings";
-import MenuIcon from "@material-ui/icons/Menu";
+} from "@mui/material";
+import AccountBoxIcon from "@mui/icons-material/AccountBox";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import ViewListIcon from "@mui/icons-material/ViewList";
+import SettingsIcon from "@mui/icons-material/Settings";
+import MenuIcon from "@mui/icons-material/Menu";
 
 // lodash
 import { uniqueId } from "lodash";
@@ -270,7 +271,7 @@ const HeaderMenu = ({
           root: classes.iconButtonOtherRoot,
         }}
         onClick={handleClick}
-      >
+        size="large">
         <MenuIcon />
       </IconButton>
       <Menu

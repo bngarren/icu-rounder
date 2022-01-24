@@ -1,14 +1,16 @@
 import { useRef, useEffect } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
 
-import TextField from "@material-ui/core/TextField";
-import Autocomplete from "@material-ui/lab/Autocomplete";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
-import Grid from "@material-ui/core/Grid";
-import Fade from "@material-ui/core/Fade";
-import Popper from "@material-ui/core/Popper";
-import ClickAwayListener from "@material-ui/core/ClickAwayListener";
+import makeStyles from '@mui/styles/makeStyles';
+
+import TextField from "@mui/material/TextField";
+import Autocomplete from '@mui/material/Autocomplete';
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+import Grid from "@mui/material/Grid";
+import Fade from "@mui/material/Fade";
+import Popper from "@mui/material/Popper";
+import ClickAwayListener from "@mui/material/ClickAwayListener";
 import { bindPopper } from "material-ui-popup-state/hooks";
 
 const useStyles = makeStyles((theme) => ({
@@ -128,15 +130,12 @@ const SnippetPopover = ({ popupState, onSelect = (f) => f }) => {
                 <Grid
                   container
                   direction="row"
-                  justify="space-between"
+                  justifyContent="space-between"
                   alignItems="center"
                   className={classes.header}
                 >
                   Choose snippet to insert
-                  <IconButton
-                    className={classes.closeButton}
-                    onClick={handleClose}
-                  >
+                  <IconButton className={classes.closeButton} onClick={handleClose} size="large">
                     <CloseIcon size="small" />
                   </IconButton>
                 </Grid>
@@ -172,7 +171,6 @@ const SnippetPopover = ({ popupState, onSelect = (f) => f }) => {
                           root: classes.textFieldRoot,
                           focused: classes.textFieldFocused,
                         },
-                        disableUnderline: true,
                         inputProps: {
                           ...params.inputProps,
                         },

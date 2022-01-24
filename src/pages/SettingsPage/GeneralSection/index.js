@@ -1,6 +1,6 @@
 // Material UI
-import { Grid } from "@material-ui/core";
-// import { makeStyles } from "@material-ui/styles";
+import { Grid } from "@mui/material";
+// import { makeStyles } from "@mui/styles";
 
 // Custom components
 import CustomTextField from "../CustomTextField";

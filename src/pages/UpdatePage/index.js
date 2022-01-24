@@ -6,8 +6,8 @@ import {
   useCallback,
   useMemo,
 } from "react";
-import { useMediaQuery, Grid, Typography } from "@material-ui/core";
-import { makeStyles, useTheme } from "@material-ui/styles";
+import { useMediaQuery, Grid, Typography } from "@mui/material";
+import { makeStyles, useTheme } from "@mui/styles";
 
 // Components
 import TableBedList from "../../components/TableBedList";

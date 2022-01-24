@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Autocomplete from "@material-ui/lab/Autocomplete";
-import Checkbox from "@material-ui/core/Checkbox";
-import { TextField } from "@material-ui/core";
-import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
-import CheckBoxIcon from "@material-ui/icons/CheckBox";
+import makeStyles from '@mui/styles/makeStyles';
+import Autocomplete from '@mui/material/Autocomplete';
+import Checkbox from "@mui/material/Checkbox";
+import { TextField } from "@mui/material";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -62,7 +62,6 @@ const ContingencyInput = ({
 
   return (
     <Autocomplete
-      debug={false}
       classes={{
         popper: classes.popper,
         option: classes.option,
@@ -85,7 +84,6 @@ const ContingencyInput = ({
                 root: textFieldClasses.textFieldRoot,
                 focused: textFieldClasses.textFieldFocused,
               },
-              disableUnderline: true,
             }}
             inputProps={{
               ...params.inputProps,
@@ -106,8 +104,8 @@ const ContingencyInput = ({
           />
         );
       }}
-      renderOption={(option, { selected }) => (
-        <div key={option}>
+      renderOption={(props, option, { selected }) => (
+        <li {...props}>
           <Checkbox
             classes={{
               root: classes.checkboxRoot,
@@ -119,7 +117,7 @@ const ContingencyInput = ({
             checked={selected}
           />
           {option}
-        </div>
+        </li>
       )}
       {...props}
       value={value ? value : []}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-import { TextField, Button } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { TextField, Button } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles({
    inputFile: {},
@@ -77,7 +77,7 @@ const Importer = ({ onNewDataSelected = (f) => f }) => {
                   fullWidth
                   disabled
                   size="medium"
-                  rowsMax={20}
+                  maxRows={20}
                   value={formatted}
                   InputProps={{
                      classes: {

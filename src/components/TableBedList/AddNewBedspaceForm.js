@@ -5,9 +5,9 @@ import {
   IconButton,
   Typography,
   Zoom,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
-import AddIcon from "@material-ui/icons/Add";
+} from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import AddIcon from "@mui/icons-material/Add";
 
 // Context
 import { useGridStateContext } from "../../context/GridState";
@@ -112,10 +112,7 @@ const AddNewBedspaceForm = ({ onSubmit = (f) => f }) => {
         endAdornment={
           <Zoom in={value.trim() !== ""}>
             <InputAdornment position="end">
-              <IconButton
-                className={classes.addIconButton}
-                onClick={handleOnSubmit}
-              >
+              <IconButton className={classes.addIconButton} onClick={handleOnSubmit} size="large">
                 <AddIcon />
               </IconButton>
             </InputAdornment>

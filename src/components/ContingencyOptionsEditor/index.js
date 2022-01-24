@@ -7,9 +7,9 @@ import {
   ListItemSecondaryAction,
   IconButton,
   InputBase,
-} from "@material-ui/core";
-import { makeStyles, useTheme } from "@material-ui/styles";
-import ClearIcon from "@material-ui/icons/Clear";
+} from "@mui/material";
+import { makeStyles, useTheme } from "@mui/styles";
+import ClearIcon from "@mui/icons-material/Clear";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -112,7 +112,7 @@ const ContingencyOptionsEditor = ({
                     <IconButton
                       className={classes.clearIconButton}
                       onClick={() => onRemove(index)}
-                    >
+                      size="large">
                       <ClearIcon />
                     </IconButton>
                   </ListItemSecondaryAction>

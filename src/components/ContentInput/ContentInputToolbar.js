@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { AppBar, Toolbar, Divider, MenuItem } from "@material-ui/core";
+import { AppBar, Toolbar, Divider, MenuItem } from "@mui/material";
 
-import { makeStyles } from "@material-ui/styles";
+import { makeStyles } from "@mui/styles";
 
 import CustomTextField from "./CustomTextField";
 import QuickAddInput from "./QuickAddInput";
@@ -150,7 +150,6 @@ const SelectTemplate = ({ onSelect = (f) => f }) => {
             vertical: "top",
             horizontal: "left",
           },
-          getContentAnchorEl: null,
         },
       }}
     >

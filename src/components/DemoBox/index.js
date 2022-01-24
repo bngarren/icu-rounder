@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Paper, makeStyles, Collapse } from "@material-ui/core";
-import StopIcon from "@material-ui/icons/Stop";
+import { Paper, Collapse } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import StopIcon from "@mui/icons-material/Stop";
 
 import { useSettings } from "../../context/Settings";
 

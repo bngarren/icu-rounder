@@ -7,10 +7,10 @@ import {
   Switch,
   IconButton,
   Tooltip,
-} from "@material-ui/core";
-import { makeStyles, useTheme } from "@material-ui/styles";
-import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
-import NavigateNextIcon from "@material-ui/icons/NavigateNext";
+} from "@mui/material";
+import { makeStyles, useTheme } from "@mui/styles";
+import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
 // Lodash
 import { uniqueId } from "lodash";
@@ -191,7 +191,7 @@ const DemoAndEditorController = ({
           className={classes.navigateIconButton}
           disableRipple
           onClick={() => onNextBedspace(true)}
-        >
+          size="large">
           <NavigateBeforeIcon className={classes.navigateIcon} />
         </IconButton>
         <Typography
@@ -205,7 +205,7 @@ const DemoAndEditorController = ({
           className={classes.navigateIconButton}
           disableRipple
           onClick={() => onNextBedspace(false)}
-        >
+          size="large">
           <NavigateNextIcon className={classes.navigateIcon} />
         </IconButton>
       </div>

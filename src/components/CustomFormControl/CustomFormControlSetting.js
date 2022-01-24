@@ -1,6 +1,6 @@
 import { useState, useEffect, cloneElement, useRef } from "react";
-import { Grid, Typography, Zoom, Button } from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
+import { Grid, Typography, Zoom, Button } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
@@ -115,7 +115,7 @@ const CustomFormControlSetting = ({
         </Grid>
 
         <Grid item xs>
-          <Zoom in={diff} disableStrictModeCompat={true} timeout={300}>
+          <Zoom in={diff} timeout={300}>
             <Grid container>
               <Button
                 className={classes.revertButton}

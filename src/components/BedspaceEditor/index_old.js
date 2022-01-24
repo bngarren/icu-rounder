@@ -1,8 +1,10 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { debounce } from "lodash";
 
-import { TextField, Paper } from "@material-ui/core";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { TextField, Paper } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+
+import makeStyles from '@mui/styles/makeStyles';
 
 import { getCursorPos, setCursorPos } from "../../utils/CursorPos";
 

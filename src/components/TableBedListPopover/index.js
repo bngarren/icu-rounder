@@ -1,5 +1,5 @@
-import { makeStyles } from "@material-ui/styles";
-import { Menu, MenuItem, Divider } from "@material-ui/core";
+import { makeStyles } from "@mui/styles";
+import { Menu, MenuItem, Divider } from "@mui/material";
 
 import { bindMenu } from "material-ui-popup-state/hooks";
 

@@ -1,8 +1,8 @@
 import { forwardRef } from "react";
 
-import { InputBase } from "@material-ui/core";
+import { InputBase } from "@mui/material";
 
-import { makeStyles } from "@material-ui/styles";
+import { makeStyles } from "@mui/styles";
 const useStyles = makeStyles((theme) => ({
   textFieldRoot: {
     border: "1px solid #e2e2e1",

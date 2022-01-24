@@ -1,5 +1,5 @@
-import { Container, Grid, Typography, Divider } from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
+import { Container, Grid, Typography, Divider } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 
 // custom components
 import SettingsPageSection from "./SettingsPageSection";

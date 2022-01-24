@@ -6,12 +6,12 @@ import {
   IconButton,
   Typography,
   Tooltip,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
-import StopIcon from "@material-ui/icons/Stop";
-import ClearIcon from "@material-ui/icons/Clear";
-import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
-import CancelIcon from "@material-ui/icons/Cancel";
+} from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import StopIcon from "@mui/icons-material/Stop";
+import ClearIcon from "@mui/icons-material/Clear";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 // React Movable
 import { List as MovableList, arrayMove } from "react-movable";
@@ -238,7 +238,7 @@ const ContentInputForm = ({
           Edit Section
         </Typography>
         <Tooltip title="Close">
-          <IconButton className={classes.closeButton} onClick={onClose}>
+          <IconButton className={classes.closeButton} onClick={onClose} size="large">
             <CancelIcon className={classes.closeButtonIcon} />
           </IconButton>
         </Tooltip>
@@ -258,7 +258,7 @@ const ContentInputForm = ({
         tooltip="Content"
         multiline
         rows={2}
-        rowsMax={3}
+        maxRows={3}
         value={topText}
         onChange={(e) => handleOnTopTextChange(e.target.value)}
         style={{ paddingTop: "5px" }}
@@ -288,7 +288,7 @@ const ContentInputForm = ({
                 onChange={(e) => handleOnItemChange(e.target.value, value.id)}
                 multiline
                 rows={1}
-                rowsMax={3}
+                maxRows={3}
                 style={{ padding: 0 }}
                 InputProps={{
                   startAdornment: (
@@ -316,7 +316,7 @@ const ContentInputForm = ({
                       <IconButton
                         onClick={() => handleRemoveItem(value.id)}
                         className={classes.removeIconButton}
-                      >
+                        size="large">
                         <ClearIcon className={classes.removeIcon} />
                       </IconButton>
                     </InputAdornment>

@@ -1,7 +1,7 @@
 import "./App.css";
 
 // Theme
-import { ThemeProvider } from "@material-ui/core/styles";
+import { ThemeProvider, StyledEngineProvider } from "@mui/material/styles";
 import { theme } from "./Theme";
 
 // Settings
@@ -28,17 +28,19 @@ function App() {
   return (
     <div className="app">
       <SettingsProvider>
-        <ThemeProvider theme={theme}>
-          <AuthStateProvider Firebase={fb}>
-            <GridStateProvider Firebase={fb}>
-              <BrowserRouter>
-                <Header />
-                <PageRouter />
-                <Footer />
-              </BrowserRouter>
-            </GridStateProvider>
-          </AuthStateProvider>
-        </ThemeProvider>
+        <StyledEngineProvider injectFirst>
+          <ThemeProvider theme={theme}>
+            <AuthStateProvider Firebase={fb}>
+              <GridStateProvider Firebase={fb}>
+                <BrowserRouter>
+                  <Header />
+                  <PageRouter />
+                  <Footer />
+                </BrowserRouter>
+              </GridStateProvider>
+            </AuthStateProvider>
+          </ThemeProvider>
+        </StyledEngineProvider>
       </SettingsProvider>
     </div>
   );

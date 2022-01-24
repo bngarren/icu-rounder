@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 
-import { InputAdornment, IconButton, Fade } from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
-import AddBoxIcon from "@material-ui/icons/AddBox";
+import { InputAdornment, IconButton, Fade } from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 
 //components
 import CustomTextField from "./CustomTextField";
@@ -55,10 +55,7 @@ const QuickAddInput = ({ onSubmit = (f) => f, reset, ...props }) => {
           endAdornment: (
             <InputAdornment position="end">
               <Fade in={value !== null && value !== ""}>
-                <IconButton
-                  onClick={handleSubmit}
-                  className={classes.iconButton}
-                >
+                <IconButton onClick={handleSubmit} className={classes.iconButton} size="large">
                   <AddBoxIcon className={classes.icon} />
                 </IconButton>
               </Fade>

@@ -7,11 +7,11 @@ import {
   Typography,
   IconButton,
   Fade,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
-import StopIcon from "@material-ui/icons/Stop";
-import ClearIcon from "@material-ui/icons/Clear";
-import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
+} from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import StopIcon from "@mui/icons-material/Stop";
+import ClearIcon from "@mui/icons-material/Clear";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 
 import clsx from "clsx";
 
@@ -241,7 +241,6 @@ const ContentInput = ({
       <Grid item container xs={12} className={classes.gridBody}>
         {id === "simpleContent" ? (
           <CustomTextField
-            variant="filled"
             multiline
             rows={10}
             value={data}
@@ -286,12 +285,14 @@ const ContentInput = ({
             </Grid>
             <Grid item xs={12} sm={6}>
               <Fade in={selectedSection !== null} timeout={200}>
-                <ContentInputForm
-                  initialData={selectedSection}
-                  stealFocus={shouldFocusOnContentInputForm.current}
-                  onContentInputFormChange={handleContentInputFormChange}
-                  onClose={handleCloseContentInputForm}
-                />
+                <div>
+                  <ContentInputForm
+                    initialData={selectedSection}
+                    stealFocus={shouldFocusOnContentInputForm.current}
+                    onContentInputFormChange={handleContentInputFormChange}
+                    onClose={handleCloseContentInputForm}
+                  />
+                </div>
               </Fade>
             </Grid>
           </>
@@ -453,6 +454,7 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
             [classes.sectionRemoveIconButtonSelected]: selected,
           })}
           onClick={(e) => onRemoveSection(e, id)}
+          size="large"
         >
           <ClearIcon style={{ fontSize: "20px" }} />
         </IconButton>

@@ -1,9 +1,9 @@
-import ToggleButton from "@material-ui/lab/ToggleButton";
-import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
-import NotesIcon from "@material-ui/icons/Notes";
-import VerticalSplitIcon from "@material-ui/icons/VerticalSplit";
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import NotesIcon from "@mui/icons-material/Notes";
+import VerticalSplitIcon from "@mui/icons-material/VerticalSplit";
 
-import { makeStyles } from "@material-ui/styles";
+import { makeStyles } from "@mui/styles";
 
 const useStyles = makeStyles((theme) => ({
   button: {

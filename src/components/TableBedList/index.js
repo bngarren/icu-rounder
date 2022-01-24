@@ -12,12 +12,12 @@ import {
   Typography,
   Paper,
   useMediaQuery,
-} from "@material-ui/core";
-import EditIcon from "@material-ui/icons/Edit";
-import MenuIcon from "@material-ui/icons/Menu";
-import MenuOpenIcon from "@material-ui/icons/MenuOpen";
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import MenuIcon from "@mui/icons-material/Menu";
+import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 
-import { makeStyles, useTheme } from "@material-ui/styles";
+import { makeStyles, useTheme } from "@mui/styles";
 
 // Utility
 import { isBedEmpty } from "../../utils/Utility";
@@ -184,7 +184,7 @@ const TableBedList = ({ data, selectedKey }) => {
         classes={{
           root: classes.tablePaginationRoot,
           toolbar: classes.tablePaginationToolbar,
-          input: classes.tablePaginationInput,
+          select: classes.tablePaginationInput,
           caption: classes.tablePaginationCaption,
         }}
         backIconButtonProps={{
@@ -203,8 +203,8 @@ const TableBedList = ({ data, selectedKey }) => {
         count={data.length}
         rowsPerPage={rowsPerPage}
         page={page}
-        onChangePage={handleChangePage}
-        onChangeRowsPerPage={handleChangeRowsPerPage}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
       />
     </TableContainer>
   );
@@ -346,7 +346,7 @@ const BedActions = memo(({ classes, isSelected, bedKey, emptyBed }) => {
           <IconButton
             className={classes.tableEditIconButton}
             onClick={() => bedActionEdit(bedKey)}
-          >
+            size="large">
             <EditIcon
               fontSize="small"
               className={[
@@ -361,7 +361,7 @@ const BedActions = memo(({ classes, isSelected, bedKey, emptyBed }) => {
         <IconButton
           className={classes.tableMenuIconButton}
           onClick={(e) => handleOnClickMenu(e, bedKey)}
-        >
+          size="large">
           {popupState.isOpen ? (
             <MenuOpenIcon fontSize="small" />
           ) : (

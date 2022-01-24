@@ -1,6 +1,6 @@
 // Material UI
-import { Grid, Select, MenuItem } from "@material-ui/core";
-// import { makeStyles } from "@material-ui/styles";
+import { Grid, Select, MenuItem } from "@mui/material";
+// import { makeStyles } from "@mui/styles";
 
 // Custom components
 import CustomTextField from "../CustomTextField";
@@ -42,7 +42,6 @@ const DocumentSection = ({ parentCss, onSave = (f) => f }) => {
               root: parentCss.selectInputRoot,
               select: parentCss.selectInputSelect,
             }}
-            disableUnderline={true}
           >
             <MenuItem value={1}>1</MenuItem>
             <MenuItem value={2}>2</MenuItem>

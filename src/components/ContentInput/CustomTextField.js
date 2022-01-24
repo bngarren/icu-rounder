@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 
-import { TextField } from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
+import { TextField } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 
 const useStylesForCustomTextField = makeStyles((theme) => ({
   textFieldRoot: {
@@ -70,7 +70,6 @@ const CustomTextField = forwardRef(
             overflow: overflow,
             ...props.style,
           },
-          disableUnderline: true,
           inputProps: {
             ...inputProps,
             className: classes.textFieldNativeInput,

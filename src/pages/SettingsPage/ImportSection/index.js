@@ -1,10 +1,10 @@
 import { useState, useCallback } from "react";
 
 // Material UI
-import { Grid, Typography, Button } from "@material-ui/core";
-import WarningIcon from "@material-ui/icons/Warning";
-import CheckBoxIcon from "@material-ui/icons/CheckBox";
-import { makeStyles } from "@material-ui/styles";
+import { Grid, Typography, Button } from "@mui/material";
+import WarningIcon from "@mui/icons-material/Warning";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import { makeStyles } from "@mui/styles";
 
 // Custom components
 import Importer from "../../../components/Importer";

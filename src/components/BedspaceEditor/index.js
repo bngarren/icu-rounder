@@ -1,8 +1,10 @@
 import { useEffect, useState, useCallback, useRef, memo } from "react";
 import { debounce } from "lodash";
 
-import { TextField, Paper } from "@material-ui/core";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { TextField, Paper } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+
+import makeStyles from '@mui/styles/makeStyles';
 
 import clsx from "clsx";
 
@@ -119,7 +121,6 @@ const CustomTextField = memo(function ({
           root: classes.textFieldRoot,
           focused: classes.textFieldFocused,
         },
-        disableUnderline: true,
         inputProps: {
           style: { fontSize: "10.5pt" },
         },

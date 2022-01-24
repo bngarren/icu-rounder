@@ -4,7 +4,7 @@ import {
   DialogTitle,
   DialogContent,
   LinearProgress,
-} from "@material-ui/core";
+} from "@mui/material";
 
 // Context
 import { useAuthStateContext } from "../../context/AuthState";
