@@ -27,7 +27,7 @@ import MenuIcon from "@material-ui/icons/Menu";
 import { uniqueId } from "lodash";
 
 // React Router
-import { useHistory, useRouteMatch } from "react-router-dom";
+import { useMatch, useNavigate } from "react-router-dom";
 
 // Context
 import { useAuthStateContext } from "../../context/AuthState";
@@ -101,6 +101,7 @@ const ElevationScroll = ({ children }) => {
 const Header = () => {
   const theme = useTheme();
   const classes = useStyles(theme);
+  const navigate = useNavigate();
 
   const { showLogin, LoginDialog } = useLoginDialog();
 
@@ -110,12 +111,16 @@ const Header = () => {
     showLogin((prevValue) => !prevValue);
   };
 
+  const handleClickLogo = () => {
+    navigate("/");
+  }
+
   return (
     <div>
       <ElevationScroll>
         <AppBar className={classes.navbar}>
           <Toolbar variant="dense" className={classes.toolbarRoot}>
-            <div className={classes.toolbarTitleDiv}>
+            <div className={classes.toolbarTitleDiv} onClick={handleClickLogo} style={{ cursor: "pointer" }}>
               <svg
                 version="1.1"
                 xmlns="http://www.w3.org/2000/svg"
@@ -164,9 +169,8 @@ const HeaderMenu = ({
 }) => {
   const { userIsLoggedIn, signOut } = useAuthStateContext();
   const { settings } = useSettings();
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
-
-  let history = useHistory(); // react router
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -196,13 +200,13 @@ const HeaderMenu = ({
   };
 
   const handleEdit = () => {
-    history.push("/update");
     handleClose();
+    navigate("/update")
   };
 
   const handleSettings = () => {
-    history.push("/settings");
     handleClose();
+    navigate("/settings")
   };
 
   const exportFilename = settings.export_filename
@@ -210,7 +214,7 @@ const HeaderMenu = ({
     : "grid";
 
   const loggedInMenu = [
-    <MenuItem onClick={handleEdit} disabled={Boolean(useRouteMatch("/update"))}>
+    <MenuItem onClick={handleEdit} disabled={Boolean(useMatch("/update"))}>
       <ListItemIcon>
         <ViewListIcon />
       </ListItemIcon>
@@ -218,7 +222,7 @@ const HeaderMenu = ({
     </MenuItem>,
     <MenuItem
       onClick={handleSettings}
-      disabled={Boolean(useRouteMatch("/settings"))}
+      disabled={Boolean(useMatch("/settings"))}
     >
       <ListItemIcon>
         <SettingsIcon />
@@ -282,11 +286,11 @@ const HeaderMenu = ({
       >
         {userIsLoggedIn
           ? loggedInMenu.map((i) =>
-              cloneElement(i, { key: uniqueId("menuItem-") })
-            )
+            cloneElement(i, { key: uniqueId("menuItem-") })
+          )
           : loggedOutMenu.map((i) =>
-              cloneElement(i, { key: uniqueId("menuItem-") })
-            )}
+            cloneElement(i, { key: uniqueId("menuItem-") })
+          )}
       </Menu>
     </div>
   );

@@ -13,7 +13,7 @@ import Footer from "./components/Footer";
 
 // Where all of our pages come from
 // ! Using HashRouter instead of BrowserRouter to work with GitHub pages deployment
-import { HashRouter as Router } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import PageRouter from "./components/PageRouter";
 
 // Firebase
@@ -31,11 +31,11 @@ function App() {
         <ThemeProvider theme={theme}>
           <AuthStateProvider Firebase={fb}>
             <GridStateProvider Firebase={fb}>
-              <Router>
+              <BrowserRouter>
                 <Header />
                 <PageRouter />
                 <Footer />
-              </Router>
+              </BrowserRouter>
             </GridStateProvider>
           </AuthStateProvider>
         </ThemeProvider>

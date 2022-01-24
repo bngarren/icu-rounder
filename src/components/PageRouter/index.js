@@ -1,4 +1,4 @@
-import { Switch, Route } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import HomePage from "../../pages/HomePage";
 import UpdatePage from "../../pages/UpdatePage";
 import SettingsPage from "../../pages/SettingsPage/index.js";
@@ -10,38 +10,64 @@ import { useAuthStateContext } from "../../context/AuthState";
 
 const PageRouter = () => {
   return (
-    <Switch>
-      <Route path="/login" component={LoginPage} />
-      <PrivateRoute path="/update">
-        <UpdatePage />
-      </PrivateRoute>
-      <PrivateRoute path="/settings">
-        <SettingsPage />
-      </PrivateRoute>
-      <PrivateRoute path="/document">
-        <DocumentPage />
-      </PrivateRoute>
-      <Route path="/" component={HomePage} />
-      <Route>404, Page not found!</Route>
-    </Switch>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/login" element={<LoginPage />} />
+
+      {/* The following routes are "protected", i.e. logged in only */}
+      <Route
+        path="/update"
+        element={
+          <RequireAuth>
+            <UpdatePage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <RequireAuth>
+            <SettingsPage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/document"
+        element={
+          <RequireAuth>
+            <DocumentPage />
+          </RequireAuth>
+        }
+      />
+
+      {/* The no match route, i.e. 404 */}
+      <Route
+        path="*"
+        element={
+          <main style={{ padding: "1rem" }}>
+            <p>There's nothing here!</p>
+          </main>
+        }
+      />
+    </Routes>
   );
 };
 
-/* Wraps around a Route component giving us the ability to display
-the route only if authenticate, otherwise redirects to Login page
-https://ui.dev/react-router-v5-protected-routes-authentication/
- */
-const PrivateRoute = ({ children, ...rest }) => {
+/* If user is logged in, will show the "protected" child component,
+if not, will redirect to the LoginPage */
+const RequireAuth = ({ children }) => {
   const { userIsLoggedIn } = useAuthStateContext();
+  const location = useLocation();
 
-  return (
-    <Route
-      {...rest}
-      render={({ location }) =>
-        userIsLoggedIn ? children : <>You must log in</>
-      }
-    />
-  );
-};
+  if (!userIsLoggedIn) {
+    // Redirect them to the /login page, but save the current location they were
+    // trying to go to when they were redirected. This allows us to send them
+    // along to that page after they login, which is a nicer user experience
+    // than dropping them off on the home page.
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+}
 
 export default PageRouter;
