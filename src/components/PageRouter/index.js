@@ -7,50 +7,63 @@ import DocumentPage from "../../pages/DocumentPage";
 
 // Authentication
 import { useAuthStateContext } from "../../context/AuthState";
+import {
+  UNAUTHENTICATED,
+} from "../../components/Firebase/Firebase";
 
 const PageRouter = () => {
-  return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<LoginPage />} />
 
-      {/* The following routes are "protected", i.e. logged in only */}
-      <Route
-        path="/update"
-        element={
-          <RequireAuth>
-            <UpdatePage />
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/settings"
-        element={
-          <RequireAuth>
-            <SettingsPage />
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/document"
-        element={
-          <RequireAuth>
-            <DocumentPage />
-          </RequireAuth>
-        }
-      />
+  const { authState } = useAuthStateContext();
 
-      {/* The no match route, i.e. 404 */}
-      <Route
-        path="*"
-        element={
-          <main style={{ padding: "1rem" }}>
-            <p>There's nothing here!</p>
-          </main>
-        }
-      />
-    </Routes>
-  );
+  /* Don't try to figure out routes before we've decided if the
+  user is logged in or not. Otherwise, they always get sent to the 
+  login page */
+  if (authState.status !== UNAUTHENTICATED) {
+    return (
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* The following routes are "protected", i.e. logged in only */}
+        <Route
+          path="/update"
+          element={
+            <RequireAuth>
+              <UpdatePage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <RequireAuth>
+              <SettingsPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/document"
+          element={
+            <RequireAuth>
+              <DocumentPage />
+            </RequireAuth>
+          }
+        />
+
+        {/* The no match route, i.e. 404 */}
+        <Route
+          path="*"
+          element={
+            <main style={{ padding: "1rem" }}>
+              <p>There's nothing here!</p>
+            </main>
+          }
+        />
+      </Routes>
+    );
+  }
+  /* Figuring out if user is logged in or not. Could put a spinner if we wanted... */
+  else return <></>
 };
 
 /* If user is logged in, will show the "protected" child component,
