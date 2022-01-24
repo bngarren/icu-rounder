@@ -1,6 +1,24 @@
-import { createTheme, adaptV4Theme } from "@mui/material/styles";
+import { createTheme } from "@mui/material/styles";
 
-export const theme = createTheme(adaptV4Theme({
+
+/* Palette created here: https://material.io/resources/color/#!/?view.left=0&view.right=0&primary.color=455A64&secondary.color=B2FF59 */
+
+export const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#455a64",
+      light: "#718792",
+      dark: "#1c313a",
+    },
+    secondary: {
+      main: "#b2ff59",
+      light: "#e7ff8c",
+      dark: "#7ecb20",
+    }
+  }
+})
+
+/* export const theme = createTheme(adaptV4Theme({
   palette: {
     primary: {
       main: "#00A90B",
@@ -24,4 +42,4 @@ export const theme = createTheme(adaptV4Theme({
       main: "#D70500",
     },
   },
-}));
+})); */
