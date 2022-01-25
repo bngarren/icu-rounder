@@ -1,4 +1,6 @@
 import { useState, useEffect, useContext, memo } from "react";
+
+// MUI
 import {
   TableContainer,
   Table,
@@ -10,15 +12,11 @@ import {
   IconButton,
   Typography,
   Paper,
-  useMediaQuery,
+  Radio,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
-
-// MUI
-import { styled, alpha } from "@mui/system";
-import { makeStyles, useTheme } from "@mui/styles";
+import { styled } from "@mui/system";
 
 // Utility
 import { isBedEmpty } from "../../utils/Utility";
@@ -33,56 +31,24 @@ import AddNewBedspaceForm from "./AddNewBedspaceForm";
 // Context
 import { BedActionsContext } from "../../pages/UpdatePage";
 
-const useStyles = makeStyles((theme) => ({
-  tableEditIconButton: {
-    padding: "6px",
-  },
-  tableEditIcon: {
-    cursor: "pointer",
-    color: "#626060",
-    fontSize: "22px",
-  },
-  tableEditIconSelected: {
-    color: theme.palette.secondary.main,
-  },
-  tableMenuIconButton: {
-    padding: "6px",
-  },
-  tableDeleteButton: {
-    cursor: "pointer",
-    fontSize: "22px",
-    color: "#626060",
-  },
-  transparent: {
-    color: "transparent",
-  },
-}));
+// Defaults //! Need to put this in Settings
+const ROWS_PER_PAGE = 15;
 
+/* Styling */
 const StyledTableCellHeader = styled(TableCell)(({ theme }) => ({
   backgroundColor: theme.palette.primary.dark,
   color: theme.palette.primary.contrastText,
   padding: "4px 2px 4px 10px",
 }));
 
-const StyledTableRow = styled(TableRow, {
-  shouldForwardProp: (prop) => prop !== "shouldHighlight",
-})(({ shouldHighlight, theme }) => ({
-  "&.Mui-selected": {
-    background: `linear-gradient(90deg, ${theme.palette.secondary.dark} 1%, rgba(0,212,255,0) 1%)`,
-  },
-  "&.Mui-selected:hover": {
-    background: `linear-gradient(90deg, ${alpha(
-      theme.palette.secondary.dark,
-      0.9
-    )} 1%, rgba(0,212,255,0) 1%)`,
-  },
-  transition: "background-color 0.8s linear",
-  ...(shouldHighlight && {
-    backgroundColor: alpha(theme.palette.secondary.light, 0.5),
-  }),
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&.MuiTableRow-hover:hover": {},
 }));
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
+const StyledTableCell = styled(TableCell, {
+  shouldForwardProp: (prop) =>
+    prop !== "shouldHighlight" && prop !== "isSelected",
+})(({ shouldHighlight, isSelected, component, theme }) => ({
   [theme.breakpoints.up("lg")]: {
     padding: "3px 10px 3px 15px",
     fontSize: "1rem",
@@ -91,11 +57,36 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     padding: "2px 2px 2px 10px",
     fontSize: "0.85rem",
   },
+  transition: "background-color 0.2s ease-out",
+  ...(isSelected &&
+    component === "th" && {
+      transition: "color 0.15s linear",
+      backgroundColor: theme.palette.primary.main,
+    }),
+  ...(isSelected && {
+    fontWeight: 600,
+  }),
+  ...(shouldHighlight && {
+    transition: "color 0.2s ease-in",
+    backgroundColor: theme.palette.secondary.main,
+  }),
 }));
 
-const StyledTypographyBedNumber = styled(Typography)(({ theme }) => ({
+const StyledTypographyBedNumber = styled(Typography, {
+  shouldForwardProp: (prop) =>
+    prop !== "shouldHighlight" && prop !== "isSelected",
+})(({ shouldHighlight, isSelected, theme }) => ({
   color: theme.palette.primary.main,
   fontWeight: "bold",
+  transition: "color 0.2s ease-out",
+  ...(isSelected && {
+    transition: "color 0.15s linear",
+    color: theme.palette.secondary.light,
+  }),
+  ...(shouldHighlight && {
+    transition: "color 0.2s ease-in",
+    color: theme.palette.primary.main,
+  }),
 }));
 
 const StyledTablePagination = styled(TablePagination)(({ theme }) => ({
@@ -120,12 +111,29 @@ const StyledTablePagination = styled(TablePagination)(({ theme }) => ({
   },
 }));
 
-const ROWS_PER_PAGE = 15;
+const StyledBedActionsDiv = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-around",
+}));
+
+const StyledMenuIconButton = styled(IconButton)(({ theme }) => ({
+  padding: "6px",
+}));
+
+const StyledMenuIcon = styled(MenuIcon)(({ theme }) => ({
+  cursor: "pointer",
+  color: theme.palette.primary.light,
+  fontSize: "1.5rem",
+}));
+
+const StyledMenuOpenIcon = styled(MenuOpenIcon)(({ theme }) => ({
+  cursor: "pointer",
+  color: theme.palette.primary.light,
+  fontSize: "1.5rem",
+}));
 
 const TableBedList = ({ data, selectedKey }) => {
-  const theme = useTheme();
-  const classes = useStyles(theme);
-
   // table pagination
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(ROWS_PER_PAGE);
@@ -165,22 +173,21 @@ const TableBedList = ({ data, selectedKey }) => {
       <Table aria-label="simple table">
         <TableHead>
           <TableRow>
-            <StyledTableCellHeader style={{ minWidth: 30 }}>
+            <StyledTableCellHeader sx={{ minWidth: 30 }}>
               Bed
             </StyledTableCellHeader>
-            <StyledTableCellHeader style={{ width: "100%" }}>
+            <StyledTableCellHeader sx={{ width: "100%" }}>
               Patient
             </StyledTableCellHeader>
-            <StyledTableCellHeader style={{ minWidth: 30, maxWidth: 30 }}>
+            <StyledTableCellHeader sx={{ minWidth: 30, maxWidth: 30 }}>
               Team
             </StyledTableCellHeader>
             <StyledTableCellHeader
-              style={{ minWidth: "30px", maxWidth: "30px" }}
+              sx={{ minWidth: "30px", maxWidth: "30px" }}
             />
           </TableRow>
         </TableHead>
         <MyTableBody
-          classes={classes}
           data={data}
           page={page}
           rowsPerPage={rowsPerPage}
@@ -201,18 +208,18 @@ const TableBedList = ({ data, selectedKey }) => {
   );
 };
 
-const MyTableBody = ({ classes, data, page, rowsPerPage, selectedKey }) => {
+const MyTableBody = ({ data, page, rowsPerPage, selectedKey }) => {
   const [highlightedKey, setHighlightedKey] = useState(false);
 
   const handleNewBedspaceSubmitted = (key) => {
     setHighlightedKey(key);
     setTimeout(() => {
       setHighlightedKey(null);
-    }, 1000);
+    }, 2000);
   };
 
   const MyInputTableRow = (
-    <TableRow className={classes.myInputTableRow}>
+    <TableRow>
       <StyledTableCell component="th" scope="row" align="right" colSpan={4}>
         <AddNewBedspaceForm onSubmit={handleNewBedspaceSubmitted} />
       </StyledTableCell>
@@ -230,7 +237,6 @@ const MyTableBody = ({ classes, data, page, rowsPerPage, selectedKey }) => {
 
             return (
               <MyTableRow
-                classes={classes}
                 shouldHighlight={highlightedKey === adjustedKey}
                 adjustedKey={adjustedKey}
                 isSelected={isSelected}
@@ -246,24 +252,27 @@ const MyTableBody = ({ classes, data, page, rowsPerPage, selectedKey }) => {
 };
 
 const MyTableRow = memo(
-  ({ classes, shouldHighlight, adjustedKey, isSelected, value }) => {
+  ({ shouldHighlight, adjustedKey, isSelected, value }) => {
     const emptyBed = isBedEmpty(value);
+
     return (
-      <StyledTableRow
-        //className={clsx(classes.tableRow, {
-        //  [classes.highlightRowIn]: highlight === adjustedKey,
-        //})}
-        shouldHighlight={shouldHighlight}
-        key={value.bed}
-        hover
-        selected={isSelected}
-      >
-        <StyledTableCell component="th" scope="row" align="left">
-          <StyledTypographyBedNumber variant="h5">
+      <StyledTableRow key={value.bed} hover selected={isSelected}>
+        <StyledTableCell
+          component="th"
+          scope="row"
+          align="left"
+          shouldHighlight={shouldHighlight}
+          isSelected={isSelected}
+        >
+          <StyledTypographyBedNumber
+            variant="h5"
+            shouldHighlight={shouldHighlight}
+            isSelected={isSelected}
+          >
             {value.bed}
           </StyledTypographyBedNumber>
         </StyledTableCell>
-        <StyledTableCell align="left">
+        <StyledTableCell align="left" isSelected={isSelected}>
           <span>
             {value["lastName"]}
             {value["lastName"] && value["firstName"] && ", "}
@@ -275,7 +284,6 @@ const MyTableRow = memo(
         </StyledTableCell>
         <StyledTableCell>
           <BedActions
-            classes={classes}
             isSelected={isSelected}
             bedKey={adjustedKey}
             emptyBed={emptyBed}
@@ -286,7 +294,7 @@ const MyTableRow = memo(
   }
 );
 
-const BedActions = memo(({ classes, isSelected, bedKey, emptyBed }) => {
+const BedActions = memo(({ isSelected, bedKey, emptyBed }) => {
   const { bedActionEdit, bedActionClear, bedActionDelete } =
     useContext(BedActionsContext);
 
@@ -301,42 +309,23 @@ const BedActions = memo(({ classes, isSelected, bedKey, emptyBed }) => {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-around",
-      }}
-    >
+    <StyledBedActionsDiv>
       {
-        <div title="Edit">
-          <IconButton
-            className={classes.tableEditIconButton}
-            onClick={() => bedActionEdit(bedKey)}
-            size="large"
-          >
-            <EditIcon
-              fontSize="small"
-              className={[
-                classes.tableEditIcon,
-                isSelected && classes.tableEditIconSelected,
-              ].join(" ")}
-            />
-          </IconButton>
-        </div>
+        <>
+          <Radio checked={isSelected} onClick={() => bedActionEdit(bedKey)} />
+        </>
       }
       {
-        <IconButton
-          className={classes.tableMenuIconButton}
+        <StyledMenuIconButton
           onClick={(e) => handleOnClickMenu(e, bedKey)}
           size="large"
         >
           {popupState.isOpen ? (
-            <MenuOpenIcon fontSize="small" />
+            <StyledMenuOpenIcon fontSize="small" />
           ) : (
-            <MenuIcon fontSize="small" />
+            <StyledMenuIcon fontSize="small" />
           )}
-        </IconButton>
+        </StyledMenuIconButton>
       }
       <TableBedListPopover
         popupState={popupState}
@@ -345,7 +334,7 @@ const BedActions = memo(({ classes, isSelected, bedKey, emptyBed }) => {
         onSelectDelete={() => bedActionDelete(bedKey)}
         onSelectClear={() => bedActionClear(bedKey)}
       />
-    </div>
+    </StyledBedActionsDiv>
   );
 });
 
