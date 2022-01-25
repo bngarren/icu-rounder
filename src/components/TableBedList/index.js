@@ -8,7 +8,6 @@ import {
   TableBody,
   TablePagination,
   IconButton,
-  Tooltip,
   Typography,
   Paper,
   useMediaQuery,
@@ -17,11 +16,12 @@ import EditIcon from "@mui/icons-material/Edit";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 
+// MUI
+import { styled, alpha } from "@mui/system";
 import { makeStyles, useTheme } from "@mui/styles";
 
 // Utility
 import { isBedEmpty } from "../../utils/Utility";
-import clsx from "clsx";
 
 // Popover
 import { usePopupState } from "material-ui-popup-state/hooks";
@@ -34,29 +34,6 @@ import AddNewBedspaceForm from "./AddNewBedspaceForm";
 import { BedActionsContext } from "../../pages/UpdatePage";
 
 const useStyles = makeStyles((theme) => ({
-  tableContainer: {},
-  table: {},
-  tableRow: {
-    "&.Mui-selected": {
-      background: `linear-gradient(90deg, ${theme.palette.secondary.main} 1%, rgba(0,212,255,0) 1%)`,
-    },
-    "&.Mui-selected:hover": {
-      background: `linear-gradient(90deg, ${theme.palette.secondary.light} 1%, rgba(0,212,255,0) 1%)`,
-    },
-  },
-  highlightRowIn: {
-    backgroundColor: theme.palette.secondary.veryVeryLight,
-    transition: "background 0.5s",
-  },
-  tableHeader: {
-    backgroundColor: "#f6f8fa",
-    color: "black",
-    padding: "4px 2px 4px 10px",
-  },
-  tableHeaderBedNumber: {
-    color: "#626060",
-    fontWeight: "bold",
-  },
   tableEditIconButton: {
     padding: "6px",
   },
@@ -79,29 +56,67 @@ const useStyles = makeStyles((theme) => ({
   transparent: {
     color: "transparent",
   },
-  tableCellDefault: {
+}));
+
+const StyledTableCellHeader = styled(TableCell)(({ theme }) => ({
+  backgroundColor: theme.palette.primary.dark,
+  color: theme.palette.primary.contrastText,
+  padding: "4px 2px 4px 10px",
+}));
+
+const StyledTableRow = styled(TableRow, {
+  shouldForwardProp: (prop) => prop !== "shouldHighlight",
+})(({ shouldHighlight, theme }) => ({
+  "&.Mui-selected": {
+    background: `linear-gradient(90deg, ${theme.palette.secondary.dark} 1%, rgba(0,212,255,0) 1%)`,
+  },
+  "&.Mui-selected:hover": {
+    background: `linear-gradient(90deg, ${alpha(
+      theme.palette.secondary.dark,
+      0.9
+    )} 1%, rgba(0,212,255,0) 1%)`,
+  },
+  transition: "background-color 0.8s linear",
+  ...(shouldHighlight && {
+    backgroundColor: alpha(theme.palette.secondary.light, 0.5),
+  }),
+}));
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [theme.breakpoints.up("lg")]: {
     padding: "3px 10px 3px 15px",
-    fontSize: "11pt",
+    fontSize: "1rem",
   },
-  tableCellSmall: {
+  [theme.breakpoints.down("lg")]: {
     padding: "2px 2px 2px 10px",
-    fontSize: "10pt",
+    fontSize: "0.85rem",
   },
-  tablePaginationRoot: {
+}));
+
+const StyledTypographyBedNumber = styled(Typography)(({ theme }) => ({
+  color: theme.palette.primary.main,
+  fontWeight: "bold",
+}));
+
+const StyledTablePagination = styled(TablePagination)(({ theme }) => ({
+  "& .MuiTablePagination-root": {
     overflow: "hidden",
     padding: 0,
   },
-  tablePaginationToolbar: {
+  "& .MuiTablePagination-toolbar": {
     paddingLeft: "5px",
+    justifyContent: "center",
   },
-  tablePaginationInput: {
+  "& .MuiTablePagination-spacer": {
+    flex: "none",
+  },
+  "& .MuiTablePagination-input": {
     marginRight: "15px",
   },
-  tablePaginationCaption: {
-    fontSize: "9pt",
-  },
-  tablePaginationButton: {
-    padding: "6px",
+  "& .MuiInputBase-root": {
+    [theme.breakpoints.down("lg")]: {
+      marginRight: "10px",
+    },
   },
 }));
 
@@ -110,7 +125,6 @@ const ROWS_PER_PAGE = 15;
 const TableBedList = ({ data, selectedKey }) => {
   const theme = useTheme();
   const classes = useStyles(theme);
-  const media_atleast_lg = useMediaQuery("(min-width:1280px)");
 
   // table pagination
   const [page, setPage] = useState(0);
@@ -147,27 +161,20 @@ const TableBedList = ({ data, selectedKey }) => {
   //
 
   return (
-    <TableContainer component={Paper} className={classes.tableContainer}>
-      <Table className={classes.table} aria-label="simple table">
+    <TableContainer component={Paper}>
+      <Table aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell className={classes.tableHeader} style={{ minWidth: 30 }}>
+            <StyledTableCellHeader style={{ minWidth: 30 }}>
               Bed
-            </TableCell>
-            <TableCell
-              className={classes.tableHeader}
-              style={{ width: "100%" }}
-            >
+            </StyledTableCellHeader>
+            <StyledTableCellHeader style={{ width: "100%" }}>
               Patient
-            </TableCell>
-            <TableCell
-              className={classes.tableHeader}
-              style={{ minWidth: 30, maxWidth: 30 }}
-            >
+            </StyledTableCellHeader>
+            <StyledTableCellHeader style={{ minWidth: 30, maxWidth: 30 }}>
               Team
-            </TableCell>
-            <TableCell
-              className={classes.tableHeader}
+            </StyledTableCellHeader>
+            <StyledTableCellHeader
               style={{ minWidth: "30px", maxWidth: "30px" }}
             />
           </TableRow>
@@ -180,64 +187,35 @@ const TableBedList = ({ data, selectedKey }) => {
           selectedKey={selectedKey}
         />
       </Table>
-      <TablePagination
-        classes={{
-          root: classes.tablePaginationRoot,
-          toolbar: classes.tablePaginationToolbar,
-          select: classes.tablePaginationInput,
-          caption: classes.tablePaginationCaption,
-        }}
-        backIconButtonProps={{
-          classes: {
-            root: classes.tablePaginationButton,
-          },
-        }}
-        nextIconButtonProps={{
-          classes: {
-            root: classes.tablePaginationButton,
-          },
-        }}
+      <StyledTablePagination
         rowsPerPageOptions={[5, 15, 30]}
-        colSpan={5}
         component="div"
         count={data.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+        variant="footer"
       />
     </TableContainer>
   );
 };
 
 const MyTableBody = ({ classes, data, page, rowsPerPage, selectedKey }) => {
-  const media_atleast_lg = useMediaQuery("(min-width:1280px)");
-
-  const tableCellClasses = [
-    classes.tableCellDefault,
-    !media_atleast_lg && classes.tableCellSmall,
-  ].join(" ");
-
-  const [highlight, setHighlight] = useState(false);
+  const [highlightedKey, setHighlightedKey] = useState(false);
 
   const handleNewBedspaceSubmitted = (key) => {
-    setHighlight(key);
+    setHighlightedKey(key);
     setTimeout(() => {
-      setHighlight(null);
-    }, 500);
+      setHighlightedKey(null);
+    }, 1000);
   };
 
   const MyInputTableRow = (
     <TableRow className={classes.myInputTableRow}>
-      <TableCell
-        component="th"
-        scope="row"
-        align="right"
-        colSpan={4}
-        className={tableCellClasses}
-      >
+      <StyledTableCell component="th" scope="row" align="right" colSpan={4}>
         <AddNewBedspaceForm onSubmit={handleNewBedspaceSubmitted} />
-      </TableCell>
+      </StyledTableCell>
     </TableRow>
   );
 
@@ -249,11 +227,11 @@ const MyTableBody = ({ classes, data, page, rowsPerPage, selectedKey }) => {
           .map((value, key) => {
             let adjustedKey = key + page * rowsPerPage; // the key resets to index 0 for every pagination page
             const isSelected = adjustedKey === selectedKey;
+
             return (
               <MyTableRow
                 classes={classes}
-                tableCellClasses={tableCellClasses}
-                highlight={highlight}
+                shouldHighlight={highlightedKey === adjustedKey}
                 adjustedKey={adjustedKey}
                 isSelected={isSelected}
                 key={`MyTableRow-${value.bed}-${key}`}
@@ -268,53 +246,42 @@ const MyTableBody = ({ classes, data, page, rowsPerPage, selectedKey }) => {
 };
 
 const MyTableRow = memo(
-  ({
-    classes,
-    tableCellClasses,
-    highlight,
-    adjustedKey,
-    isSelected,
-    value,
-  }) => {
+  ({ classes, shouldHighlight, adjustedKey, isSelected, value }) => {
     const emptyBed = isBedEmpty(value);
     return (
-      <TableRow
-        className={clsx(classes.tableRow, {
-          [classes.highlightRowIn]: highlight === adjustedKey,
-        })}
+      <StyledTableRow
+        //className={clsx(classes.tableRow, {
+        //  [classes.highlightRowIn]: highlight === adjustedKey,
+        //})}
+        shouldHighlight={shouldHighlight}
         key={value.bed}
         hover
         selected={isSelected}
       >
-        <TableCell
-          component="th"
-          scope="row"
-          align="left"
-          className={tableCellClasses}
-        >
-          <Typography variant="h5" className={classes.tableHeaderBedNumber}>
+        <StyledTableCell component="th" scope="row" align="left">
+          <StyledTypographyBedNumber variant="h5">
             {value.bed}
-          </Typography>
-        </TableCell>
-        <TableCell align="left" className={tableCellClasses}>
+          </StyledTypographyBedNumber>
+        </StyledTableCell>
+        <StyledTableCell align="left">
           <span>
             {value["lastName"]}
             {value["lastName"] && value["firstName"] && ", "}
             {value["firstName"]}
           </span>
-        </TableCell>
-        <TableCell align="center" className={tableCellClasses}>
+        </StyledTableCell>
+        <StyledTableCell align="center">
           <span>{value["teamNumber"]}</span>
-        </TableCell>
-        <TableCell className={tableCellClasses}>
+        </StyledTableCell>
+        <StyledTableCell>
           <BedActions
             classes={classes}
             isSelected={isSelected}
             bedKey={adjustedKey}
             emptyBed={emptyBed}
           />
-        </TableCell>
-      </TableRow>
+        </StyledTableCell>
+      </StyledTableRow>
     );
   }
 );
@@ -346,7 +313,8 @@ const BedActions = memo(({ classes, isSelected, bedKey, emptyBed }) => {
           <IconButton
             className={classes.tableEditIconButton}
             onClick={() => bedActionEdit(bedKey)}
-            size="large">
+            size="large"
+          >
             <EditIcon
               fontSize="small"
               className={[
@@ -361,7 +329,8 @@ const BedActions = memo(({ classes, isSelected, bedKey, emptyBed }) => {
         <IconButton
           className={classes.tableMenuIconButton}
           onClick={(e) => handleOnClickMenu(e, bedKey)}
-          size="large">
+          size="large"
+        >
           {popupState.isOpen ? (
             <MenuOpenIcon fontSize="small" />
           ) : (

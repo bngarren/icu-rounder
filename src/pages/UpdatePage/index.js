@@ -23,7 +23,6 @@ import { DebouncedContextProvider } from "./DebouncedContext";
 import { useAuthStateContext } from "../../context/AuthState";
 import { useGridStateContext } from "../../context/GridState";
 
-
 /* This holds the functions we pass way down to the TableBedList's buttons */
 export const BedActionsContext = createContext();
 
@@ -356,18 +355,20 @@ const UpdatePage = () => {
     return (
       <div>
         <Grid container>
-          <Grid
-            item
-            md={4}
-            sm={7}
-            xs={12}
-            style={{ padding: "0 6px", marginBottom: "8px" }}
-          >
+          <Grid item lg={4} md={5} sm={10} xs={12} sx={{ py: 0, px: 1, mb: 1 }}>
             <BedActionsContext.Provider value={bedActions}>
               <TableBedList data={gridData} selectedKey={selectedKey} />
             </BedActionsContext.Provider>
             {census ? (
-              <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-around", p: 0.5, pt: 1 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-around",
+                  p: 0.5,
+                  pt: 1,
+                }}
+              >
                 <Typography variant="caption">
                   {`${census.filledTotal}/${census.total}`}{" "}
                   {census.emptyBeds.length > 0 &&
@@ -386,7 +387,7 @@ const UpdatePage = () => {
               <></>
             )}
           </Grid>
-          <Grid item lg md={8} sm={12} xs={12} ref={refToBedspaceEditorDiv}>
+          <Grid item lg md sm={0} xs ref={refToBedspaceEditorDiv}>
             {selectedKey != null && (
               <DebouncedContextProvider>
                 <DemoAndEditorController
