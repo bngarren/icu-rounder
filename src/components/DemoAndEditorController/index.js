@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+
+// MUI
 import {
   Grid,
+  Box,
   Button,
   Toolbar,
   Typography,
@@ -8,7 +11,8 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { makeStyles, useTheme } from "@mui/styles";
+import { styled } from "@mui/system";
+import { makeStyles } from "@mui/styles";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
@@ -22,59 +26,10 @@ import BedspaceEditor from "../../components/BedspaceEditor";
 // context
 import { useDebouncedContext } from "../../pages/UpdatePage/DebouncedContext";
 
-// Style
 const useStyles = makeStyles((theme) => ({
   root: {
     padding: "0 1vw",
     justifyContent: "center",
-  },
-  bedspaceEditorToolbar: {
-    borderBottom: "2px solid #f6f8fa",
-  },
-  navigationDiv: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    minWidth: "235px",
-  },
-  bedspaceEditorToolbarBedNumber: {
-    color: "#8c888821",
-  },
-  navigateIconButton: {
-    color: theme.palette.secondary.veryLight,
-    padding: 5,
-    "&:hover": {
-      color: theme.palette.secondary.light,
-      cursor: "pointer",
-      backgroundColor: "transparent",
-    },
-  },
-  navigateIcon: {
-    fontSize: "50px",
-  },
-  saveButton: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText,
-    "&:hover": {
-      backgroundColor: theme.palette.primary.light,
-      color: theme.palette.primary.contrastText,
-    },
-    marginRight: "3px",
-  },
-  saveButtonDisabled: {
-    backgroundColor: "#f4f4f466",
-  },
-  resetButton: {
-    backgroundColor: theme.palette.secondary.main,
-    color: theme.palette.secondary.contrastText,
-    "&:hover": {
-      backgroundColor: theme.palette.secondary.light,
-      color: theme.palette.secondary.contrastText,
-    },
-    marginRight: "3px",
-  },
-  resetButtonDisabled: {
-    backgroundColor: "#f4f4f466",
   },
   bedspaceEditorGridItem: {
     background: "white",
@@ -83,6 +38,40 @@ const useStyles = makeStyles((theme) => ({
     background:
       "repeating-linear-gradient( -45deg, #017c820a, #017c820a 10px, #fff0 5px, #0000 20px )",
   },
+}));
+
+/* Styling */
+
+const StyledNavigateIconButton = styled(IconButton)(({ theme }) => ({
+  color: theme.palette.primary.light,
+  padding: 5,
+  "&:hover": {
+    color: theme.palette.secondary.light,
+    cursor: "pointer",
+    backgroundColor: "transparent",
+  },
+}));
+
+// for Save and Reset
+const StyledButton = styled(Button, {
+  shouldForwardProp: (prop) => prop !== "save",
+})(({ save, theme }) => ({
+  fontSize: "0.85rem",
+  backgroundColor: theme.palette.primary.light,
+  color: theme.palette.primary.contrastText,
+  ...(save && {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.secondary.light,
+  }),
+  "&.Mui-disabled": {
+    backgroundColor: theme.palette.grey[50],
+    color: theme.palette.grey[500],
+  },
+  "&:hover": {
+    backgroundColor: theme.palette.secondary.light,
+    color: theme.palette.secondary.contrastText,
+  },
+  marginRight: "3px",
 }));
 
 const DemoAndEditorController = ({
@@ -184,53 +173,55 @@ const DemoAndEditorController = ({
   /* Renders the Toolbar associated with the BedspaceEditor, includes
   Navigation arrows, Save, and Reset buttons */
   const renderToolbar = () => (
-    <Toolbar variant="dense" className={classes.bedspaceEditorToolbar}>
-      <div className={classes.navigationDiv}>
-        <IconButton
+    <Toolbar
+      variant="dense"
+      sx={{ borderBottom: "2px solid", borderColor: "grey.50" }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          minWidth: "235px",
+        }}
+      >
+        <StyledNavigateIconButton
           disabled={needsSave}
-          className={classes.navigateIconButton}
           disableRipple
           onClick={() => onNextBedspace(true)}
-          size="large">
-          <NavigateBeforeIcon className={classes.navigateIcon} />
-        </IconButton>
-        <Typography
-          variant="h1"
-          className={classes.bedspaceEditorToolbarBedNumber}
+          size="large"
         >
+          <NavigateBeforeIcon
+            sx={{ fontSize: "4rem", textShadow: "shadows.1" }}
+          />
+        </StyledNavigateIconButton>
+        <Typography variant="h1" sx={{ color: "grey.300" }}>
           {defaultBedData.bed || ""}
         </Typography>
-        <IconButton
+        <StyledNavigateIconButton
           disabled={needsSave}
-          className={classes.navigateIconButton}
           disableRipple
           onClick={() => onNextBedspace(false)}
-          size="large">
-          <NavigateNextIcon className={classes.navigateIcon} />
-        </IconButton>
-      </div>
-      <Button
-        classes={{
-          root: classes.saveButton,
-          disabled: classes.saveButtonDisabled,
-        }}
+          size="large"
+        >
+          <NavigateNextIcon sx={{ fontSize: "4rem" }} />
+        </StyledNavigateIconButton>
+      </Box>
+      <StyledButton
         size="small"
         disabled={!needsSave}
         onClick={() => onSave(bedspaceEditorData)}
+        save
       >
         Save
-      </Button>
-      <Button
-        classes={{
-          root: classes.resetButton,
-          disabled: classes.resetButtonDisabled,
-        }}
+      </StyledButton>
+      <StyledButton
         size="small"
         disabled={!needsSave}
         onClick={(e) => handleOnReset(e)}
       >
         Reset
-      </Button>
+      </StyledButton>
     </Toolbar>
   );
 

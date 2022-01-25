@@ -57,12 +57,11 @@ const StyledTableCell = styled(TableCell, {
     padding: "2px 2px 2px 10px",
     fontSize: "0.85rem",
   },
-  transition: "background-color 0.2s ease-out",
   ...(isSelected &&
     component === "th" && {
-      transition: "color 0.15s linear",
-      backgroundColor: theme.palette.primary.main,
-    }),
+    transition: "color 0.1s linear",
+    backgroundColor: theme.palette.primary.main,
+  }),
   ...(isSelected && {
     fontWeight: 600,
   }),
@@ -78,9 +77,7 @@ const StyledTypographyBedNumber = styled(Typography, {
 })(({ shouldHighlight, isSelected, theme }) => ({
   color: theme.palette.primary.main,
   fontWeight: "bold",
-  transition: "color 0.2s ease-out",
   ...(isSelected && {
-    transition: "color 0.15s linear",
     color: theme.palette.secondary.light,
   }),
   ...(shouldHighlight && {
@@ -260,7 +257,7 @@ const MyTableRow = memo(
         <StyledTableCell
           component="th"
           scope="row"
-          align="left"
+          align="center"
           shouldHighlight={shouldHighlight}
           isSelected={isSelected}
         >
