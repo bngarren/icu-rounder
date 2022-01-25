@@ -6,8 +6,10 @@ import {
   useCallback,
   useMemo,
 } from "react";
-import { useMediaQuery, Grid, Typography } from "@mui/material";
-import { makeStyles, useTheme } from "@mui/styles";
+
+// MUI
+import { useMediaQuery, Grid, Box, Typography } from "@mui/material";
+import { useTheme } from "@mui/styles";
 
 // Components
 import TableBedList from "../../components/TableBedList";
@@ -21,21 +23,12 @@ import { DebouncedContextProvider } from "./DebouncedContext";
 import { useAuthStateContext } from "../../context/AuthState";
 import { useGridStateContext } from "../../context/GridState";
 
-const useStyles = makeStyles((theme) => ({
-  censusRoot: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    padding: "8px 4px 4px 4px",
-  },
-}));
 
 /* This holds the functions we pass way down to the TableBedList's buttons */
 export const BedActionsContext = createContext();
 
 const UpdatePage = () => {
   const theme = useTheme();
-  const classes = useStyles();
 
   // Media queries for CSS
   const media_atleast_md = useMediaQuery("(min-width:960px)");
@@ -50,6 +43,7 @@ const UpdatePage = () => {
   const [needsSave, setNeedsSave] = useState(false); // true, if an unsaved changed has occurred in bedspaceEditor
 
   const [defaultBedData, setDefaultBedData] = useState();
+
   /* Default bed data */
   const defaults = useRef({
     bed: "",
@@ -361,7 +355,7 @@ const UpdatePage = () => {
   if (gridData != null) {
     return (
       <div>
-        <Grid container className={classes.root}>
+        <Grid container>
           <Grid
             item
             md={4}
@@ -373,7 +367,7 @@ const UpdatePage = () => {
               <TableBedList data={gridData} selectedKey={selectedKey} />
             </BedActionsContext.Provider>
             {census ? (
-              <div className={classes.censusRoot}>
+              <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-around", p: 0.5, pt: 1 }}>
                 <Typography variant="caption">
                   {`${census.filledTotal}/${census.total}`}{" "}
                   {census.emptyBeds.length > 0 &&
@@ -387,7 +381,7 @@ const UpdatePage = () => {
                     </Typography>
                   );
                 })}
-              </div>
+              </Box>
             ) : (
               <></>
             )}

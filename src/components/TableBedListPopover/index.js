@@ -30,7 +30,6 @@ const TableBedListPopover = ({
     <div className={classes.root}>
       <Menu
         {...bindMenu(popupState)}
-        getContentAnchorEl={null}
         anchorOrigin={{ vertical: "center", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "left" }}
       >

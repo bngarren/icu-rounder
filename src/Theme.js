@@ -4,17 +4,21 @@ import { createTheme } from "@mui/material/styles";
 /* Palette created here: https://material.io/resources/color/#!/?view.left=0&view.right=0&primary.color=455A64&secondary.color=B2FF59 */
 
 export const theme = createTheme({
+  mode: "light",
   palette: {
     primary: {
       main: "#455a64",
       light: "#718792",
       dark: "#1c313a",
+      contrastText: "#ffffff"
     },
     secondary: {
       main: "#b2ff59",
       light: "#e7ff8c",
       dark: "#7ecb20",
-    }
+      contrastText: "#000000",
+    },
+
   }
 })
 
