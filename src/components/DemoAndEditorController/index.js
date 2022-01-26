@@ -12,7 +12,6 @@ import {
   Tooltip,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import { makeStyles } from "@mui/styles";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
@@ -23,22 +22,8 @@ import { uniqueId } from "lodash";
 import DemoBox from "../../components/DemoBox";
 import BedspaceEditor from "../../components/BedspaceEditor";
 
-// context
+// Context
 import { useDebouncedContext } from "../../pages/UpdatePage/DebouncedContext";
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    padding: "0 1vw",
-    justifyContent: "center",
-  },
-  bedspaceEditorGridItem: {
-    background: "white",
-  },
-  bedspaceEditorGridItemNeedsSave: {
-    background:
-      "repeating-linear-gradient( -45deg, #017c820a, #017c820a 10px, #fff0 5px, #0000 20px )",
-  },
-}));
 
 /* Styling */
 
@@ -81,8 +66,6 @@ const DemoAndEditorController = ({
   onNextBedspace = (f) => f,
   onSave = (f) => f,
 }) => {
-  const classes = useStyles();
-
   /* Holds the Editor's own version of this bedspace's data
    */
   const [bedspaceEditorData, _setBedspaceEditorData] = useState(); // i.e. "Working" data
@@ -236,7 +219,6 @@ const DemoAndEditorController = ({
             <Switch
               checked={!demoBoxCollapsed}
               onChange={() => setDemoBoxCollapsed((prevValue) => !prevValue)}
-              color="secondary"
             />
           </Tooltip>
           <DemoBox data={bedspaceEditorData} collapsed={demoBoxCollapsed} />
@@ -247,11 +229,9 @@ const DemoAndEditorController = ({
         <Grid
           item
           xs={12}
-          className={
-            needsSave
-              ? classes.bedspaceEditorGridItemNeedsSave
-              : classes.bedspaceEditorGridItem
-          }
+          sx={{
+            ...(needsSave ? {} : {}),
+          }}
         >
           <BedspaceEditor
             data={bedspaceEditorData}

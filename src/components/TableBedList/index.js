@@ -50,11 +50,11 @@ const StyledTableCell = styled(TableCell, {
     prop !== "shouldHighlight" && prop !== "isSelected",
 })(({ shouldHighlight, isSelected, component, theme }) => ({
   [theme.breakpoints.up("lg")]: {
-    padding: "3px 10px 3px 15px",
+    padding: "3px 8px 3px 8px",
     fontSize: "1rem",
   },
   [theme.breakpoints.down("lg")]: {
-    padding: "2px 2px 2px 10px",
+    padding: "2px 2px 2px 2px",
     fontSize: "0.85rem",
   },
   ...(isSelected &&
@@ -270,14 +270,14 @@ const MyTableRow = memo(
           </StyledTypographyBedNumber>
         </StyledTableCell>
         <StyledTableCell align="left" isSelected={isSelected}>
-          <span>
+          <Typography sx={{ pl: 1.5 }}>
             {value["lastName"]}
             {value["lastName"] && value["firstName"] && ", "}
             {value["firstName"]}
-          </span>
+          </Typography>
         </StyledTableCell>
         <StyledTableCell align="center">
-          <span>{value["teamNumber"]}</span>
+          <Typography>{value["teamNumber"]}</Typography>
         </StyledTableCell>
         <StyledTableCell>
           <BedActions
