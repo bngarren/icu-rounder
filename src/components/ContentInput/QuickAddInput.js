@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 
-import { InputAdornment, IconButton, Fade } from "@mui/material";
+import { InputAdornment, IconButton, Fade, TextField } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 
 //components
-import CustomTextField from "./CustomTextField";
 
 const useStylesForQuickAddInput = makeStyles((theme) => ({
   iconButton: {
@@ -47,7 +46,7 @@ const QuickAddInput = ({ onSubmit = (f) => f, reset, ...props }) => {
 
   return (
     <div>
-      <CustomTextField
+      <TextField
         value={value}
         onChange={handleOnChange}
         onKeyDown={handleKeyDown}
@@ -55,7 +54,11 @@ const QuickAddInput = ({ onSubmit = (f) => f, reset, ...props }) => {
           endAdornment: (
             <InputAdornment position="end">
               <Fade in={value !== null && value !== ""}>
-                <IconButton onClick={handleSubmit} className={classes.iconButton} size="large">
+                <IconButton
+                  onClick={handleSubmit}
+                  className={classes.iconButton}
+                  size="large"
+                >
                   <AddBoxIcon className={classes.icon} />
                 </IconButton>
               </Fade>

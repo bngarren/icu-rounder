@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { AppBar, Toolbar, Divider, MenuItem } from "@mui/material";
+import { AppBar, Toolbar, Divider, MenuItem, TextField } from "@mui/material";
 
 import { makeStyles } from "@mui/styles";
 
-import CustomTextField from "./CustomTextField";
 import QuickAddInput from "./QuickAddInput";
 
 const useStylesForContentInputToolbar = makeStyles((theme) => ({
@@ -122,7 +121,7 @@ const SelectTemplate = ({ onSelect = (f) => f }) => {
   };
 
   return (
-    <CustomTextField
+    <TextField
       value={value}
       onChange={handleChange}
       select
@@ -168,7 +167,7 @@ const SelectTemplate = ({ onSelect = (f) => f }) => {
           </MenuItem>
         );
       })}
-    </CustomTextField>
+    </TextField>
   );
 };
 

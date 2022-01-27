@@ -6,6 +6,7 @@ import {
   IconButton,
   Typography,
   Tooltip,
+  TextField,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import StopIcon from "@mui/icons-material/Stop";
@@ -17,7 +18,6 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import { List as MovableList, arrayMove } from "react-movable";
 
 // components
-import CustomTextField from "./CustomTextField";
 import QuickAddInput from "./QuickAddInput";
 
 // context
@@ -238,12 +238,16 @@ const ContentInputForm = ({
           Edit Section
         </Typography>
         <Tooltip title="Close">
-          <IconButton className={classes.closeButton} onClick={onClose} size="large">
+          <IconButton
+            className={classes.closeButton}
+            onClick={onClose}
+            size="large"
+          >
             <CancelIcon className={classes.closeButtonIcon} />
           </IconButton>
         </Tooltip>
       </div>
-      <CustomTextField
+      <TextField
         ref={refToTitle}
         placeholder="Title"
         tooltip="Section Title"
@@ -253,7 +257,7 @@ const ContentInputForm = ({
           style: { fontWeight: "bold", fontSize: "11.5pt" },
         }}
       />
-      <CustomTextField
+      <TextField
         placeholder="Content"
         tooltip="Content"
         multiline
@@ -281,7 +285,7 @@ const ContentInputForm = ({
                 listStyleType: "none",
               }}
             >
-              <CustomTextField
+              <TextField
                 className={classes.inputItem}
                 key={value.id}
                 value={value.value}
@@ -316,7 +320,8 @@ const ContentInputForm = ({
                       <IconButton
                         onClick={() => handleRemoveItem(value.id)}
                         className={classes.removeIconButton}
-                        size="large">
+                        size="large"
+                      >
                         <ClearIcon className={classes.removeIcon} />
                       </IconButton>
                     </InputAdornment>

@@ -10,6 +10,7 @@ import {
   Typography,
   IconButton,
   Fade,
+  TextField,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import StopIcon from "@mui/icons-material/Stop";
@@ -20,13 +21,11 @@ import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { List as MovableList, arrayMove } from "react-movable";
 
 // Components
-import CustomTextField from "./CustomTextField";
 import ContentInputForm from "./ContentInputForm";
 import ContentInputToolbar from "./ContentInputToolbar";
 
 // lodash
 import { uniqueId } from "lodash";
-
 
 /* Styling - ContentInput */
 
@@ -38,7 +37,7 @@ const gridRootSx = {
   padding: "0px 0px 20px 0px",
   margin: "6px 0px 6px 0px",
   minHeight: "225px",
-}
+};
 
 const gridHeaderSx = {
   display: "flex",
@@ -46,19 +45,16 @@ const gridHeaderSx = {
   alignItems: "center",
   borderBottom: "1px solid #eee",
   minHeight: "45px",
-}
+};
 
 const gridBodySimpleSx = {
   flexDirection: "row",
   flex: "2",
-  paddingTop: "0px",
-  paddingLeft: "4px",
-  paddingRight: "4px",
-}
+};
 
 const gridBodyNestedSx = {
   padding: "15px 4px 0px 0px",
-}
+};
 
 /* 
 
@@ -82,7 +78,6 @@ const ContentInput = ({
   onChange = (f) => f,
   children,
 }) => {
-
   /* we use the initialValue prop to know when to reset the content input,
   i.e., get rid of any selected section */
   useEffect(() => {
@@ -215,14 +210,17 @@ const ContentInput = ({
   return (
     <Grid container sx={gridRootSx}>
       <Grid item xs={12} sx={gridHeaderSx}>
-        <Typography variant="h6" sx={{
-          /* needs to match font appearance of
+        <Typography
+          variant="h6"
+          sx={{
+            /* needs to match font appearance of
           EditorTextField labels */
-          color: "primary.light",
-          px: 0.8,
-          fontSize: "1rem",
-          transform: "scale(0.75)",
-        }}>
+            color: "primary.light",
+            px: 0.8,
+            fontSize: "1rem",
+            transform: "scale(0.75)",
+          }}
+        >
           Content
         </Typography>
         {children}
@@ -234,16 +232,21 @@ const ContentInput = ({
       </Grid>
       <Grid item container xs={12} sx={gridBodySimpleSx}>
         {id === "simpleContent" ? (
-          <CustomTextField
+          <TextField
+            fullWidth
             multiline
-            rows={10}
+            minRows={10}
+            maxRows={20}
             value={data}
             onChange={onChange}
-            style={{
-              width: "100%",
-              padding: "5px 2px 0 2px",
-              fontSize: "8pt",
+            sx={{
               lineHeight: "1.5em",
+              "& .MuiOutlinedInput-notchedOutline": {
+                border: "none",
+              },
+              "& .MuiOutlinedInput-input": {
+                fontSize: "formFontSizeLevel1",
+              },
             }}
           />
         ) : (
@@ -255,21 +258,20 @@ const ContentInput = ({
                   onChange={handleMoveSection}
                   lockVertically={true}
                   renderList={({ children, props }) => (
-                    <List
-                      component="nav"
-                      sx={{ p: 0 }}
-                      {...props}
-                    >
+                    <List component="nav" sx={{ p: 0 }} {...props}>
                       {children}
                     </List>
                   )}
                   renderItem={({ value, props, isDragged }) => (
-                    <li sx={{
-                      listStyleType: "none",
-                      "&:focus-visible": {
-                        outline: `1px dotted "primary.light"`,
-                      },
-                    }} {...props}>
+                    <li
+                      sx={{
+                        listStyleType: "none",
+                        "&:focus-visible": {
+                          outline: `1px dotted "primary.light"`,
+                        },
+                      }}
+                      {...props}
+                    >
                       <SectionContainer
                         element={value}
                         selected={selectedSection?.id === value.id}
@@ -301,7 +303,6 @@ const ContentInput = ({
   );
 };
 
-
 const SectionContainer = memo(function ({
   element,
   selected,
@@ -309,7 +310,6 @@ const SectionContainer = memo(function ({
   onClickSection = (f) => f,
   onRemoveSection = (f) => f,
 }) {
-
   return (
     <Box
       onClick={() => onClickSection(element.id)}
@@ -337,7 +337,7 @@ const SectionContainer = memo(function ({
           border: "1px dashed #988b8b",
           opacity: 1,
           backgroundColor: "#ffffff6b !important",
-        })
+        }),
       }}
     >
       <Section
@@ -350,7 +350,6 @@ const SectionContainer = memo(function ({
   );
 });
 
-
 /* Styling */
 const StyledRootBox = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -359,7 +358,7 @@ const StyledRootBox = styled(Box)(({ theme }) => ({
     visibility: "inherit",
     opacity: 1,
   },
-}))
+}));
 
 const StyledButtonsBox = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -367,14 +366,14 @@ const StyledButtonsBox = styled(Box)(({ theme }) => ({
   justifyContent: "flex-start",
   alignItems: "center",
   borderRight: "3px solid transparent",
-}))
+}));
 
 const StyledSectionTopBox = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "row",
   flexGrow: "1",
   justifyContent: "flex-start",
-}))
+}));
 
 const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
   const { id, title, top, items } = data;
@@ -397,7 +396,7 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
             ...(selected === true && {
               visibility: "inherit",
               opacity: 1,
-            })
+            }),
           }}
         >
           <ClearIcon sx={{ fontSize: "1.2rem" }} />
@@ -421,20 +420,22 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
       </StyledButtonsBox>
       <Box sx={{ flexGrow: 1 }}>
         <StyledSectionTopBox>
-          <Typography sx={{
-            fontSize: "formFontSizeLevel2",
-            lineHeight: "1",
-            whiteSpace: "pre-line",
-            width: "100%",
-            marginBottom: "2px",
-            ...(isDragged === true && {
-              display: "inline-block",
-              maxWidth: "200px",
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              textOverflow: "ellipsis",
-            })
-          }}>
+          <Typography
+            sx={{
+              fontSize: "formFontSizeLevel2",
+              lineHeight: "1",
+              whiteSpace: "pre-line",
+              width: "100%",
+              marginBottom: "2px",
+              ...(isDragged === true && {
+                display: "inline-block",
+                maxWidth: "200px",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+              }),
+            }}
+          >
             <Typography
               component="span"
               sx={{
@@ -444,7 +445,7 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
                 ...(isEmpty === true && {
                   fontWeight: "normal",
                   letterSpacing: "2px",
-                })
+                }),
               }}
             >
               {title && `${title}:`}
@@ -466,7 +467,9 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
                     }}
                     key={uniqueId("sectionItem-")}
                   >
-                    <StopIcon sx={{ fontSize: "0.8rem", color: "primary.light" }} />
+                    <StopIcon
+                      sx={{ fontSize: "0.8rem", color: "primary.light" }}
+                    />
                     <ListItemText
                       primary={itemText}
                       sx={{
@@ -475,14 +478,15 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
                         "& .MuiListItemText-primary": {
                           fontSize: "formFontSizeLevel3",
                           lineHeight: "1",
-                        }
+                        },
                       }}
                     />
                   </ListItem>
                 );
               })}
           </List>
-        )} </Box>
+        )}{" "}
+      </Box>
     </StyledRootBox>
   );
 };
