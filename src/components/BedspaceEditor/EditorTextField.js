@@ -14,15 +14,20 @@ const StyledTextField = styled(TextField, {
    "& .MuiFormLabel-root": {
       ...(diff ? {
          color: theme.palette.secondary.dark,
-         fontWeight: 600,
+         fontWeight: theme.typography.fontWeightBold,
       } : {
          color: theme.palette.primary.light,
       })
    },
    "& .MuiOutlinedInput-root": {
       "&.Mui-focused fieldset": {
+         borderWidth: "0.1em",
+         borderColor: theme.palette.primary.main,
          boxShadow: "rgba(17, 17, 26, 0.15) 0px 1px 0px",
       }
+   },
+   "& .MuiOutlinedInput-input": {
+      fontSize: theme.typography.formFontSizeLevel1,
    }
 }))
 

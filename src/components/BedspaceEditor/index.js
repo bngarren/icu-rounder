@@ -1,9 +1,8 @@
 import { useEffect, useState, useCallback, useRef, memo } from "react";
 
 // MUI
-import { Box, TextField, Paper } from "@mui/material";
+import { Box, Paper } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import makeStyles from '@mui/styles/makeStyles';
 
 import { usePopupState } from "material-ui-popup-state/hooks";
 
@@ -25,20 +24,6 @@ import { uniqueId, debounce } from "lodash";
 // Util
 import { getCursorPos, setCursorPos } from "../../utils/CursorPos";
 
-const useStyles = makeStyles((theme) => ({
-  contingenciesRoot: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    marginLeft: "2px",
-    marginTop: "8px",
-  },
-  contingencyItem: {
-    borderBottom: "1px solid gray",
-    marginRight: "2px",
-  },
-}));
-
 /* Styling */
 
 
@@ -52,9 +37,6 @@ const BedspaceEditor = ({
   setNeedsSave = (f) => f,
   debounceInterval,
 }) => {
-  const theme = useTheme();
-  const classes = useStyles(theme);
-
   const { settings } = useSettings();
 
   /* For each input in the Editor, tracks whether it needs a save or not */
@@ -362,7 +344,11 @@ const BedspaceEditor = ({
                 fullWidth
               />
             </CustomFormControlEditor>
-            <Box className={classes.contingenciesRoot}>
+            <Box sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}>
               <CustomFormControlEditor
                 id="contingencies"
                 initialValue={defaultValues.contingencies}
@@ -428,6 +414,7 @@ const BedspaceEditor = ({
               <EditorTextField
                 label="Bottom Right Text"
                 inputSize={30}
+                size="small"
               />
             </CustomFormControlEditor>
           </Box>

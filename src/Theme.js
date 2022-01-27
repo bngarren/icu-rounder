@@ -18,6 +18,11 @@ export const theme = createTheme({
       contrastText: "#000000",
     },
   },
+  typography: {
+    formFontSizeLevel1: "0.95rem",
+    formFontSizeLevel2: "0.90rem",
+    formFontSizeLevel3: "0.85rem",
+  }
 });
 
 /* export const theme = createTheme(adaptV4Theme({

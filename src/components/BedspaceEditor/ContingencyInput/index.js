@@ -51,7 +51,6 @@ const ContingencyInput = ({
 
   return (
     <StyledAutocomplete
-      size="small"
       limitTags={5}
       fullWidth
       multiple

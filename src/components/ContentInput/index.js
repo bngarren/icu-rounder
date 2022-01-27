@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback, useRef, memo } from "react";
+
+// MUI
 import {
   Grid,
+  Box,
   List,
   ListItem,
   ListItemText,
@@ -8,12 +11,10 @@ import {
   IconButton,
   Fade,
 } from "@mui/material";
-import { makeStyles } from "@mui/styles";
+import { styled } from "@mui/system";
 import StopIcon from "@mui/icons-material/Stop";
 import ClearIcon from "@mui/icons-material/Clear";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-
-import clsx from "clsx";
 
 // React Movable
 import { List as MovableList, arrayMove } from "react-movable";
@@ -26,52 +27,38 @@ import ContentInputToolbar from "./ContentInputToolbar";
 // lodash
 import { uniqueId } from "lodash";
 
-const useStylesForContentInput = makeStyles((theme) => ({
-  root: {
-    flexDirection: "column",
-    backgroundColor: "white",
-    border: "1px solid #dcdcdc",
-    borderRadius: "3px",
-    padding: "0px 0px 20px 0px",
-    margin: "2px",
-    marginTop: "8px",
-    minHeight: "225px",
-  },
-  gridHeader: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    borderBottom: "1px solid #eee",
-    minHeight: "45px",
-  },
-  label: {
-    color: theme.palette.secondary.main,
-    fontSize: "8.5pt",
-    //fontWeight: "600",
-    paddingTop: "0px",
-    paddingLeft: "10px",
-    paddingRight: "10px",
-  },
-  gridBody: {
-    flexDirection: "row",
-    flex: "2",
-    paddingTop: "0px",
-    paddingLeft: "4px",
-    paddingRight: "4px",
-  },
-  gridNestedContent: {
-    padding: "15px 4px 0px 0px",
-  },
-  mainList: {
-    padding: 0,
-  },
-  movableLi: {
-    listStyleType: "none",
-    "&:focus-visible": {
-      outline: `1px dotted ${theme.palette.primary.light}`,
-    },
-  },
-}));
+
+/* Styling - ContentInput */
+
+const gridRootSx = {
+  flexDirection: "column",
+  backgroundColor: "white",
+  border: "1px solid #dcdcdc",
+  borderRadius: "4px",
+  padding: "0px 0px 20px 0px",
+  margin: "6px 0px 6px 0px",
+  minHeight: "225px",
+}
+
+const gridHeaderSx = {
+  display: "flex",
+  flexDirection: "row",
+  alignItems: "center",
+  borderBottom: "1px solid #eee",
+  minHeight: "45px",
+}
+
+const gridBodySimpleSx = {
+  flexDirection: "row",
+  flex: "2",
+  paddingTop: "0px",
+  paddingLeft: "4px",
+  paddingRight: "4px",
+}
+
+const gridBodyNestedSx = {
+  padding: "15px 4px 0px 0px",
+}
 
 /* 
 
@@ -95,7 +82,6 @@ const ContentInput = ({
   onChange = (f) => f,
   children,
 }) => {
-  const classes = useStylesForContentInput();
 
   /* we use the initialValue prop to know when to reset the content input,
   i.e., get rid of any selected section */
@@ -225,10 +211,18 @@ const ContentInput = ({
     setSelectedSection(null);
   }, []);
 
+  /* Content Input */
   return (
-    <Grid container className={classes.root}>
-      <Grid item xs={12} className={classes.gridHeader}>
-        <Typography variant="h6" className={classes.label}>
+    <Grid container sx={gridRootSx}>
+      <Grid item xs={12} sx={gridHeaderSx}>
+        <Typography variant="h6" sx={{
+          /* needs to match font appearance of
+          EditorTextField labels */
+          color: "primary.light",
+          px: 0.8,
+          fontSize: "1rem",
+          transform: "scale(0.75)",
+        }}>
           Content
         </Typography>
         {children}
@@ -238,7 +232,7 @@ const ContentInput = ({
           onSelectTemplate={handleOnSelectTemplate}
         />
       </Grid>
-      <Grid item container xs={12} className={classes.gridBody}>
+      <Grid item container xs={12} sx={gridBodySimpleSx}>
         {id === "simpleContent" ? (
           <CustomTextField
             multiline
@@ -254,7 +248,7 @@ const ContentInput = ({
           />
         ) : (
           <>
-            <Grid item xs={12} sm={6} className={classes.gridNestedContent}>
+            <Grid item xs={12} sm={6} sx={gridBodyNestedSx}>
               {data instanceof Array && data?.length > 0 && (
                 <MovableList
                   values={data}
@@ -263,14 +257,19 @@ const ContentInput = ({
                   renderList={({ children, props }) => (
                     <List
                       component="nav"
-                      className={classes.mainList}
+                      sx={{ p: 0 }}
                       {...props}
                     >
                       {children}
                     </List>
                   )}
                   renderItem={({ value, props, isDragged }) => (
-                    <li className={classes.movableLi} {...props}>
+                    <li sx={{
+                      listStyleType: "none",
+                      "&:focus-visible": {
+                        outline: `1px dotted "primary.light"`,
+                      },
+                    }} {...props}>
                       <SectionContainer
                         element={value}
                         selected={selectedSection?.id === value.id}
@@ -302,34 +301,6 @@ const ContentInput = ({
   );
 };
 
-const useStylesForSectionContainer = makeStyles((theme) => ({
-  sectionContainer: {
-    backgroundColor: "white",
-    opacity: "0.6",
-    minHeight: "20px",
-    marginBottom: "5px",
-    cursor: "pointer",
-    "&:hover": {
-      backgroundColor: "#f8f8f8",
-      opacity: "0.7",
-    },
-    transition: "background linear 0.2s",
-  },
-  sectionContainerSelected: {
-    opacity: "1",
-    transition: "background-color 0.3s",
-    boxShadow:
-      "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.04) 0px 0px 0px 1px",
-    "&:hover": {
-      opacity: "1",
-    },
-  },
-  sectionContainerDragged: {
-    border: "1px dashed #988b8b",
-    opacity: 1,
-    backgroundColor: "#ffffff6b !important",
-  },
-}));
 
 const SectionContainer = memo(function ({
   element,
@@ -338,15 +309,36 @@ const SectionContainer = memo(function ({
   onClickSection = (f) => f,
   onRemoveSection = (f) => f,
 }) {
-  const classes = useStylesForSectionContainer();
 
   return (
-    <div
-      className={clsx(classes.sectionContainer, {
-        [classes.sectionContainerSelected]: selected,
-        [classes.sectionContainerDragged]: isDragged,
-      })}
+    <Box
       onClick={() => onClickSection(element.id)}
+      sx={{
+        backgroundColor: "white",
+        opacity: "0.6",
+        minHeight: "20px",
+        marginBottom: "5px",
+        cursor: "pointer",
+        "&:hover": {
+          backgroundColor: "#f8f8f8",
+          opacity: "0.7",
+        },
+        transition: "background linear 0.2s",
+        ...(selected === true && {
+          opacity: "1",
+          transition: "background-color 0.3s",
+          boxShadow:
+            "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.04) 0px 0px 0px 1px",
+          "&:hover": {
+            opacity: "1",
+          },
+        }),
+        ...(isDragged === true && {
+          border: "1px dashed #988b8b",
+          opacity: 1,
+          backgroundColor: "#ffffff6b !important",
+        })
+      }}
     >
       <Section
         data={element}
@@ -354,140 +346,114 @@ const SectionContainer = memo(function ({
         isDragged={isDragged}
         onRemoveSection={onRemoveSection}
       />
-    </div>
+    </Box>
   );
 });
 
-const useStylesForSection = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-    flexDirection: "row",
-    "&:hover $sectionRemoveIconButton": {
-      visibility: "inherit",
-      opacity: 1,
-    },
-  },
-  buttonsDiv: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    borderRight: "3px solid transparent",
-  },
-  buttonsDivSelected: {},
-  contentDiv: {
-    flexGrow: 1,
-  },
-  emptySection: {},
-  sectionTopDiv: {
-    display: "flex",
-    flexDirection: "row",
-    flexGrow: "1",
-    justifyContent: "flex-start",
-  },
-  sectionDragIndicatorIcon: {
-    fontSize: "20px",
-    color: "#626060",
-    "&:hover": {
-      color: theme.palette.secondary.light,
-    },
-    transform: "rotate(90deg)",
-  },
-  sectionRemoveIconButton: {
-    padding: "2px",
-    color: theme.palette.secondary.light,
-    visibility: "hidden",
-    opacity: 0,
-    transition: "visibility 0s linear 0s, opacity 300ms",
-    "&:hover": {
-      backgroundColor: theme.palette.secondary.faint,
-    },
-  },
-  sectionRemoveIconButtonSelected: {
+
+/* Styling */
+const StyledRootBox = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "row",
+  "&:hover $sectionRemoveIconButton": {
     visibility: "inherit",
     opacity: 1,
   },
-  sectionTitleText: {
-    fontSize: "10pt",
-    fontWeight: "bold",
-    marginRight: "5px",
-  },
-  sectionTitleTextEmpty: {
-    fontWeight: "normal",
-    letterSpacing: "2px",
-  },
-  sectionTopText: {
-    fontSize: "9pt",
-    lineHeight: "1",
-    whiteSpace: "pre-line",
-    width: "100%",
-    marginBottom: "2px",
-  },
-  sectionItem: {
-    padding: "1px 0 1px 8px",
-  },
-  sectionItemTextRoot: {
-    margin: "0",
-    paddingLeft: "3px",
-  },
-  sectionItemTextPrimary: {
-    fontSize: "9pt",
-    lineHeight: "1",
-  },
-}));
+}))
+
+const StyledButtonsBox = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "flex-start",
+  alignItems: "center",
+  borderRight: "3px solid transparent",
+}))
+
+const StyledSectionTopBox = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "row",
+  flexGrow: "1",
+  justifyContent: "flex-start",
+}))
 
 const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
-  const classes = useStylesForSection();
-
   const { id, title, top, items } = data;
   const isEmpty = !title && !top && items.length < 1;
 
   return (
-    <div className={classes.root}>
-      <div
-        className={clsx(classes.buttonsDiv, {
-          [classes.buttonsDivSelected]: selected,
-        })}
-      >
+    <StyledRootBox>
+      <StyledButtonsBox>
         <IconButton
-          className={clsx(classes.sectionRemoveIconButton, {
-            [classes.sectionRemoveIconButtonSelected]: selected,
-          })}
           onClick={(e) => onRemoveSection(e, id)}
-          size="large"
+          sx={{
+            padding: "2px",
+            color: "primary.main",
+            visibility: "hidden",
+            opacity: 0,
+            transition: "visibility 0s linear 0s, opacity 300ms",
+            "&:hover": {
+              color: "secondary.dark",
+            },
+            ...(selected === true && {
+              visibility: "inherit",
+              opacity: 1,
+            })
+          }}
         >
-          <ClearIcon style={{ fontSize: "20px" }} />
+          <ClearIcon sx={{ fontSize: "1.2rem" }} />
         </IconButton>
         {selected ? (
           <DragIndicatorIcon
             data-movable-handle
-            className={classes.sectionDragIndicatorIcon}
-            style={{ cursor: isDragged ? "grabbing" : "grab" }}
+            sx={{
+              fontSize: "1.2rem",
+              color: "primary.light",
+              "&:hover": {
+                color: "secondary.dark",
+              },
+              transform: "rotate(90deg)",
+              cursor: isDragged ? "grabbing" : "grab",
+            }}
           />
         ) : (
           <div data-movable-handle></div>
         )}
-      </div>
-      {!isDragged ? (
-        <div className={classes.contentDiv}>
-          <div
-            className={clsx(classes.sectionTopDiv, {
-              [classes.emptySection]: isEmpty,
-            })}
-          >
-            <Typography className={classes.sectionTopText}>
-              <Typography
-                component="span"
-                className={clsx(classes.sectionTitleText, {
-                  [classes.sectionTitleTextEmpty]: isEmpty,
-                })}
-              >
-                {title && `${title}:`}
-                {isEmpty && <i>empty section</i>}
-              </Typography>
-              {top}
+      </StyledButtonsBox>
+      <Box sx={{ flexGrow: 1 }}>
+        <StyledSectionTopBox>
+          <Typography sx={{
+            fontSize: "formFontSizeLevel2",
+            lineHeight: "1",
+            whiteSpace: "pre-line",
+            width: "100%",
+            marginBottom: "2px",
+            ...(isDragged === true && {
+              display: "inline-block",
+              maxWidth: "200px",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+            })
+          }}>
+            <Typography
+              component="span"
+              sx={{
+                fontSize: "formFontSizeLevel1",
+                fontWeight: "bold",
+                marginRight: "5px",
+                ...(isEmpty === true && {
+                  fontWeight: "normal",
+                  letterSpacing: "2px",
+                })
+              }}
+            >
+              {title && `${title}:`}
+              {isEmpty && <i>empty section</i>}
             </Typography>
-          </div>
+            {top}
+          </Typography>
+        </StyledSectionTopBox>
+        {!isDragged && (
           <List component="ul" disablePadding>
             {items &&
               items.length > 0 &&
@@ -495,49 +461,29 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
                 const itemText = item.value !== "" ? item.value : "";
                 return (
                   <ListItem
-                    className={classes.sectionItem}
+                    sx={{
+                      padding: "1px 0 1px 8px",
+                    }}
                     key={uniqueId("sectionItem-")}
                   >
-                    <StopIcon style={{ fontSize: "9px", color: "#626060" }} />
+                    <StopIcon sx={{ fontSize: "0.8rem", color: "primary.light" }} />
                     <ListItemText
                       primary={itemText}
-                      classes={{
-                        root: classes.sectionItemTextRoot,
-                        primary: classes.sectionItemTextPrimary,
+                      sx={{
+                        margin: "0",
+                        paddingLeft: "3px",
+                        "& .MuiListItemText-primary": {
+                          fontSize: "formFontSizeLevel3",
+                          lineHeight: "1",
+                        }
                       }}
                     />
                   </ListItem>
                 );
               })}
           </List>
-        </div>
-      ) : (
-        // Is being dragged so show this instead
-        <div className={classes.contentDiv}>
-          <Typography
-            className={classes.sectionTopText}
-            style={{
-              display: "inline-block",
-              maxWidth: "200px",
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              textOverflow: "ellipsis",
-            }}
-          >
-            <Typography
-              component="span"
-              className={clsx(classes.sectionTitleText, {
-                [classes.sectionTitleTextEmpty]: isEmpty,
-              })}
-            >
-              {title && `${title}:`}
-              {isEmpty && <i>empty section</i>}
-            </Typography>
-            {top}
-          </Typography>
-        </div>
-      )}
-    </div>
+        )} </Box>
+    </StyledRootBox>
   );
 };
 
