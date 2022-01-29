@@ -4,6 +4,7 @@ import { useState, cloneElement } from "react";
 import {
   AppBar,
   Toolbar,
+  Box,
   IconButton,
   useScrollTrigger,
   Menu,
@@ -11,7 +12,10 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  Tooltip,
+  alpha,
 } from "@mui/material";
+import { styled } from "@mui/system";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
@@ -19,8 +23,6 @@ import GetAppIcon from "@mui/icons-material/GetApp";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import SettingsIcon from "@mui/icons-material/Settings";
 import MenuIcon from "@mui/icons-material/Menu";
-import { useTheme } from "@mui/material/styles";
-import makeStyles from "@mui/styles/makeStyles";
 
 // Logo
 import { ReactComponent as Logo } from "../../logo_color.svg";
@@ -44,51 +46,6 @@ import { useLoginDialog } from "../../components/Login";
 // Exporter
 import Exporter from "../../components/Exporter";
 
-const useStyles = makeStyles((theme) => ({
-  navbar: {
-    backgroundColor: "white",
-    borderBottom: "1px solid #e8e7e7a6",
-  },
-  toolbarRoot: {
-    justifyContent: "center",
-  },
-  toolbarButtonsDiv: {
-    display: "flex",
-    justifyContent: "center",
-  },
-  toolbarTitleDiv: {
-    display: "flex",
-    flexDirection: "row",
-    color: "black",
-    paddingRight: "15px",
-  },
-  iconButtonDownloadRoot: {
-    "&:hover": {
-      backgroundColor: "#00a90b08",
-    },
-  },
-  iconButtonDownload: {
-    color: theme.palette.primary.main,
-    "&:hover": {
-      color: theme.palette.primary.light,
-    },
-  },
-  iconButtonOtherRoot: {
-    "&:hover": {
-      backgroundColor: "#00a90b08",
-    },
-  },
-  iconButtonOther: {
-    color: theme.palette.secondary.main,
-    "&:hover": {
-      color: theme.palette.secondary.light,
-    },
-  },
-  listItemText: {
-    fontSize: "10pt",
-  },
-}));
-
 /* Used to make the App Bar add elevation when the page is scrolled */
 const ElevationScroll = ({ children }) => {
   const scrollTrigger = useScrollTrigger({
@@ -100,9 +57,16 @@ const ElevationScroll = ({ children }) => {
   });
 };
 
+/* Styling */
+
+const StyledHeaderMenuBox = styled(Box, {
+  name: "StyledHeaderMenuBox",
+})(() => ({
+  display: "flex",
+  flexGrow: 1,
+}));
+
 const Header = () => {
-  const theme = useTheme();
-  const classes = useStyles(theme);
   const navigate = useNavigate();
 
   const { showLogin, LoginDialog } = useLoginDialog();
@@ -113,52 +77,83 @@ const Header = () => {
     showLogin((prevValue) => !prevValue);
   };
 
+  /* Take us home on Logo click */
   const handleClickLogo = () => {
     navigate("/");
   };
 
   return (
-    <div>
+    <>
       <ElevationScroll>
-        <AppBar className={classes.navbar}>
-          <Toolbar variant="dense" className={classes.toolbarRoot}>
-            <div
-              className={classes.toolbarTitleDiv}
+        <AppBar
+          sx={{
+            backgroundColor: "white",
+            borderBottom: "1px solid #e8e7e7a6", // very light grey
+          }}
+        >
+          <Toolbar
+            variant="dense"
+            sx={{
+              justifyContent: "center",
+              p: 0,
+            }}
+          >
+            <Box
               onClick={handleClickLogo}
-              style={{ cursor: "pointer" }}
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                color: "black",
+                paddingRight: "15px",
+                cursor: "pointer",
+              }}
             >
               <Logo width="175px" />
-            </div>
-            <div className={classes.toolbarButtonsDiv}>
+            </Box>
+            <StyledHeaderMenuBox
+              sx={{
+                justifyContent: {
+                  xs: "flex-end",
+                  md: "center",
+                },
+              }}
+            >
               <HeaderMenu
-                customStyle={classes}
                 onClickLogin={handleClickLogin}
                 onDownloadPdf={getPdf}
               />
-            </div>
+            </StyledHeaderMenuBox>
           </Toolbar>
         </AppBar>
       </ElevationScroll>
       <Toolbar />
       {LoginDialog}
-    </div>
+    </>
   );
 };
 
-const CustomListItemText = ({ children }) => {
-  const classes = useStyles();
-  return (
-    <ListItemText classes={{ primary: classes.listItemText }}>
-      {children}
-    </ListItemText>
-  );
-};
+/* Styling */
 
-const HeaderMenu = ({
-  customStyle: classes,
-  onClickLogin = (f) => f,
-  onDownloadPdf = (f) => f,
-}) => {
+const StyledListItemText = styled(ListItemText)(() => ({
+  fontSize: "1rem",
+}));
+
+/* StyledIconButton's are used in the expanded menu across the top */
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
+  padding: "6px",
+  borderRadius: "3px",
+  "&.Mui-disabled": {
+    border: `1px solid ${alpha(theme.palette.primary.light, 0.08)}`,
+    color: theme.palette.secondary.dark,
+  },
+  "&:hover": {
+    color: theme.palette.primary.light,
+  },
+}));
+
+/* HeaderMenu contains the links. Can either be expanded or collapsed, depending on
+screen size. */
+const HeaderMenu = ({ onClickLogin = (f) => f, onDownloadPdf = (f) => f }) => {
   const { userIsLoggedIn, signOut } = useAuthStateContext();
   const { settings } = useSettings();
   const navigate = useNavigate();
@@ -205,12 +200,12 @@ const HeaderMenu = ({
     ? settings.export_filename
     : "grid";
 
-  const loggedInMenu = [
+  const loggedInMenuCondensed = [
     <MenuItem onClick={handleEdit} disabled={Boolean(useMatch("/update"))}>
       <ListItemIcon>
         <ViewListIcon />
       </ListItemIcon>
-      <CustomListItemText>Edit Grid</CustomListItemText>
+      <StyledListItemText>Edit Grid</StyledListItemText>
     </MenuItem>,
     <MenuItem
       onClick={handleSettings}
@@ -219,21 +214,21 @@ const HeaderMenu = ({
       <ListItemIcon>
         <SettingsIcon />
       </ListItemIcon>
-      <CustomListItemText>Settings</CustomListItemText>
+      <StyledListItemText>Settings</StyledListItemText>
     </MenuItem>,
     <Divider />,
     <MenuItem onClick={handleDownloadPdf}>
       <ListItemIcon>
         <PictureAsPdfIcon />
       </ListItemIcon>
-      <CustomListItemText>Download PDF</CustomListItemText>
+      <StyledListItemText>Download PDF</StyledListItemText>
     </MenuItem>,
     <Exporter onExported={handleOnExported} filename={exportFilename}>
       <MenuItem>
         <ListItemIcon>
           <GetAppIcon />
         </ListItemIcon>
-        <CustomListItemText>Export Grid</CustomListItemText>
+        <StyledListItemText>Export Grid</StyledListItemText>
       </MenuItem>
     </Exporter>,
     <Divider />,
@@ -241,51 +236,142 @@ const HeaderMenu = ({
       <ListItemIcon>
         <ExitToAppIcon />
       </ListItemIcon>
-      <CustomListItemText>Logout</CustomListItemText>
+      <StyledListItemText>Logout</StyledListItemText>
     </MenuItem>,
   ];
 
-  const loggedOutMenu = [
+  const loggedOutMenuCondensed = [
     <MenuItem onClick={handleLogin}>
       <ListItemIcon>
         <AccountBoxIcon />
       </ListItemIcon>
-      <CustomListItemText>Login</CustomListItemText>
+      <StyledListItemText>Login</StyledListItemText>
     </MenuItem>,
   ];
 
+  const loggedInMenuExpanded = [
+    <Tooltip title="Edit Grid" placement="bottom">
+      <span>
+        {/* Surround with <span> so that tooltip still works when button is disabled, per MUI */}
+        <StyledIconButton
+          onClick={handleEdit}
+          disabled={Boolean(useMatch("/update"))}
+        >
+          <ViewListIcon />
+        </StyledIconButton>
+      </span>
+    </Tooltip>,
+    <Tooltip title="Settings" placement="bottom">
+      <span>
+        <StyledIconButton
+          onClick={handleSettings}
+          disabled={Boolean(useMatch("/settings"))}
+        >
+          <SettingsIcon />
+        </StyledIconButton>
+      </span>
+    </Tooltip>,
+    <Divider orientation="vertical" />,
+    <Tooltip title="Download PDF" placement="bottom">
+      <StyledIconButton onClick={handleDownloadPdf}>
+        <PictureAsPdfIcon />
+      </StyledIconButton>
+    </Tooltip>,
+    <Exporter onExported={handleOnExported} filename={exportFilename}>
+      <Tooltip title="Export Grid" placement="bottom">
+        <StyledIconButton>
+          <GetAppIcon />
+        </StyledIconButton>
+      </Tooltip>
+    </Exporter>,
+    <Divider orientation="vertical" />,
+    <Tooltip title="Logout" placement="bottom">
+      <StyledIconButton onClick={handleLogout}>
+        <ExitToAppIcon />
+      </StyledIconButton>
+    </Tooltip>,
+  ];
+
+  const loggedOutMenuExpanded = [
+    <Tooltip title="Settings" placement="bottom">
+      <StyledIconButton onClick={handleLogin}>
+        <AccountBoxIcon />
+      </StyledIconButton>
+    </Tooltip>,
+  ];
+
   return (
-    <div>
-      <IconButton
-        className={classes.iconButtonOther}
-        classes={{
-          root: classes.iconButtonOtherRoot,
+    <>
+      <Box
+        sx={{
+          display: {
+            xs: "flex",
+            md: "none",
+          },
         }}
-        onClick={handleClick}
-        size="large"
       >
-        <MenuIcon />
-      </IconButton>
-      <Menu
-        id="simple-menu"
-        anchorEl={anchorEl}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
+        <IconButton
+          onClick={handleClick}
+          size="large"
+          sx={{
+            color: "primary.dark",
+            "&:hover": {
+              color: "primary.main",
+            },
+          }}
+        >
+          <MenuIcon />
+        </IconButton>
+        <Menu
+          id="simple-menu"
+          anchorEl={anchorEl}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "left",
+          }}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+          sx={{
+            display: { xs: "block", md: "none" },
+            "& .MuiListItemIcon-root": {
+              color: "primary.dark",
+            },
+            "& .MuiMenuItem-root:hover .MuiListItemIcon-root": {
+              color: "primary.main",
+            },
+          }}
+        >
+          {userIsLoggedIn
+            ? loggedInMenuCondensed.map((i) =>
+                cloneElement(i, { key: uniqueId("menuItem-") })
+              )
+            : loggedOutMenuCondensed.map((i) =>
+                cloneElement(i, { key: uniqueId("menuItem-") })
+              )}
+        </Menu>
+      </Box>
+      <Box
+        sx={{
+          flexGrow: 1,
+          display: { xs: "none", md: "flex" },
+          justifyContent: "space-between",
+          maxWidth: {
+            xs: "90%",
+            md: "40%",
+            lg: "30%",
+          },
         }}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
       >
         {userIsLoggedIn
-          ? loggedInMenu.map((i) =>
+          ? loggedInMenuExpanded.map((i) =>
               cloneElement(i, { key: uniqueId("menuItem-") })
             )
-          : loggedOutMenu.map((i) =>
+          : loggedOutMenuExpanded.map((i) =>
               cloneElement(i, { key: uniqueId("menuItem-") })
             )}
-      </Menu>
-    </div>
+      </Box>
+    </>
   );
 };
 
