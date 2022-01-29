@@ -59,12 +59,9 @@ const StyledTableCell = styled(TableCell, {
   },
   ...(isSelected &&
     component === "th" && {
-    transition: "color 0.1s linear",
-    backgroundColor: theme.palette.primary.main,
-  }),
-  ...(isSelected && {
-    fontWeight: 600,
-  }),
+      transition: "color 0.1s linear",
+      backgroundColor: theme.palette.primary.main,
+    }),
   ...(shouldHighlight && {
     transition: "color 0.2s ease-in",
     backgroundColor: theme.palette.secondary.main,
@@ -270,7 +267,13 @@ const MyTableRow = memo(
           </StyledTypographyBedNumber>
         </StyledTableCell>
         <StyledTableCell align="left" isSelected={isSelected}>
-          <Typography sx={{ pl: 1.5 }}>
+          <Typography
+            variant="body1"
+            sx={{
+              pl: 1.5,
+              fontWeight: isSelected ? "fontWeightMedium" : "fontWeightRegular",
+            }}
+          >
             {value["lastName"]}
             {value["lastName"] && value["firstName"] && ", "}
             {value["firstName"]}

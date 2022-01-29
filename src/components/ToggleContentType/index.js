@@ -1,18 +1,26 @@
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import NotesIcon from "@mui/icons-material/Notes";
 import VerticalSplitIcon from "@mui/icons-material/VerticalSplit";
 
-import { makeStyles } from "@mui/styles";
+// MUI
+import { styled } from "@mui/system";
 
-const useStyles = makeStyles((theme) => ({
-  button: {
-    padding: "4px",
+/* Styling */
+const StyledToggleButton = styled(ToggleButton, {
+  name: "StyledToggleButton",
+})(({ theme }) => ({
+  padding: theme.spacing(0.5),
+  color: theme.palette.primary.light,
+  "&:hover": {
+    color: theme.palette.primary.dark,
+  },
+  "&.Mui-selected": {
+    color: theme.palette.primary.dark,
   },
 }));
 
 const ToggleContentType = ({ value, onChange = (f) => f }) => {
-  const classes = useStyles();
   /* modify the onChange before sending the rest of the handling to the callback.
   This lets us always keep a value in the toggle
   */
@@ -28,26 +36,26 @@ const ToggleContentType = ({ value, onChange = (f) => f }) => {
       aria-label="content type"
       value={value}
       onChange={handleOnChange}
-      style={{ backgroundColor: "white" }}
+      sx={{ backgroundColor: "white" }}
     >
-      <ToggleButton
+      <StyledToggleButton
         value="simple"
         aria-label="simple input"
         size="small"
-        className={classes.button}
         title="Simple"
+        disabled={value === "simple"}
       >
-        <NotesIcon style={{ fontSize: "12pt" }} />
-      </ToggleButton>
-      <ToggleButton
+        <NotesIcon sx={{ fontSize: "1.1rem" }} />
+      </StyledToggleButton>
+      <StyledToggleButton
         value="nested"
         aria-label="nested input"
         size="small"
-        className={classes.button}
         title="Advanced"
+        disabled={value === "nested"}
       >
-        <VerticalSplitIcon style={{ fontSize: "12pt" }} />
-      </ToggleButton>
+        <VerticalSplitIcon sx={{ fontSize: "1.1rem" }} />
+      </StyledToggleButton>
     </ToggleButtonGroup>
   );
 };

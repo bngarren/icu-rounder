@@ -6,15 +6,7 @@ import { makeStyles } from "@mui/styles";
 import QuickAddInput from "./QuickAddInput";
 
 const useStylesForContentInputToolbar = makeStyles((theme) => ({
-  appBarRoot: {
-    backgroundColor: "transparent",
-    flexShrink: "inherit",
-    zIndex: "100",
-  },
-  toolbar: {
-    minHeight: "auto",
-    padding: "2px 6px",
-  },
+  toolbar: {},
   divider: {
     margin: "0 6px",
   },
@@ -29,15 +21,20 @@ const ContentInputToolbar = ({
   return (
     <AppBar
       position="static"
-      className={classes.appBarRoot}
       square={true}
       elevation={0}
+      sx={{
+        backgroundColor: "transparent",
+        flexShrink: "inherit",
+        zIndex: "100",
+      }}
     >
       <Toolbar
         disableGutters
         variant="dense"
-        classes={{
-          dense: classes.toolbar,
+        sx={{
+          minHeight: "auto",
+          padding: "2px 6px",
         }}
       >
         {contentType === "nestedContent" && (

@@ -47,7 +47,7 @@ const gridHeaderSx = {
   minHeight: "45px",
 };
 
-const gridBodySimpleSx = {
+const gridBodySx = {
   flexDirection: "row",
   flex: "2",
 };
@@ -223,15 +223,19 @@ const ContentInput = ({
         >
           Content
         </Typography>
-        {children}
+        {
+          /* ToggleContentType component is passed here as child from BedspaceEditor */
+          children
+        }
         <ContentInputToolbar
           contentType={id}
           onAddSection={handleOnAddSection}
           onSelectTemplate={handleOnSelectTemplate}
         />
       </Grid>
-      <Grid item container xs={12} sx={gridBodySimpleSx}>
+      <Grid item container xs={12} sx={gridBodySx}>
         {id === "simpleContent" ? (
+          /* SIMPLE CONTENT */
           <TextField
             fullWidth
             multiline
@@ -250,6 +254,7 @@ const ContentInput = ({
             }}
           />
         ) : (
+          /* NESTED CONTENT */
           <>
             <Grid item xs={12} sm={6} sx={gridBodyNestedSx}>
               {data instanceof Array && data?.length > 0 && (
@@ -284,6 +289,7 @@ const ContentInput = ({
                 />
               )}
             </Grid>
+            {/* ContentInputForm */}
             <Grid item xs={12} sm={6}>
               <Fade in={selectedSection !== null} timeout={200}>
                 <div>
