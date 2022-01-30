@@ -59,9 +59,9 @@ const StyledTableCell = styled(TableCell, {
   },
   ...(isSelected &&
     component === "th" && {
-    transition: "color 0.1s linear",
-    backgroundColor: theme.palette.primary.main,
-  }),
+      transition: "color 0.1s linear",
+      backgroundColor: theme.palette.primary.main,
+    }),
   ...(shouldHighlight && {
     transition: "color 0.2s ease-in",
     backgroundColor: theme.palette.secondary.main,

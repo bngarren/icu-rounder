@@ -309,6 +309,7 @@ const ContentInput = ({
   );
 };
 
+// eslint-disable-next-line react/display-name
 const SectionContainer = memo(function ({
   element,
   selected,
@@ -357,7 +358,7 @@ const SectionContainer = memo(function ({
 });
 
 /* Styling */
-const StyledRootBox = styled(Box)(({ theme }) => ({
+const StyledRootBox = styled(Box)(() => ({
   display: "flex",
   flexDirection: "row",
   "&:hover $sectionRemoveIconButton": {
@@ -366,7 +367,7 @@ const StyledRootBox = styled(Box)(({ theme }) => ({
   },
 }));
 
-const StyledButtonsBox = styled(Box)(({ theme }) => ({
+const StyledButtonsBox = styled(Box)(() => ({
   display: "flex",
   flexDirection: "column",
   justifyContent: "flex-start",
@@ -374,7 +375,7 @@ const StyledButtonsBox = styled(Box)(({ theme }) => ({
   borderRight: "3px solid transparent",
 }));
 
-const StyledSectionTopBox = styled(Box)(({ theme }) => ({
+const StyledSectionTopBox = styled(Box)(() => ({
   display: "flex",
   flexDirection: "row",
   flexGrow: "1",
@@ -464,7 +465,7 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
           <List component="ul" disablePadding>
             {items &&
               items.length > 0 &&
-              items.map((item, index) => {
+              items.map((item) => {
                 const itemText = item.value !== "" ? item.value : "";
                 return (
                   <ListItem

@@ -1,10 +1,8 @@
-import { useState, useEffect } from "react";
-
 // MUI
 import { styled } from "@mui/system";
 import { Autocomplete, Checkbox } from "@mui/material";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
 
 // Components
 import EditorTextField from "../EditorTextField";
@@ -39,16 +37,10 @@ const StyledAutocomplete = styled(Autocomplete)(({ theme }) => ({
     color: "#586069",
     fontSize: 14,
     backgroundColor: "#f6f8fa",
-  }
-}))
+  },
+}));
 
-const ContingencyInput = ({
-  options,
-  value,
-  diff,
-  ...props
-}) => {
-
+const ContingencyInput = ({ options, value, diff, ...props }) => {
   return (
     <StyledAutocomplete
       limitTags={5}

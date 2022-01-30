@@ -5,7 +5,7 @@ import { styled } from "@mui/system";
 import { bindMenu } from "material-ui-popup-state/hooks";
 
 /* Styling */
-const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
+const StyledMenuItem = styled(MenuItem)(() => ({
   fontSize: "1rem",
 }));
 

@@ -1,8 +1,7 @@
-import { useEffect, useState, useCallback, useRef, memo } from "react";
+import { useEffect, useCallback, useRef } from "react";
 
 // MUI
 import { Box, Paper } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 
 import { usePopupState } from "material-ui-popup-state/hooks";
 
