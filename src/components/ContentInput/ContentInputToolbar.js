@@ -1,60 +1,53 @@
 import { useState } from "react";
+
+// MUI
 import { AppBar, Toolbar, Divider, MenuItem, TextField } from "@mui/material";
+import { styled } from "@mui/system";
 
 import { makeStyles } from "@mui/styles";
 
 import QuickAddInput from "./QuickAddInput";
 
-const useStylesForContentInputToolbar = makeStyles((theme) => ({
-  toolbar: {},
-  divider: {
-    margin: "0 6px",
-  },
+/* Styling */
+const StyledAppBar = styled(AppBar, {
+  name: "ContentInputToolbar",
+  slot: "appbar",
+})(() => ({
+  backgroundColor: "transparent",
+  flexShrink: "inherit",
+  zIndex: "100",
 }));
+
+const StyledToolBar = styled(Toolbar, {
+  name: "ContentInputToolbar",
+  slot: "toolbar",
+})(() => ({
+  minHeight: "auto",
+  padding: "2px 6px",
+}));
+
+const dividerSx = {
+  margin: "0 6px",
+};
 
 const ContentInputToolbar = ({
   contentType,
   onAddSection = (f) => f,
   onSelectTemplate = (f) => f,
 }) => {
-  const classes = useStylesForContentInputToolbar();
   return (
-    <AppBar
-      position="static"
-      square={true}
-      elevation={0}
-      sx={{
-        backgroundColor: "transparent",
-        flexShrink: "inherit",
-        zIndex: "100",
-      }}
-    >
-      <Toolbar
-        disableGutters
-        variant="dense"
-        sx={{
-          minHeight: "auto",
-          padding: "2px 6px",
-        }}
-      >
+    <StyledAppBar position="static" square={true} elevation={0}>
+      <StyledToolBar disableGutters variant="dense" sx={{}}>
         {contentType === "nestedContent" && (
           <>
-            <Divider
-              orientation="vertical"
-              flexItem
-              className={classes.divider}
-            />
+            <Divider orientation="vertical" flexItem sx={{ ...dividerSx }} />
             <QuickAddInput label="Add Section" onSubmit={onAddSection} />
-            <Divider
-              orientation="vertical"
-              flexItem
-              className={classes.divider}
-            />
+            <Divider orientation="vertical" flexItem sx={{ ...dividerSx }} />
             <SelectTemplate onSelect={onSelectTemplate} />
           </>
         )}
-      </Toolbar>
-    </AppBar>
+      </StyledToolBar>
+    </StyledAppBar>
   );
 };
 
@@ -100,6 +93,27 @@ const useStylesForSelectTemplate = makeStyles((theme) => ({
   },
 }));
 
+/* Styling */
+
+const selectSx = {
+  background: "white",
+  color: "#676767",
+  borderBottom: "1px dotted transparent",
+  borderRadius: "0px",
+  "&:hover": {
+    color: "black",
+  },
+  "&:focus": {
+    background: "white",
+    borderStyle: "solid",
+    borderTop: 0,
+    borderRight: 0,
+    borderBottomWidth: 1,
+    borderLeft: 0,
+    borderColor: "primary.main",
+  },
+};
+
 const SelectTemplate = ({ onSelect = (f) => f }) => {
   const classes = useStylesForSelectTemplate();
 
@@ -126,9 +140,7 @@ const SelectTemplate = ({ onSelect = (f) => f }) => {
       label="Template"
       overflow="hidden"
       SelectProps={{
-        classes: {
-          root: classes.select,
-        },
+        sx: selectSx,
         displayEmpty: true,
         MenuProps: {
           classes: {

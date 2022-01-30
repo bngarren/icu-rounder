@@ -41,7 +41,7 @@ const StyledTableCellHeader = styled(TableCell)(({ theme }) => ({
   padding: "4px 2px 4px 10px",
 }));
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
+const StyledTableRow = styled(TableRow)(() => ({
   "&.MuiTableRow-hover:hover": {},
 }));
 
@@ -59,9 +59,9 @@ const StyledTableCell = styled(TableCell, {
   },
   ...(isSelected &&
     component === "th" && {
-      transition: "color 0.1s linear",
-      backgroundColor: theme.palette.primary.main,
-    }),
+    transition: "color 0.1s linear",
+    backgroundColor: theme.palette.primary.main,
+  }),
   ...(shouldHighlight && {
     transition: "color 0.2s ease-in",
     backgroundColor: theme.palette.secondary.main,
@@ -105,13 +105,13 @@ const StyledTablePagination = styled(TablePagination)(({ theme }) => ({
   },
 }));
 
-const StyledBedActionsDiv = styled("div")(({ theme }) => ({
+const StyledBedActionsDiv = styled("div")(() => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-around",
 }));
 
-const StyledMenuIconButton = styled(IconButton)(({ theme }) => ({
+const StyledMenuIconButton = styled(IconButton)(() => ({
   padding: "6px",
 }));
 
@@ -245,6 +245,7 @@ const MyTableBody = ({ data, page, rowsPerPage, selectedKey }) => {
   );
 };
 
+// eslint-disable-next-line react/display-name
 const MyTableRow = memo(
   ({ shouldHighlight, adjustedKey, isSelected, value }) => {
     const emptyBed = isBedEmpty(value);
@@ -271,7 +272,7 @@ const MyTableRow = memo(
             variant="body1"
             sx={{
               pl: 1.5,
-              fontWeight: isSelected ? "fontWeightMedium" : "fontWeightRegular",
+              fontWeight: isSelected ? "fontWeightBold" : "fontWeightRegular",
             }}
           >
             {value["lastName"]}
@@ -294,6 +295,7 @@ const MyTableRow = memo(
   }
 );
 
+// eslint-disable-next-line react/display-name
 const BedActions = memo(({ isSelected, bedKey, emptyBed }) => {
   const { bedActionEdit, bedActionClear, bedActionDelete } =
     useContext(BedActionsContext);
@@ -304,7 +306,7 @@ const BedActions = memo(({ isSelected, bedKey, emptyBed }) => {
     popupId: "actionsMenu",
   });
 
-  const handleOnClickMenu = (e, key) => {
+  const handleOnClickMenu = (e) => {
     popupState.open(e);
   };
 

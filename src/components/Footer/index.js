@@ -67,7 +67,7 @@ const Footer = () => {
         }}
       >
         <Box sx={{ display: "flex", flexDirection: "row" }}>
-          <LogoBox width="125px" style={{ opacity: "0.3" }} />
+          <LogoBox width="125px" style={{ opacity: "0.2" }} />
           <Box
             sx={{
               display: "flex",

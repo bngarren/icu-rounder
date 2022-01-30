@@ -26,8 +26,6 @@ import { getCursorPos, setCursorPos } from "../../utils/CursorPos";
 
 /* Styling */
 
-
-
 const BedspaceEditor = ({
   data,
   dataRef,
@@ -257,24 +255,24 @@ const BedspaceEditor = ({
   /*  - - - - - RETURN - - - -  */
   if (data) {
     return (
-      <Paper sx={{
-        p: 1,
-        backgroundColor: "transparent",
-        boxShadow: "none",
-      }}>
-        <form
-          autoComplete="off"
-          spellCheck="false"
-          key={resetKey}
-        >
+      <Paper
+        sx={{
+          p: 1,
+          backgroundColor: "transparent",
+          boxShadow: "none",
+        }}
+      >
+        <form autoComplete="off" spellCheck="false" key={resetKey}>
           {/* Box containing Bed, Names, and Team */}
-          <Box sx={{
-            display: "flex",
-            flexDirection: "row",
-            flexWrap: "nowrap",
-            justifyContent: "flex-start",
-            gap: "4px",
-          }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              flexWrap: "nowrap",
+              justifyContent: "flex-start",
+              gap: "4px",
+            }}
+          >
             <CustomFormControlEditor
               id="bed"
               initialValue={defaultValues.bed}
@@ -282,11 +280,7 @@ const BedspaceEditor = ({
               onDiffChange={onDiffChange}
               onBlur={handleInputOnBlur}
             >
-              <EditorTextField
-                label="Bed"
-                size="small"
-                inputSize={3}
-              />
+              <EditorTextField label="Bed" size="small" inputSize={3} />
             </CustomFormControlEditor>
             <CustomFormControlEditor
               id="lastName"
@@ -309,10 +303,7 @@ const BedspaceEditor = ({
               onDiffChange={onDiffChange}
               onBlur={handleInputOnBlur}
             >
-              <EditorTextField
-                label="First Name"
-                size="small"
-              />
+              <EditorTextField label="First Name" size="small" />
             </CustomFormControlEditor>
             <CustomFormControlEditor
               id="teamNumber"
@@ -321,11 +312,7 @@ const BedspaceEditor = ({
               onDiffChange={onDiffChange}
               onBlur={handleInputOnBlur}
             >
-              <EditorTextField
-                label="Team"
-                size="small"
-                inputSize={10}
-              />
+              <EditorTextField label="Team" size="small" inputSize={10} />
             </CustomFormControlEditor>
           </Box>
           <Box>
@@ -344,11 +331,13 @@ const BedspaceEditor = ({
                 fullWidth
               />
             </CustomFormControlEditor>
-            <Box sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-            }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
               <CustomFormControlEditor
                 id="contingencies"
                 initialValue={defaultValues.contingencies}
@@ -357,9 +346,7 @@ const BedspaceEditor = ({
                 onBlur={handleInputOnBlur}
                 onChangeArgument={1}
               >
-                <ContingencyInput
-                  options={settings.contingencyOptions}
-                />
+                <ContingencyInput options={settings.contingencyOptions} />
               </CustomFormControlEditor>
             </Box>
             <Box>
