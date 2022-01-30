@@ -51,13 +51,13 @@ const getJsonObjectFromSortedArray = (arr) => {
   });
 
   // Convert the map to JSON
-  const json = JSON.stringify(Object.fromEntries(map), null, 2)
+  const json = JSON.stringify(Object.fromEntries(map), null, 2);
   return json;
 };
 
 const GridStateContext = createContext();
 
-export default function GridStateProvider({ children, Firebase }) {
+export default function GridStateProvider({ children }) {
   const [bedLayout, setBedLayout] = useState();
   const [gridData, setGridData] = useState();
   const [gridDataJson, setGridDataJson] = useState();

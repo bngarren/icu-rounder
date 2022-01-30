@@ -7,12 +7,9 @@ import DocumentPage from "../../pages/DocumentPage";
 
 // Authentication
 import { useAuthStateContext } from "../../context/AuthState";
-import {
-  UNAUTHENTICATED,
-} from "../../components/Firebase/Firebase";
+import { UNAUTHENTICATED } from "../../components/Firebase/Firebase";
 
 const PageRouter = () => {
-
   const { authState } = useAuthStateContext();
 
   /* Don't try to figure out routes before we've decided if the
@@ -55,15 +52,14 @@ const PageRouter = () => {
           path="*"
           element={
             <main style={{ padding: "1rem" }}>
-              <p>There's nothing here!</p>
+              <p>There&#39;s nothing here!</p>
             </main>
           }
         />
       </Routes>
     );
-  }
+  } else return <></>;
   /* Figuring out if user is logged in or not. Could put a spinner if we wanted... */
-  else return <></>
 };
 
 /* If user is logged in, will show the "protected" child component,
@@ -81,6 +77,6 @@ const RequireAuth = ({ children }) => {
   }
 
   return children;
-}
+};
 
 export default PageRouter;

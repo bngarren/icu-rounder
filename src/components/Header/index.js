@@ -201,6 +201,9 @@ const HeaderMenu = ({ onClickLogin = (f) => f, onDownloadPdf = (f) => f }) => {
     : "grid";
 
   const loggedInMenuCondensed = [
+    /* Note that we disable the eslint checking for each element in an array
+    having a 'key', because we do this programatically later on */
+    /*eslint-disable react/jsx-key*/
     <MenuItem onClick={handleEdit} disabled={Boolean(useMatch("/update"))}>
       <ListItemIcon>
         <ViewListIcon />
@@ -238,18 +241,22 @@ const HeaderMenu = ({ onClickLogin = (f) => f, onDownloadPdf = (f) => f }) => {
       </ListItemIcon>
       <StyledListItemText>Logout</StyledListItemText>
     </MenuItem>,
+    /*eslint-enable */
   ];
 
   const loggedOutMenuCondensed = [
+    /*eslint-disable react/jsx-key*/
     <MenuItem onClick={handleLogin}>
       <ListItemIcon>
         <AccountBoxIcon />
       </ListItemIcon>
       <StyledListItemText>Login</StyledListItemText>
     </MenuItem>,
+    /*eslint-enable */
   ];
 
   const loggedInMenuExpanded = [
+    /*eslint-disable react/jsx-key*/
     <Tooltip title="Edit Grid" placement="bottom">
       <span>
         {/* Surround with <span> so that tooltip still works when button is disabled, per MUI */}
@@ -298,6 +305,7 @@ const HeaderMenu = ({ onClickLogin = (f) => f, onDownloadPdf = (f) => f }) => {
         <AccountBoxIcon />
       </StyledIconButton>
     </Tooltip>,
+    /*eslint-disable*/
   ];
 
   return (

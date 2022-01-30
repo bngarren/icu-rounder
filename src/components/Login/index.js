@@ -10,8 +10,7 @@ import {
 import { useAuthStateContext } from "../../context/AuthState";
 
 const LoginForm = ({ onLoginSuccess = (f) => f }) => {
-  const { authState, userIsLoggedIn, signInWithEmailAndPassword, signOut } =
-    useAuthStateContext();
+  const { signInWithEmailAndPassword } = useAuthStateContext();
   const [inputEmail, setInputEmail] = useState("");
   const [inputPassword, setInputPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,7 +23,7 @@ const LoginForm = ({ onLoginSuccess = (f) => f }) => {
       signInWithEmailAndPassword(
         inputEmail,
         inputPassword,
-        (user) => {
+        () => {
           onLoginSuccess();
           setLoading(false);
         },

@@ -11,7 +11,7 @@ import {
 import { makeStyles, useTheme } from "@mui/styles";
 import ClearIcon from "@mui/icons-material/Clear";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     alignItems: "center",
     justifyContent: "center",
@@ -112,7 +112,8 @@ const ContingencyOptionsEditor = ({
                     <IconButton
                       className={classes.clearIconButton}
                       onClick={() => onRemove(index)}
-                      size="large">
+                      size="large"
+                    >
                       <ClearIcon />
                     </IconButton>
                   </ListItemSecondaryAction>

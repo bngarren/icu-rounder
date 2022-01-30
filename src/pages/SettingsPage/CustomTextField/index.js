@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
   textFieldFocused: {},
 }));
 
+// eslint-disable-next-line react/display-name
 const CustomTextField = forwardRef(({ inputProps, ...props }, ref) => {
   const classes = useStyles();
 

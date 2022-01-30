@@ -12,7 +12,7 @@ import CustomFormControlSetting from "../../../components/CustomFormControl/Cust
 // Context
 import { useSettings } from "../../../context/Settings";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   exportFilenameTextfieldInput: {
     textAlign: "right",
     paddingRight: "4px",

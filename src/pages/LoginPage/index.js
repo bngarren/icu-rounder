@@ -25,7 +25,7 @@ const LoginPage = () => {
       signInWithEmailAndPassword(
         inputEmail,
         inputPassword,
-        (user) => {
+        () => {
           // success
           /* Send them back to the page they tried to visit when they were
           redirected to the login page. Use { replace: true } so we don't create

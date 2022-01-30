@@ -19,7 +19,7 @@ import { useGridStateContext } from "../../context/GridState";
 // Utility
 import { isBedEmpty, getDataForBed } from "../../utils/Utility";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",

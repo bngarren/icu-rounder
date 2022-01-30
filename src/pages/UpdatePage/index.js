@@ -20,7 +20,6 @@ import { useDialog } from "../../components/Dialog";
 import { DebouncedContextProvider } from "./DebouncedContext";
 
 // Firebase
-import { useAuthStateContext } from "../../context/AuthState";
 import { useGridStateContext } from "../../context/GridState";
 
 /* This holds the functions we pass way down to the TableBedList's buttons */
@@ -34,9 +33,6 @@ const UpdatePage = () => {
 
   // The truth GridState and gridData
   const { gridData, census, updateGridData } = useGridStateContext();
-
-  // Authentication
-  const { authState, userIsLoggedIn } = useAuthStateContext();
 
   const [selectedKey, setSelectedKey] = useState(); // index of the bedspace being "edited"
   const [needsSave, setNeedsSave] = useState(false); // true, if an unsaved changed has occurred in bedspaceEditor
@@ -211,7 +207,7 @@ const UpdatePage = () => {
             <b>
               <span style={{ color: theme.palette.warning.main }}>REMOVE</span>
             </b>{" "}
-            this bedspace and it's data?
+            this bedspace and it&#39;s data?
           </div>
           <div>
             Bed: {gridData[key].bed}
@@ -227,7 +223,7 @@ const UpdatePage = () => {
         () => {
           //should delete callback
           let updatedData = [...gridData];
-          let deleted = updatedData.splice(key, 1);
+          // let deleted = updatedData.splice(key, 1);
           updateGridData(updatedData); //send new data to GridStateContext (handles truth data)
           setNeedsSave(false);
           setSelectedKey(null);

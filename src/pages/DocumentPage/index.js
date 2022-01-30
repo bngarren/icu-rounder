@@ -1,7 +1,4 @@
-import { useState, useEffect } from "react";
 import { PDFViewer } from "@react-pdf/renderer";
-
-import { sortByBed } from "../../utils/Utility";
 
 import MyDocument from "../../components/MyDocument";
 
@@ -9,7 +6,7 @@ import { useSettings } from "../../context/Settings";
 import { useGridStateContext } from "../../context/GridState";
 
 const DocumentPage = () => {
-  const { settings, dispatchSettings } = useSettings();
+  const { settings } = useSettings();
   const { bedLayout, gridData, census } = useGridStateContext();
 
   if (gridData) {

@@ -112,7 +112,11 @@ const AddNewBedspaceForm = ({ onSubmit = (f) => f }) => {
         endAdornment={
           <Zoom in={value.trim() !== ""}>
             <InputAdornment position="end">
-              <IconButton className={classes.addIconButton} onClick={handleOnSubmit} size="large">
+              <IconButton
+                className={classes.addIconButton}
+                onClick={handleOnSubmit}
+                size="large"
+              >
                 <AddIcon />
               </IconButton>
             </InputAdornment>

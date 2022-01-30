@@ -1,10 +1,10 @@
 import { useRef, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 
 import TextField from "@mui/material/TextField";
-import Autocomplete from '@mui/material/Autocomplete';
+import Autocomplete from "@mui/material/Autocomplete";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Grid from "@mui/material/Grid";
@@ -111,7 +111,7 @@ const SnippetPopover = ({ popupState, onSelect = (f) => f }) => {
     popupState.close();
   };
 
-  const handleClose = (e) => {
+  const handleClose = () => {
     popupState.close();
   };
 
@@ -135,7 +135,11 @@ const SnippetPopover = ({ popupState, onSelect = (f) => f }) => {
                   className={classes.header}
                 >
                   Choose snippet to insert
-                  <IconButton className={classes.closeButton} onClick={handleClose} size="large">
+                  <IconButton
+                    className={classes.closeButton}
+                    onClick={handleClose}
+                    size="large"
+                  >
                     <CloseIcon size="small" />
                   </IconButton>
                 </Grid>
@@ -184,7 +188,7 @@ const SnippetPopover = ({ popupState, onSelect = (f) => f }) => {
                       }}
                     />
                   )}
-                  renderOption={(option, { selected }) => (
+                  renderOption={(option) => (
                     <>
                       <div className={classes.optionText}>{option.key}</div>
                     </>
