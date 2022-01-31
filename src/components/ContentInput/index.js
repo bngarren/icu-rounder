@@ -272,7 +272,7 @@ const ContentInput = ({
         ) : (
           /* NESTED CONTENT */
           <>
-            <Grid item xs={12} sm={6} sx={gridBodyNestedSx}>
+            <Grid item xs={12} sm sx={gridBodyNestedSx}>
               {data instanceof Array && data?.length > 0 && (
                 <MovableList
                   values={data}
@@ -306,7 +306,7 @@ const ContentInput = ({
             <Grid
               item
               xs={12}
-              sm={6}
+              sm={selectedSection !== null ? 8 : 6}
               sx={{ marginTop: nestedContentMarginTop }}
             >
               <Fade in={selectedSection !== null} timeout={200}>
@@ -352,8 +352,8 @@ const SectionContainer = memo(function SectionContainer({
         ...(selected === true && {
           opacity: "1",
           transition: "background-color 0.3s",
-          boxShadow:
-            "rgba(0, 0, 0, 0.05) 0px 6px 15px 0px, rgba(0, 0, 0, 0.04) 0px 0px 0px 0px",
+          boxShadow: "0px 1px 3px 0px rgba(0,0,0,0.1)",
+          //"rgba(0, 0, 0, 0.05) 0px 6px 15px 0px, rgba(0, 0, 0, 0.04) 0px 0px 0px 0px",
           "&:hover": {
             opacity: "1",
           },

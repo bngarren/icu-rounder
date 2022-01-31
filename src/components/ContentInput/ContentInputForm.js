@@ -37,7 +37,7 @@ const StyledRootBox = styled(Box, {
   flexDirection: "column",
   margin: 0,
   padding: "2px 4px 30px 8px",
-  boxShadow: theme.shadows[2],
+  boxShadow: "-3px -3px 3px -4px rgba(0,0,0,0.54)",
   borderRadius: "4px",
 }));
 
