@@ -32,7 +32,8 @@ import { uniqueId } from "lodash";
 const gridRootSx = {
   flexDirection: "column",
   backgroundColor: "white",
-  border: "1px solid #dcdcdc",
+  border: "1px solid",
+  borderColor: "grey.200",
   borderRadius: "4px",
   padding: "0px 0px 20px 0px",
   margin: "6px 0px 6px 0px",
@@ -60,6 +61,16 @@ const nestedContentMarginTop = "15px";
 const gridBodyNestedSx = {
   marginTop: nestedContentMarginTop,
 };
+
+const StyledMovableLi = styled("li", {
+  name: "ContentInput",
+  slot: "li",
+})(() => ({
+  listStyleType: "none",
+  "&:focus-visible": {
+    outline: `1px dotted "primary.light"`,
+  },
+}));
 
 /* 
 
@@ -273,15 +284,7 @@ const ContentInput = ({
                     </List>
                   )}
                   renderItem={({ value, props, isDragged }) => (
-                    <li
-                      sx={{
-                        listStyleType: "none",
-                        "&:focus-visible": {
-                          outline: `1px dotted "primary.light"`,
-                        },
-                      }}
-                      {...props}
-                    >
+                    <StyledMovableLi {...props}>
                       <SectionContainer
                         element={value}
                         selected={selectedSection?.id === value.id}
@@ -289,7 +292,7 @@ const ContentInput = ({
                         onClickSection={handleOnClickSectionContainer}
                         onRemoveSection={handleRemoveSection}
                       />
-                    </li>
+                    </StyledMovableLi>
                   )}
                 />
               )}

@@ -21,6 +21,7 @@ const StyledToolBar = styled(Toolbar, {
   name: "ContentInputToolbar",
   slot: "toolbar",
 })(() => ({
+  justifyContent: "flex-end",
   padding: "0px 6px 0px 6px",
   marginLeft: 1,
   minHeight: "auto",

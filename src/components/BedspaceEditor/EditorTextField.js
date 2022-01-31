@@ -6,7 +6,8 @@ import { styled } from "@mui/system";
 
 /* Styling */
 const StyledTextField = styled(TextField, {
-  name: "StyledTextField",
+  name: "EditorTextField",
+  slot: "Root",
   shouldForwardProp: (prop) => prop !== "diff",
 })(({ diff, theme }) => ({
   margin: "6px 0px",
@@ -22,7 +23,16 @@ const StyledTextField = styled(TextField, {
         }),
   },
   "& .MuiOutlinedInput-root": {
+    borderRadius: "2px",
+    "& fieldset": {
+      // Baseline border
+      borderColor: theme.palette.grey[200],
+    },
+    "&:hover fieldset": {
+      borderColor: theme.palette.primary.light,
+    },
     "&.Mui-focused fieldset": {
+      // Focused border
       borderWidth: "0.1em",
       borderColor: theme.palette.primary.main,
       boxShadow: "rgba(17, 17, 26, 0.15) 0px 1px 0px",
@@ -30,6 +40,8 @@ const StyledTextField = styled(TextField, {
   },
   "& .MuiOutlinedInput-input": {
     fontSize: theme.typography.formFontSizeLevel1,
+    paddingTop: "10px",
+    paddingBottom: "4px",
   },
 }));
 
