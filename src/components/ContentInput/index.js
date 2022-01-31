@@ -43,6 +43,8 @@ const gridHeaderSx = {
   display: "flex",
   flexDirection: "row",
   alignItems: "center",
+  paddingTop: "10px",
+  paddingBottom: "8px",
   borderBottom: "1px solid #eee",
   minHeight: "45px",
 };

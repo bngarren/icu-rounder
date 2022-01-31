@@ -12,7 +12,7 @@ const StyledTextField = styled(TextField, {
   slot: "textfield",
 })(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
-    padding: 0,
+    padding: "8px 0px 4px 8px",
     "&.Mui-focused fieldset": {
       borderWidth: "0.1em",
       borderColor: theme.palette.primary.main,
@@ -20,7 +20,9 @@ const StyledTextField = styled(TextField, {
     },
   },
   "& .MuiOutlinedInput-input": {
-    fontSize: theme.typography.formFontSizeLevel1,
+    // the input element
+    fontSize: theme.typography.formFontSizeLevel2,
+    padding: 0,
   },
 }));
 
@@ -57,7 +59,7 @@ const QuickAddInput = ({ onSubmit = (f) => f, reset, ...props }) => {
         onKeyDown={handleKeyDown}
         size="small"
         inputProps={{
-          size: "10",
+          size: "15",
         }}
         InputLabelProps={{
           shrink: true,
@@ -69,13 +71,17 @@ const QuickAddInput = ({ onSubmit = (f) => f, reset, ...props }) => {
                 <IconButton
                   onClick={handleSubmit}
                   sx={{
-                    p: 2,
+                    p: "1.5px",
+                    color: "gray.100",
+                    "&:hover": {
+                      backgroundColor: "transparent",
+                    },
                   }}
                   size="large"
                 >
                   <AddBoxIcon
                     sx={{
-                      padding: 0.5,
+                      padding: 0.3,
                       color: "primary.light",
                       "&:hover": {
                         color: "primary.main",

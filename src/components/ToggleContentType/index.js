@@ -20,6 +20,8 @@ const StyledToggleButton = styled(ToggleButton, {
   },
 }));
 
+const iconSize = "1.3rem";
+
 const ToggleContentType = ({ value, onChange = (f) => f }) => {
   /* modify the onChange before sending the rest of the handling to the callback.
   This lets us always keep a value in the toggle
@@ -45,7 +47,7 @@ const ToggleContentType = ({ value, onChange = (f) => f }) => {
         title="Simple"
         disabled={value === "simple"}
       >
-        <NotesIcon sx={{ fontSize: "1.1rem" }} />
+        <NotesIcon sx={{ fontSize: iconSize }} />
       </StyledToggleButton>
       <StyledToggleButton
         value="nested"
@@ -54,7 +56,7 @@ const ToggleContentType = ({ value, onChange = (f) => f }) => {
         title="Advanced"
         disabled={value === "nested"}
       >
-        <VerticalSplitIcon sx={{ fontSize: "1.1rem" }} />
+        <VerticalSplitIcon sx={{ fontSize: iconSize }} />
       </StyledToggleButton>
     </ToggleButtonGroup>
   );
