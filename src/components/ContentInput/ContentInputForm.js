@@ -1,6 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 
+// MUI
 import {
+  Box,
   List,
   InputAdornment,
   IconButton,
@@ -8,7 +10,7 @@ import {
   Tooltip,
   TextField,
 } from "@mui/material";
-import { makeStyles } from "@mui/styles";
+import { styled } from "@mui/system";
 import StopIcon from "@mui/icons-material/Stop";
 import ClearIcon from "@mui/icons-material/Clear";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
@@ -17,92 +19,64 @@ import CancelIcon from "@mui/icons-material/Cancel";
 // React Movable
 import { List as MovableList, arrayMove } from "react-movable";
 
-// components
+// Components
 import QuickAddInput from "./QuickAddInput";
 
-// context
+// Context
 import { useDebouncedContext } from "../../pages/UpdatePage/DebouncedContext";
 
 //lodash
 import { uniqueId, debounce } from "lodash";
 
-const useStylesForContentInputForm = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-    flexDirection: "column",
-    borderLeft: `4px solid ${theme.palette.secondary.light}`,
-    borderImageSource: theme.palette.primary.verticalGradient,
-    borderImageSlice: 1,
-    marginTop: "4px",
-    padding: "2px 4px 30px 4px",
-    boxShadow:
-      "rgb(0 0 0 / 7%) 0px 6px 24px 0px, rgb(0 0 0 / 35%) 0px 0px 0px 1px",
-    borderRadius: "4px",
+/* Styling */
+const StyledRootBox = styled(Box, {
+  name: "ContentInputForm",
+  slot: "Root",
+})(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  borderLeft: `2px solid ${theme.palette.secondary.dark}`,
+  margin: 0,
+  padding: "2px 4px 30px 8px",
+  boxShadow:
+    "rgb(0 0 0 / 7%) 0px 6px 24px 0px, rgb(0 0 0 / 35%) 0px 0px 0px 1px",
+  borderRadius: "4px",
+}));
+
+const StyledHeaderBox = styled(Box, {
+  name: "ContentInputForm",
+  slot: "header",
+})(() => ({
+  display: "flex",
+  flexDirection: "row",
+  alignItems: "center",
+}));
+
+const StyledTextField = styled(TextField, {
+  name: "ContentInputForm",
+  slot: "textfield",
+})(({ theme }) => ({
+  overflow: "overflow",
+  "& .MuiOutlinedInput-root": {
+    padding: 0,
+    fontSize: theme.typography.formFontSizeLevel2,
+
+    "& > fieldset": {
+      border: "none",
+    },
   },
-  header: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  headerText: {
-    color: theme.palette.primary.main,
-    fontSize: "11pt",
-    fontWeight: "bold",
-    textTransform: "uppercase",
-    marginBottom: "4px",
-    flexGrow: "1",
-    textAlign: "center",
-    letterSpacing: "1px",
-  },
-  closeButton: {
-    padding: "4px",
-    transform: "translate(6px, -2px)",
-    color: theme.palette.primary.main,
+  "& .MuiOutlinedInput-input": {
+    borderBottom: "1px dotted transparent",
+    transition: "border-color linear 0.1s",
+    paddingBottom: "2px",
+    paddingLeft: "4px",
     "&:hover": {
-      color: theme.palette.primary.light,
+      borderColor: "#5f5f5f",
     },
-  },
-  closeButtonIcon: {
-    fontSize: "14pt",
-  },
-  itemList: {
-    padding: "0px 0px 10px 12px",
-  },
-  endAdornment: {
-    visibility: "hidden",
-    opacity: 0,
-    transition: "opacity linear 0.2s",
-  },
-  addIconButton: {
-    padding: 6,
-  },
-  removeIconButton: {
-    padding: 2,
-  },
-  removeIcon: {
-    fontSize: "18px",
-  },
-  dragIcon: {
-    fontSize: "18px",
-    color: "#626060",
-    "&:hover": {
-      color: theme.palette.secondary.light,
+    "&:focus": {
+      borderStyle: "solid",
+      borderColor: "#a9a9a9",
     },
-    transform: "rotate(90deg)",
-  },
-  inputItem: {
-    width: "100%",
-    "&:hover $endAdornment": {
-      visibility: "inherit",
-      opacity: 1,
-    },
-  },
-  bullet: {
-    fontSize: "10px",
-    color: "#626060",
-  },
-  quickAddInput: {
-    width: "85%",
   },
 }));
 
@@ -114,8 +88,6 @@ const ContentInputForm = ({
   onClose = (f) => f,
   ...props
 }) => {
-  const classes = useStylesForContentInputForm();
-
   const [title, setTitle] = useState("");
   const [topText, setTopText] = useState("");
   const [items, setItems] = useState([]);
@@ -232,40 +204,57 @@ const ContentInputForm = ({
   );
 
   return (
-    <div className={classes.root} {...props}>
-      <div className={classes.header}>
-        <Typography variant="h4" className={classes.headerText}>
+    <StyledRootBox {...props}>
+      <StyledHeaderBox>
+        <Typography
+          variant="h4"
+          sx={{
+            color: "secondary.dark",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            textTransform: "uppercase",
+            flexGrow: "1",
+            textAlign: "center",
+            letterSpacing: "1px",
+          }}
+        >
           Edit Section
         </Typography>
         <Tooltip title="Close">
           <IconButton
-            className={classes.closeButton}
             onClick={onClose}
             size="large"
+            sx={{
+              padding: "4px",
+              transform: "translate(6px, -2px)",
+              color: "primary.light",
+              "&:hover": {
+                color: "primary.main",
+              },
+            }}
           >
-            <CancelIcon className={classes.closeButtonIcon} />
+            <CancelIcon sx={{ fontSize: "1.3rem" }} />
           </IconButton>
         </Tooltip>
-      </div>
-      <TextField
+      </StyledHeaderBox>
+      <StyledTextField
         ref={refToTitle}
         placeholder="Title"
-        tooltip="Section Title"
         value={title}
         onChange={(e) => handleOnTitleChange(e.target.value)}
+        size="small"
         inputProps={{
-          style: { fontWeight: "bold", fontSize: "11.5pt" },
+          sx: { fontWeight: "bold", fontSize: "formFontSizeLevel1" },
         }}
       />
-      <TextField
+      <StyledTextField
         placeholder="Content"
-        tooltip="Content"
         multiline
-        rows={2}
-        maxRows={3}
+        minRows={1}
+        maxRows={4}
         value={topText}
         onChange={(e) => handleOnTopTextChange(e.target.value)}
-        style={{ paddingTop: "5px" }}
+        size="small"
       />
       {items?.length > 0 && (
         <MovableList
@@ -273,7 +262,7 @@ const ContentInputForm = ({
           onChange={handleMoveItem}
           lockVertically={true}
           renderList={({ children, props }) => (
-            <List className={classes.itemList} {...props}>
+            <List sx={{ padding: "0px 0px 10px 12px" }} {...props}>
               {children}
             </List>
           )}
@@ -285,15 +274,25 @@ const ContentInputForm = ({
                 listStyleType: "none",
               }}
             >
-              <TextField
-                className={classes.inputItem}
+              <StyledTextField
                 key={value.id}
                 value={value.value}
                 onChange={(e) => handleOnItemChange(e.target.value, value.id)}
+                size="small"
                 multiline
-                rows={1}
+                minRows={1}
                 maxRows={3}
-                style={{ padding: 0 }}
+                sx={{
+                  width: "100%",
+                  padding: 0,
+                  "& .MuiOutlinedInput-input": {
+                    fontSize: "formFontSizeLevel3",
+                  },
+                  "&:hover .MuiInputAdornment-root": {
+                    visibility: "inherit",
+                    opacity: 1,
+                  },
+                }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment
@@ -304,25 +303,41 @@ const ContentInputForm = ({
                         marginTop: "10px",
                       }}
                     >
-                      <StopIcon className={classes.bullet} />
+                      <StopIcon
+                        sx={{
+                          fontSize: "0.8rem",
+                          color: "primary.light",
+                        }}
+                      />
                     </InputAdornment>
                   ),
                   endAdornment: (
                     <InputAdornment
                       position="end"
-                      className={classes.endAdornment}
+                      sx={{
+                        visibility: "hidden",
+                        opacity: 0,
+                        transition: "opacity linear 0.2s",
+                      }}
                     >
                       <DragIndicatorIcon
-                        className={classes.dragIcon}
                         data-movable-handle
-                        style={{ cursor: isDragged ? "grabbing" : "grab" }}
+                        sx={{
+                          cursor: isDragged ? "grabbing" : "grab",
+                          fontSize: "1.3rem",
+                          color: "primary.main",
+                          "&:hover": {
+                            color: "primary.light",
+                          },
+                          transform: "rotate(90deg)",
+                        }}
                       />
                       <IconButton
                         onClick={() => handleRemoveItem(value.id)}
-                        className={classes.removeIconButton}
+                        sx={{ padding: "2px" }}
                         size="large"
                       >
-                        <ClearIcon className={classes.removeIcon} />
+                        <ClearIcon sx={{ fontSize: "1.3rem" }} />
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -335,14 +350,12 @@ const ContentInputForm = ({
 
       <div style={{ marginTop: 10, marginLeft: 10 }}>
         <QuickAddInput
-          className={classes.quickAddInput}
           placeholder="+ Add Item"
-          tooltip="Add Item"
           onSubmit={handleAddItem}
           reset={initialData}
         />
       </div>
-    </div>
+    </StyledRootBox>
   );
 };
 

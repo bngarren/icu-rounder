@@ -52,10 +52,13 @@ const gridHeaderSx = {
 const gridBodySx = {
   flexDirection: "row",
   flex: "2",
+  padding: "0px 4px 0px 4px",
 };
 
+const nestedContentMarginTop = "15px";
+
 const gridBodyNestedSx = {
-  padding: "15px 4px 0px 0px",
+  marginTop: nestedContentMarginTop,
 };
 
 /* 
@@ -235,7 +238,7 @@ const ContentInput = ({
           onSelectTemplate={handleOnSelectTemplate}
         />
       </Grid>
-      <Grid item container xs={12} sx={gridBodySx}>
+      <Grid item container xs={12} sx={gridBodySx} spacing={1}>
         {id === "simpleContent" ? (
           /* SIMPLE CONTENT */
           <TextField
@@ -292,7 +295,12 @@ const ContentInput = ({
               )}
             </Grid>
             {/* ContentInputForm */}
-            <Grid item xs={12} sm={6}>
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              sx={{ marginTop: nestedContentMarginTop }}
+            >
               <Fade in={selectedSection !== null} timeout={200}>
                 <div>
                   <ContentInputForm
@@ -360,10 +368,14 @@ const SectionContainer = memo(function ({
 });
 
 /* Styling */
-const StyledRootBox = styled(Box)(() => ({
+
+const StyledRootBox = styled(Box, {
+  name: "Section",
+  slot: "Root",
+})(() => ({
   display: "flex",
   flexDirection: "row",
-  "&:hover $sectionRemoveIconButton": {
+  "&:hover .MuiIconButton-root": {
     visibility: "inherit",
     opacity: 1,
   },
