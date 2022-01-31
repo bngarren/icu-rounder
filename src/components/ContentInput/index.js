@@ -288,6 +288,11 @@ const ContentInput = ({
                       <SectionContainer
                         element={value}
                         selected={selectedSection?.id === value.id}
+                        subdued={
+                          /* a section is selected, but not this one */
+                          !Object.is(selectedSection, null) &&
+                          selectedSection?.id !== value.id
+                        }
                         isDragged={isDragged}
                         onClickSection={handleOnClickSectionContainer}
                         onRemoveSection={handleRemoveSection}
@@ -322,10 +327,10 @@ const ContentInput = ({
   );
 };
 
-// eslint-disable-next-line react/display-name
-const SectionContainer = memo(function ({
+const SectionContainer = memo(function SectionContainer({
   element,
   selected,
+  subdued,
   isDragged,
   onClickSection = (f) => f,
   onRemoveSection = (f) => f,
@@ -335,7 +340,7 @@ const SectionContainer = memo(function ({
       onClick={() => onClickSection(element.id)}
       sx={{
         backgroundColor: "white",
-        opacity: "0.6",
+        opacity: subdued ? "0.2" : "0.6",
         minHeight: "20px",
         marginBottom: "5px",
         cursor: "pointer",
@@ -348,7 +353,7 @@ const SectionContainer = memo(function ({
           opacity: "1",
           transition: "background-color 0.3s",
           boxShadow:
-            "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.04) 0px 0px 0px 1px",
+            "rgba(0, 0, 0, 0.05) 0px 6px 15px 0px, rgba(0, 0, 0, 0.04) 0px 0px 0px 0px",
           "&:hover": {
             opacity: "1",
           },
@@ -415,6 +420,7 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
             opacity: 0,
             transition: "visibility 0s linear 0s, opacity 300ms",
             "&:hover": {
+              backgroundColor: "transparent",
               color: "secondary.dark",
             },
             ...(selected === true && {
@@ -468,12 +474,12 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
                 marginRight: "5px",
                 ...(isEmpty === true && {
                   fontWeight: "normal",
-                  letterSpacing: "2px",
+                  letterSpacing: "1.5px",
                 }),
               }}
             >
               {title && `${title}:`}
-              {isEmpty && <i>empty section</i>}
+              {isEmpty && "[empty section]"}
             </Typography>
             {top}
           </Typography>

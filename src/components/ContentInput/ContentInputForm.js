@@ -35,11 +35,9 @@ const StyledRootBox = styled(Box, {
 })(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  borderLeft: `2px solid ${theme.palette.secondary.dark}`,
   margin: 0,
   padding: "2px 4px 30px 8px",
-  boxShadow:
-    "rgb(0 0 0 / 7%) 0px 6px 24px 0px, rgb(0 0 0 / 35%) 0px 0px 0px 1px",
+  boxShadow: theme.shadows[2],
   borderRadius: "4px",
 }));
 
@@ -210,7 +208,7 @@ const ContentInputForm = ({
           variant="h4"
           sx={{
             color: "secondary.dark",
-            fontSize: "1rem",
+            fontSize: "1.1rem",
             fontWeight: "bold",
             textTransform: "uppercase",
             flexGrow: "1",
@@ -227,9 +225,11 @@ const ContentInputForm = ({
             sx={{
               padding: "4px",
               transform: "translate(6px, -2px)",
-              color: "primary.light",
+              color: "secondary.dark",
+
               "&:hover": {
-                color: "primary.main",
+                backgroundColor: "transparent",
+                color: "primary.light",
               },
             }}
           >
