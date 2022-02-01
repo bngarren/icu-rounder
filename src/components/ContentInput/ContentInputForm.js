@@ -32,13 +32,14 @@ import { uniqueId, debounce } from "lodash";
 const StyledRootBox = styled(Box, {
   name: "ContentInputForm",
   slot: "Root",
-})(({ theme }) => ({
+})(() => ({
   display: "flex",
   flexDirection: "column",
+  position: "relative",
   margin: 0,
-  padding: "2px 4px 30px 8px",
-  boxShadow: "-3px -3px 3px -4px rgba(0,0,0,0.54)",
-  borderRadius: "4px",
+  padding: "10px 10px 30px 10px",
+  borderRadius: "2px",
+  boxShadow: "rgba(0, 0, 0, 0.05) 0px 0px 0px 1px",
 }));
 
 const StyledHeaderBox = styled(Box, {
@@ -47,17 +48,21 @@ const StyledHeaderBox = styled(Box, {
 })(() => ({
   display: "flex",
   flexDirection: "row",
+  position: "absolute",
+  top: "10px",
+  right: "10px",
+  zIndex: 10,
   alignItems: "center",
 }));
 
 const StyledTextField = styled(TextField, {
   name: "ContentInputForm",
   slot: "textfield",
-})(({ theme }) => ({
+})(() => ({
   overflow: "overflow",
   "& .MuiOutlinedInput-root": {
     padding: 0,
-    fontSize: theme.typography.formFontSizeLevel2,
+    fontSize: "1rem",
 
     "& > fieldset": {
       border: "none",
@@ -212,8 +217,8 @@ const ContentInputForm = ({
             fontWeight: "bold",
             textTransform: "uppercase",
             flexGrow: "1",
-            textAlign: "center",
             letterSpacing: "1px",
+            textAlign: "end",
           }}
         >
           Edit Section
@@ -223,7 +228,7 @@ const ContentInputForm = ({
             onClick={onClose}
             size="large"
             sx={{
-              padding: "4px",
+              padding: "0px",
               transform: "translate(6px, -2px)",
               color: "secondary.dark",
 
@@ -244,7 +249,7 @@ const ContentInputForm = ({
         onChange={(e) => handleOnTitleChange(e.target.value)}
         size="small"
         inputProps={{
-          sx: { fontWeight: "bold", fontSize: "formFontSizeLevel1" },
+          sx: { fontWeight: "bold", fontSize: "1.3rem" },
         }}
       />
       <StyledTextField
@@ -286,7 +291,7 @@ const ContentInputForm = ({
                   width: "100%",
                   padding: 0,
                   "& .MuiOutlinedInput-input": {
-                    fontSize: "formFontSizeLevel3",
+                    fontSize: "formFontSizeLevel1",
                   },
                   "&:hover .MuiInputAdornment-root": {
                     visibility: "inherit",

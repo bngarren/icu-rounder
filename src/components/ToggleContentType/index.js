@@ -1,22 +1,34 @@
-import ToggleButton from "@mui/material/ToggleButton";
-import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+// MUI
+import { ToggleButtonGroup, ToggleButton, Tooltip } from "@mui/material";
 import NotesIcon from "@mui/icons-material/Notes";
 import VerticalSplitIcon from "@mui/icons-material/VerticalSplit";
-
-// MUI
 import { styled } from "@mui/system";
 
+/* // Unfortunately, wrapping with Tooltip breaks ToggleButton functionality.
+https://github.com/mui-org/material-ui/issues/12921
+This is a workaround. */
+const TooltipToggleButton = ({ children, title, ...props }) => (
+  <Tooltip title={title}>
+    <span>
+      <ToggleButton {...props}>{children}</ToggleButton>
+    </span>
+  </Tooltip>
+);
+
 /* Styling */
-const StyledToggleButton = styled(ToggleButton, {
+const StyledToggleButton = styled(TooltipToggleButton, {
   name: "StyledToggleButton",
 })(({ theme }) => ({
-  padding: theme.spacing(0.5),
+  padding: theme.spacing(0.25),
+  border: "none",
   color: theme.palette.primary.light,
   "&:hover": {
     color: theme.palette.primary.dark,
   },
   "&.Mui-selected": {
-    color: theme.palette.primary.dark,
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+    border: "none",
   },
 }));
 

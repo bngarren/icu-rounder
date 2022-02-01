@@ -46,7 +46,6 @@ const gridHeaderSx = {
   alignItems: "center",
   paddingTop: "10px",
   paddingBottom: "8px",
-  borderBottom: "1px solid #eee",
   minHeight: "45px",
 };
 
@@ -327,6 +326,28 @@ const ContentInput = ({
   );
 };
 
+/* Styling */
+const StyledSectionOverlayBox = styled(Box, {
+  name: "SectionContainer",
+  slot: "overlay",
+  shouldForwardProp: (prop) => prop !== "selected",
+})(({ theme, selected }) => ({
+  position: "absolute",
+  width: "100%",
+  height: "100%",
+  top: 0,
+  left: 0,
+  zIndex: 10,
+  display: selected ? "flex" : "none",
+  flexDirection: "row",
+  justifyContent: "center",
+  alignItems: "center",
+  color: theme.palette.primary.dark,
+  backgroundColor: "white",
+  opacity: "0.8",
+  transition: "background-color 0.3s",
+}));
+
 const SectionContainer = memo(function SectionContainer({
   element,
   selected,
@@ -340,20 +361,20 @@ const SectionContainer = memo(function SectionContainer({
       onClick={() => onClickSection(element.id)}
       sx={{
         backgroundColor: "white",
-        opacity: subdued ? "0.2" : "0.6",
+        opacity: subdued ? "0.4" : "0.8",
         minHeight: "20px",
         marginBottom: "5px",
         cursor: "pointer",
         "&:hover": {
           backgroundColor: "#f8f8f8",
-          opacity: "0.7",
+          opacity: "0.9",
         },
         transition: "background linear 0.2s",
         ...(selected === true && {
           opacity: "1",
           transition: "background-color 0.3s",
-          boxShadow: "0px 1px 3px 0px rgba(0,0,0,0.1)",
-          //"rgba(0, 0, 0, 0.05) 0px 6px 15px 0px, rgba(0, 0, 0, 0.04) 0px 0px 0px 0px",
+          backgroundColor: "grey.300",
+          //boxShadow: "0px 1px 3px 0px rgba(0,0,0,0.1)",
           "&:hover": {
             opacity: "1",
           },
@@ -371,6 +392,24 @@ const SectionContainer = memo(function SectionContainer({
         isDragged={isDragged}
         onRemoveSection={onRemoveSection}
       />
+      <StyledSectionOverlayBox selected={selected}>
+        <Typography
+          variant="overline"
+          display="block"
+          sx={{
+            fontSize: "formFontSizeLevel2",
+          }}
+        >
+          MODIFYING
+          <Typography
+            variant="body1"
+            component="span"
+            sx={{ fontSize: "1.5rem", color: "secondary.dark" }}
+          >
+            ...
+          </Typography>
+        </Typography>
+      </StyledSectionOverlayBox>
     </Box>
   );
 });
@@ -395,6 +434,7 @@ const StyledButtonsBox = styled(Box)(() => ({
   justifyContent: "flex-start",
   alignItems: "center",
   borderRight: "3px solid transparent",
+  zIndex: 20,
 }));
 
 const StyledSectionTopBox = styled(Box)(() => ({
@@ -410,44 +450,6 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
 
   return (
     <StyledRootBox>
-      <StyledButtonsBox>
-        <IconButton
-          onClick={(e) => onRemoveSection(e, id)}
-          sx={{
-            padding: "2px",
-            color: "primary.main",
-            visibility: "hidden",
-            opacity: 0,
-            transition: "visibility 0s linear 0s, opacity 300ms",
-            "&:hover": {
-              backgroundColor: "transparent",
-              color: "secondary.dark",
-            },
-            ...(selected === true && {
-              visibility: "inherit",
-              opacity: 1,
-            }),
-          }}
-        >
-          <ClearIcon sx={{ fontSize: "1.2rem" }} />
-        </IconButton>
-        {selected ? (
-          <DragIndicatorIcon
-            data-movable-handle
-            sx={{
-              fontSize: "1.2rem",
-              color: "primary.light",
-              "&:hover": {
-                color: "secondary.dark",
-              },
-              transform: "rotate(90deg)",
-              cursor: isDragged ? "grabbing" : "grab",
-            }}
-          />
-        ) : (
-          <div data-movable-handle></div>
-        )}
-      </StyledButtonsBox>
       <Box sx={{ flexGrow: 1 }}>
         <StyledSectionTopBox>
           <Typography
@@ -474,7 +476,7 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
                 marginRight: "5px",
                 ...(isEmpty === true && {
                   fontWeight: "normal",
-                  letterSpacing: "1.5px",
+                  letterSpacing: "1.2px",
                 }),
               }}
             >
@@ -517,6 +519,44 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
           </List>
         )}{" "}
       </Box>
+      <StyledButtonsBox>
+        <IconButton
+          onClick={(e) => onRemoveSection(e, id)}
+          sx={{
+            padding: "2px",
+            color: "primary.main",
+            visibility: "hidden",
+            opacity: 0,
+            transition: "visibility 0s linear 0s, opacity 300ms",
+            "&:hover": {
+              backgroundColor: "transparent",
+              color: "secondary.dark",
+            },
+            ...(selected === true && {
+              visibility: "inherit",
+              opacity: 1,
+            }),
+          }}
+        >
+          <ClearIcon sx={{ fontSize: "1.2rem" }} />
+        </IconButton>
+        {selected ? (
+          <DragIndicatorIcon
+            data-movable-handle
+            sx={{
+              fontSize: "1.2rem",
+              color: "primary.light",
+              "&:hover": {
+                color: "secondary.dark",
+              },
+              transform: "rotate(90deg)",
+              cursor: isDragged ? "grabbing" : "grab",
+            }}
+          />
+        ) : (
+          <div data-movable-handle></div>
+        )}
+      </StyledButtonsBox>
     </StyledRootBox>
   );
 };
