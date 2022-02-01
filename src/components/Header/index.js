@@ -88,7 +88,6 @@ const Header = () => {
         <AppBar
           sx={{
             backgroundColor: "white",
-            borderBottom: "1px solid #e8e7e7a6", // very light grey
           }}
         >
           <Toolbar

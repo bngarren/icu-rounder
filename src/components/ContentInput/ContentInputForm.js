@@ -37,7 +37,7 @@ const StyledRootBox = styled(Box, {
   flexDirection: "column",
   position: "relative",
   margin: 0,
-  padding: "10px 10px 30px 10px",
+  padding: "20px 10px 30px 10px",
   borderRadius: "2px",
   boxShadow: "rgba(0, 0, 0, 0.05) 0px 0px 0px 1px",
 }));
@@ -49,7 +49,7 @@ const StyledHeaderBox = styled(Box, {
   display: "flex",
   flexDirection: "row",
   position: "absolute",
-  top: "10px",
+  top: "5px",
   right: "10px",
   zIndex: 10,
   alignItems: "center",
@@ -59,10 +59,10 @@ const StyledTextField = styled(TextField, {
   name: "ContentInputForm",
   slot: "textfield",
 })(() => ({
-  overflow: "overflow",
   "& .MuiOutlinedInput-root": {
     padding: 0,
     fontSize: "1rem",
+    lineHeight: "1.3rem",
 
     "& > fieldset": {
       border: "none",
@@ -213,7 +213,10 @@ const ContentInputForm = ({
           variant="h4"
           sx={{
             color: "secondary.dark",
-            fontSize: "1.1rem",
+            fontSize: {
+              xs: "0.9rem",
+              lg: "1.2rem",
+            },
             fontWeight: "bold",
             textTransform: "uppercase",
             flexGrow: "1",
@@ -286,7 +289,7 @@ const ContentInputForm = ({
                 size="small"
                 multiline
                 minRows={1}
-                maxRows={3}
+                maxRows={10}
                 sx={{
                   width: "100%",
                   padding: 0,
