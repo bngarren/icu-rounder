@@ -305,7 +305,7 @@ const ContentInput = ({
             <Grid
               item
               xs={12}
-              sm={selectedSection !== null ? 8 : 6}
+              sm={selectedSection !== null ? 7 : 5}
               sx={{ marginTop: nestedContentMarginTop }}
             >
               <Fade in={selectedSection !== null} timeout={200}>
@@ -326,12 +326,23 @@ const ContentInput = ({
   );
 };
 
-/* Styling */
+/* Styling - SectionContainer */
+const StyledSectionContainerRoot = styled(Box, {
+  name: "SectionContainer",
+  slot: "Root",
+})(() => ({
+  // Show buttons on SectionContainer hover; seems to work best from here
+  "&:hover .MuiIconButton-root": {
+    visibility: "inherit",
+    opacity: 1,
+  },
+}));
+
 const StyledSectionOverlayBox = styled(Box, {
   name: "SectionContainer",
   slot: "overlay",
   shouldForwardProp: (prop) => prop !== "selected",
-})(({ theme, selected }) => ({
+})(({ selected }) => ({
   position: "absolute",
   width: "100%",
   height: "100%",
@@ -341,11 +352,10 @@ const StyledSectionOverlayBox = styled(Box, {
   display: selected ? "flex" : "none",
   flexDirection: "row",
   justifyContent: "center",
-  alignItems: "center",
-  color: theme.palette.primary.dark,
-  backgroundColor: "white",
-  opacity: "0.8",
-  transition: "background-color 0.3s",
+  alignItems: "flex-start",
+  backgroundColor: "#ffffff33",
+  opacity: "1",
+  cursor: "pointer",
 }));
 
 const SectionContainer = memo(function SectionContainer({
@@ -357,83 +367,53 @@ const SectionContainer = memo(function SectionContainer({
   onRemoveSection = (f) => f,
 }) {
   return (
-    <Box
+    <StyledSectionContainerRoot
       onClick={() => onClickSection(element.id)}
-      sx={{
-        backgroundColor: "white",
-        opacity: subdued ? "0.4" : "0.8",
-        minHeight: "20px",
-        marginBottom: "5px",
-        cursor: "pointer",
-        "&:hover": {
-          backgroundColor: "#f8f8f8",
-          opacity: "0.9",
-        },
-        transition: "background linear 0.2s",
-        ...(selected === true && {
-          opacity: "1",
-          transition: "background-color 0.3s",
-          backgroundColor: "grey.300",
-          //boxShadow: "0px 1px 3px 0px rgba(0,0,0,0.1)",
-          "&:hover": {
-            opacity: "1",
-          },
-        }),
-        ...(isDragged === true && {
-          border: "1px dashed #988b8b",
-          opacity: 1,
-          backgroundColor: "#ffffff6b !important",
-        }),
-      }}
+      sx={{}}
     >
       <Section
         data={element}
         selected={selected}
         isDragged={isDragged}
+        subdued={subdued}
         onRemoveSection={onRemoveSection}
       />
-      <StyledSectionOverlayBox selected={selected}>
-        <Typography
-          variant="overline"
-          display="block"
-          sx={{
-            fontSize: "formFontSizeLevel2",
-          }}
-        >
-          MODIFYING
-          <Typography
-            variant="body1"
-            component="span"
-            sx={{ fontSize: "1.5rem", color: "secondary.dark" }}
-          >
-            ...
-          </Typography>
-        </Typography>
-      </StyledSectionOverlayBox>
-    </Box>
+      <StyledSectionOverlayBox selected={selected}></StyledSectionOverlayBox>
+    </StyledSectionContainerRoot>
   );
 });
 
-/* Styling */
+/* Styling for Section */
 
-const StyledRootBox = styled(Box, {
+const StyledSectionRoot = styled(Box, {
   name: "Section",
   slot: "Root",
-})(() => ({
+  shouldForwardProp: (prop) =>
+    prop !== "subdued" && prop !== "isDragged" && prop !== "selected",
+})(({ theme, selected, subdued, isDragged }) => ({
   display: "flex",
   flexDirection: "row",
-  "&:hover .MuiIconButton-root": {
-    visibility: "inherit",
-    opacity: 1,
+  paddingLeft: "9px",
+  cursor: "pointer",
+  // Sections that aren't selected should be subdued in appearance
+  opacity: subdued ? "0.4" : "1",
+
+  // Show a hovering color, unless currently being dragged or is selected
+  ":hover": {
+    backgroundColor:
+      isDragged || selected ? "transparent" : theme.palette.grey[100],
   },
+  ...(isDragged && {}),
 }));
 
-const StyledButtonsBox = styled(Box)(() => ({
+const StyledButtonsBox = styled(Box, {
+  name: "Section",
+  slot: "buttons",
+})(() => ({
   display: "flex",
   flexDirection: "column",
   justifyContent: "flex-start",
   alignItems: "center",
-  borderRight: "3px solid transparent",
   zIndex: 20,
 }));
 
@@ -444,12 +424,22 @@ const StyledSectionTopBox = styled(Box)(() => ({
   justifyContent: "flex-start",
 }));
 
-const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
+const Section = ({
+  data,
+  selected,
+  isDragged,
+  subdued,
+  onRemoveSection = (f) => f,
+}) => {
   const { id, title, top, items } = data;
   const isEmpty = !title && !top && items.length < 1;
 
   return (
-    <StyledRootBox>
+    <StyledSectionRoot
+      selected={selected}
+      subdued={subdued}
+      isDragged={isDragged}
+    >
       <Box sx={{ flexGrow: 1 }}>
         <StyledSectionTopBox>
           <Typography
@@ -459,13 +449,13 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
               whiteSpace: "pre-line",
               width: "100%",
               marginBottom: "2px",
-              ...(isDragged === true && {
+              /* ...(isDragged === true && {
                 display: "inline-block",
                 maxWidth: "200px",
                 overflow: "hidden",
                 whiteSpace: "nowrap",
                 textOverflow: "ellipsis",
-              }),
+              }), */
             }}
           >
             <Typography
@@ -484,43 +474,59 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
               {isEmpty && "[empty section]"}
             </Typography>
             {top}
+            <Typography
+              variant="caption"
+              component="span"
+              sx={{
+                display: selected ? "inline" : "none",
+                borderRadius: "5px",
+                color: "secondary.light",
+                backgroundColor: "primary.main",
+                fontSize: "0.7rem",
+                padding: "1px 2px",
+                ml: "3px",
+                zIndex: 30,
+              }}
+            >
+              EDITING
+            </Typography>
           </Typography>
         </StyledSectionTopBox>
-        {!isDragged && (
-          <List component="ul" disablePadding>
-            {items &&
-              items.length > 0 &&
-              items.map((item) => {
-                const itemText = item.value !== "" ? item.value : "";
-                return (
-                  <ListItem
+
+        <List component="ul" disablePadding>
+          {items &&
+            items.length > 0 &&
+            items.map((item) => {
+              const itemText = item.value !== "" ? item.value : "";
+              return (
+                <ListItem
+                  sx={{
+                    padding: "1px 0 1px 8px",
+                  }}
+                  key={uniqueId("sectionItem-")}
+                >
+                  <StopIcon
+                    sx={{ fontSize: "0.8rem", color: "primary.light" }}
+                  />
+                  <ListItemText
+                    primary={itemText}
                     sx={{
-                      padding: "1px 0 1px 8px",
+                      margin: "0",
+                      paddingLeft: "3px",
+                      "& .MuiListItemText-primary": {
+                        fontSize: "formFontSizeLevel3",
+                        lineHeight: "1",
+                      },
                     }}
-                    key={uniqueId("sectionItem-")}
-                  >
-                    <StopIcon
-                      sx={{ fontSize: "0.8rem", color: "primary.light" }}
-                    />
-                    <ListItemText
-                      primary={itemText}
-                      sx={{
-                        margin: "0",
-                        paddingLeft: "3px",
-                        "& .MuiListItemText-primary": {
-                          fontSize: "formFontSizeLevel3",
-                          lineHeight: "1",
-                        },
-                      }}
-                    />
-                  </ListItem>
-                );
-              })}
-          </List>
-        )}{" "}
+                  />
+                </ListItem>
+              );
+            })}
+        </List>
       </Box>
       <StyledButtonsBox>
         <IconButton
+          // Remove section button (X)
           onClick={(e) => onRemoveSection(e, id)}
           sx={{
             padding: "2px",
@@ -532,6 +538,7 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
               backgroundColor: "transparent",
               color: "secondary.dark",
             },
+            // if selected, always show the button
             ...(selected === true && {
               visibility: "inherit",
               opacity: 1,
@@ -557,7 +564,7 @@ const Section = ({ data, selected, isDragged, onRemoveSection = (f) => f }) => {
           <div data-movable-handle></div>
         )}
       </StyledButtonsBox>
-    </StyledRootBox>
+    </StyledSectionRoot>
   );
 };
 
