@@ -11,6 +11,7 @@ import {
   IconButton,
   Fade,
   TextField,
+  alpha,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import StopIcon from "@mui/icons-material/Stop";
@@ -55,6 +56,11 @@ const nestedContentMarginTop = "10px";
 
 const gridBodyNestedSx = {
   marginTop: nestedContentMarginTop,
+  paddingRight: {
+    xs: 0,
+    md: "8px",
+    lg: "12px",
+  },
 };
 
 const StyledMovableLi = styled("li", {
@@ -291,7 +297,7 @@ const ContentInput = ({
         ) : (
           /* NESTED CONTENT */
           <>
-            <Grid item xs={12} sm sx={gridBodyNestedSx}>
+            <Grid item xs={12} sm={6} xl={4} sx={gridBodyNestedSx}>
               {data instanceof Array && data?.length > 0 && (
                 <MovableList
                   values={data}
@@ -325,7 +331,8 @@ const ContentInput = ({
             <Grid
               item
               xs={12}
-              sm={selectedSection !== null ? 7 : 5}
+              sm={6}
+              xl={5}
               sx={{ marginTop: nestedContentMarginTop }}
             >
               <Fade in={selectedSection !== null} timeout={200}>
@@ -339,6 +346,8 @@ const ContentInput = ({
                 </div>
               </Fade>
             </Grid>
+            {/* Spacer grid to help responsively size the other 2 grid items */}
+            <Grid item xs sm xl />
           </>
         )}
       </Grid>
@@ -363,7 +372,7 @@ const StyledSectionOverlayBox = styled(Box, {
   name: "SectionContainer",
   slot: "overlay",
   shouldForwardProp: (prop) => prop !== "selected",
-})(({ selected }) => ({
+})(({ theme, selected }) => ({
   position: "absolute",
   width: "100%",
   height: "100%",
@@ -374,9 +383,10 @@ const StyledSectionOverlayBox = styled(Box, {
   flexDirection: "row",
   justifyContent: "center",
   alignItems: "flex-start",
-  backgroundColor: "#ffffff33",
+  backgroundColor: alpha(theme.palette.primary.main, 0.1),
   opacity: "1",
   cursor: "pointer",
+  borderRadius: theme.shape.borderRadius,
 }));
 
 const SectionContainer = memo(function SectionContainer({
@@ -495,21 +505,6 @@ const Section = ({
               {isEmpty && "[empty section]"}
             </Typography>
             {top}
-            <Typography
-              variant="caption"
-              component="span"
-              sx={{
-                display: selected ? "inline" : "none",
-                borderRadius: "5px",
-                color: "secondary.light",
-                backgroundColor: "primary.main",
-                fontSize: "1.2rem",
-                padding: "1px 2px",
-                ml: "3px",
-              }}
-            >
-              ...
-            </Typography>
           </Typography>
         </StyledSectionTopBox>
 

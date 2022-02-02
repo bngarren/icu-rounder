@@ -15,6 +15,7 @@ import StopIcon from "@mui/icons-material/Stop";
 import ClearIcon from "@mui/icons-material/Clear";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import CancelIcon from "@mui/icons-material/Cancel";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 
 // React Movable
 import { List as MovableList, arrayMove } from "react-movable";
@@ -37,7 +38,7 @@ const StyledRootBox = styled(Box, {
   flexDirection: "column",
   margin: 0,
   borderRadius: theme.shape.borderRadius,
-  boxShadow: "rgba(0, 0, 0, 0.05) 0px 0px 0px 1px",
+  boxShadow: "0px 3px 7px -2px rgba(0,0,0,0.30)",
 }));
 
 const StyledHeaderBox = styled(Box, {
@@ -46,7 +47,7 @@ const StyledHeaderBox = styled(Box, {
 })(({ theme }) => ({
   display: "flex",
   flexDirection: "row",
-  padding: "3px 6px",
+  padding: "4px 6px",
   alignItems: "center",
   backgroundColor: theme.palette.primary.light,
   borderTopLeftRadius: theme.shape.borderRadius,
@@ -59,33 +60,32 @@ const StyledContentBox = styled(Box, {
 })(() => ({
   display: "flex",
   flexDirection: "column",
-  padding: "5px 8px 20px 8px",
+  padding: "8px 8px 20px 14px",
 }));
 
 const StyledTextField = styled(TextField, {
   name: "ContentInputForm",
   slot: "textfield",
-})(() => ({
+})(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
     padding: 0,
     fontSize: "1rem",
-    lineHeight: "1.3rem",
+    lineHeight: "1.2rem",
 
     "& > fieldset": {
       border: "none",
     },
   },
   "& .MuiOutlinedInput-input": {
-    borderBottom: "1px dotted transparent",
-    transition: "border-color linear 0.1s",
-    paddingBottom: "2px",
-    paddingLeft: "4px",
+    padding: "1px 2px 1px 2px",
+    //paddingBottom: "2px",
+    //paddingLeft: "4px",
     "&:hover": {
-      borderColor: "#5f5f5f",
+      backgroundColor: theme.palette.grey[100],
     },
     "&:focus": {
-      borderStyle: "solid",
-      borderColor: "#a9a9a9",
+      color: theme.palette.primary.light,
+      backgroundColor: "transparent",
     },
   },
 }));
@@ -144,10 +144,10 @@ const ContentInputForm = ({
     });
   };
 
-  const handleAddItem = (value) => {
+  const handleAddItem = (value = "") => {
     setItems((prevValue) => {
       let arr = [...prevValue];
-      arr.push({ id: uniqueId("item-"), value: value || "" });
+      arr.push({ id: uniqueId("item-"), value: value });
 
       debouncedNotifyParent({ ...getSectionObject(), items: arr });
       return arr;
@@ -276,7 +276,10 @@ const ContentInputForm = ({
             onChange={handleMoveItem}
             lockVertically={true}
             renderList={({ children, props }) => (
-              <List sx={{ padding: "0px 0px 10px 12px" }} {...props}>
+              <List
+                sx={{ mt: "0.5rem", padding: "0px 0px 10px 12px" }}
+                {...props}
+              >
                 {children}
               </List>
             )}
@@ -362,12 +365,16 @@ const ContentInputForm = ({
           />
         )}
 
-        <div style={{ marginTop: 10, marginLeft: 10 }}>
-          <QuickAddInput
+        <div style={{}}>
+          {/* <QuickAddInput
+            label="Balls"
             placeholder="+ Add Item"
             onSubmit={handleAddItem}
             reset={initialData}
-          />
+          /> */}
+          <IconButton onClick={() => handleAddItem()}>
+            <AddBoxIcon />
+          </IconButton>
         </div>
       </StyledContentBox>
     </StyledRootBox>
