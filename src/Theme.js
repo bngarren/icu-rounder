@@ -19,7 +19,7 @@ export const theme = createTheme({
     },
   },
   typography: {
-    formFontSizeLevel1: "0.95rem",
+    formFontSizeLevel1: "0.98rem",
     formFontSizeLevel2: "0.90rem",
     formFontSizeLevel3: "0.85rem",
   },

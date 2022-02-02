@@ -13,6 +13,7 @@ const StyledTextField = styled(TextField, {
   margin: "6px 0px",
   // Change label color based on diff status (unsaved vs saved)
   "& .MuiFormLabel-root": {
+    fontWeight: "bold",
     ...(diff
       ? {
           color: theme.palette.secondary.dark,
@@ -26,7 +27,7 @@ const StyledTextField = styled(TextField, {
     borderRadius: "2px",
     "& fieldset": {
       // Baseline border
-      borderColor: theme.palette.grey[200],
+      borderColor: "transparent",
     },
     "&:hover fieldset": {
       borderColor: theme.palette.primary.light,
@@ -42,6 +43,12 @@ const StyledTextField = styled(TextField, {
     fontSize: theme.typography.formFontSizeLevel1,
     paddingTop: "10px",
     paddingBottom: "4px",
+  },
+  "& .MuiInputBase-multiline": {
+    padding: 0,
+    "& .MuiOutlinedInput-input": {
+      padding: "10px 14px 4px 14px",
+    },
   },
 }));
 

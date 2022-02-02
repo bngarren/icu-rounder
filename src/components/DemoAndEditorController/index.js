@@ -31,7 +31,7 @@ const StyledNavigateIconButton = styled(IconButton)(({ theme }) => ({
   color: theme.palette.primary.light,
   padding: 5,
   "&:hover": {
-    color: theme.palette.secondary.light,
+    color: theme.palette.secondary.dark,
     cursor: "pointer",
     backgroundColor: "transparent",
   },
@@ -156,10 +156,7 @@ const DemoAndEditorController = ({
   /* Renders the Toolbar associated with the BedspaceEditor, includes
   Navigation arrows, Save, and Reset buttons */
   const renderToolbar = () => (
-    <Toolbar
-      variant="dense"
-      sx={{ borderBottom: "2px solid", borderColor: "grey.50" }}
-    >
+    <Toolbar variant="dense">
       <Box
         sx={{
           display: "flex",

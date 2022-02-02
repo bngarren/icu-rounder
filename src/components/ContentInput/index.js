@@ -32,11 +32,8 @@ import { uniqueId } from "lodash";
 const gridRootSx = {
   flexDirection: "column",
   backgroundColor: "white",
-  border: "1px solid",
-  borderColor: "grey.200",
-  borderRadius: "4px",
   padding: "0px 0px 20px 0px",
-  margin: "6px 0px 6px 0px",
+  margin: "0px 0px 6px 0px",
   minHeight: "225px",
 };
 
@@ -52,10 +49,9 @@ const gridHeaderSx = {
 const gridBodySx = {
   flexDirection: "row",
   flex: "2",
-  padding: "0px 4px 0px 4px",
 };
 
-const nestedContentMarginTop = "15px";
+const nestedContentMarginTop = "10px";
 
 const gridBodyNestedSx = {
   marginTop: nestedContentMarginTop,
@@ -89,6 +85,7 @@ are still 'controlled' inputs.
 const ContentInput = ({
   id,
   initialValue,
+  diff,
   value: data,
   onChange = (f) => f,
   children,
@@ -230,9 +227,10 @@ const ContentInput = ({
           sx={{
             /* needs to match font appearance of
           EditorTextField labels */
-            color: "primary.light",
+            color: diff ? "secondary.dark" : "primary.light",
             px: 0.8,
             fontSize: "1rem",
+            fontWeight: "bold",
             transform: "scale(0.75)",
           }}
         >
@@ -248,7 +246,7 @@ const ContentInput = ({
           onSelectTemplate={handleOnSelectTemplate}
         />
       </Grid>
-      <Grid item container xs={12} sx={gridBodySx} spacing={1}>
+      <Grid item container xs={12} sx={gridBodySx}>
         {id === "simpleContent" ? (
           /* SIMPLE CONTENT */
           <TextField
@@ -261,10 +259,32 @@ const ContentInput = ({
             sx={{
               lineHeight: "1.5em",
               "& .MuiOutlinedInput-notchedOutline": {
-                border: "none",
+                //border: "none",
+              },
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "2px",
+                "& fieldset": {
+                  // Baseline border
+                  borderColor: "transparent",
+                },
+                "&:hover fieldset": {
+                  borderColor: "primary.light",
+                },
+                "&.Mui-focused fieldset": {
+                  // Focused border
+                  borderWidth: "0.1em",
+                  borderColor: "primary.main",
+                  boxShadow: "rgba(17, 17, 26, 0.15) 0px 1px 0px",
+                },
               },
               "& .MuiOutlinedInput-input": {
                 fontSize: "formFontSizeLevel1",
+              },
+              "& .MuiInputBase-multiline": {
+                padding: 0,
+                "& .MuiOutlinedInput-input": {
+                  padding: "10px 14px 4px 14px",
+                },
               },
             }}
           />
@@ -331,6 +351,7 @@ const StyledSectionContainerRoot = styled(Box, {
   name: "SectionContainer",
   slot: "Root",
 })(() => ({
+  marginLeft: "4px",
   // Show buttons on SectionContainer hover; seems to work best from here
   "&:hover .MuiIconButton-root": {
     visibility: "inherit",
@@ -482,13 +503,12 @@ const Section = ({
                 borderRadius: "5px",
                 color: "secondary.light",
                 backgroundColor: "primary.main",
-                fontSize: "0.7rem",
+                fontSize: "1.2rem",
                 padding: "1px 2px",
                 ml: "3px",
-                zIndex: 30,
               }}
             >
-              EDITING
+              ...
             </Typography>
           </Typography>
         </StyledSectionTopBox>
