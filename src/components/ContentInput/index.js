@@ -297,7 +297,7 @@ const ContentInput = ({
         ) : (
           /* NESTED CONTENT */
           <>
-            <Grid item xs={12} sm={6} xl={4} sx={gridBodyNestedSx}>
+            <Grid item xs={12} sm={6} sx={gridBodyNestedSx}>
               {data instanceof Array && data?.length > 0 && (
                 <MovableList
                   values={data}
@@ -332,7 +332,6 @@ const ContentInput = ({
               item
               xs={12}
               sm={6}
-              xl={5}
               sx={{ marginTop: nestedContentMarginTop }}
             >
               <Fade in={selectedSection !== null} timeout={200}>
@@ -347,7 +346,7 @@ const ContentInput = ({
               </Fade>
             </Grid>
             {/* Spacer grid to help responsively size the other 2 grid items */}
-            <Grid item xs sm xl />
+            <Grid item xs sm />
           </>
         )}
       </Grid>
