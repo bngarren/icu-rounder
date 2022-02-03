@@ -31,21 +31,23 @@ import AddNewBedspaceForm from "./AddNewBedspaceForm";
 // Context
 import { BedActionsContext } from "../../pages/UpdatePage";
 
-// Defaults //! Need to put this in Settings
+// Defaults //TODO Need to put this in Settings
 const ROWS_PER_PAGE = 15;
 
 /* Styling */
-const StyledTableCellHeader = styled(TableCell)(({ theme }) => ({
+const StyledTableCellHeader = styled(TableCell, {
+  name: "TableBedList",
+  slot: "header",
+})(({ theme }) => ({
   backgroundColor: theme.palette.primary.dark,
   color: theme.palette.primary.contrastText,
   padding: "4px 2px 4px 10px",
-}));
-
-const StyledTableRow = styled(TableRow)(() => ({
-  "&.MuiTableRow-hover:hover": {},
+  borderBottom: "none",
 }));
 
 const StyledTableCell = styled(TableCell, {
+  name: "TableBedList",
+  slot: "tableCell",
   shouldForwardProp: (prop) =>
     prop !== "shouldHighlight" && prop !== "isSelected",
 })(({ shouldHighlight, isSelected, component, theme }) => ({
@@ -57,6 +59,7 @@ const StyledTableCell = styled(TableCell, {
     padding: "2px 2px 2px 2px",
     fontSize: "0.85rem",
   },
+  // Targets the Bed number table cell, when selected
   ...(isSelected &&
     component === "th" && {
       transition: "color 0.1s linear",
@@ -64,11 +67,13 @@ const StyledTableCell = styled(TableCell, {
     }),
   ...(shouldHighlight && {
     transition: "color 0.2s ease-in",
-    backgroundColor: theme.palette.secondary.main,
+    backgroundColor: theme.palette.secondary.dark,
   }),
 }));
 
 const StyledTypographyBedNumber = styled(Typography, {
+  name: "TableBedList",
+  slot: "bedNumber",
   shouldForwardProp: (prop) =>
     prop !== "shouldHighlight" && prop !== "isSelected",
 })(({ shouldHighlight, isSelected, theme }) => ({
@@ -83,7 +88,10 @@ const StyledTypographyBedNumber = styled(Typography, {
   }),
 }));
 
-const StyledTablePagination = styled(TablePagination)(({ theme }) => ({
+const StyledTablePagination = styled(TablePagination, {
+  name: "TableBedList",
+  slot: "pagination",
+})(({ theme }) => ({
   "& .MuiTablePagination-root": {
     overflow: "hidden",
     padding: 0,
@@ -105,26 +113,37 @@ const StyledTablePagination = styled(TablePagination)(({ theme }) => ({
   },
 }));
 
-const StyledBedActionsDiv = styled("div")(() => ({
+const StyledBedActionsDiv = styled("div", {
+  name: "TableBedList",
+  slot: "bedActions",
+})(() => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-around",
 }));
 
-const StyledMenuIconButton = styled(IconButton)(() => ({
-  padding: "6px",
-}));
+const buttonPaddingSx = {
+  padding: {
+    xs: "3px",
+    md: "5px",
+  },
+};
+
+const StyledMenuIconButton = styled(IconButton)(() => ({}));
+
+const menuIconStyle = {
+  cursor: "pointer",
+  fontSize: "1.5rem",
+};
 
 const StyledMenuIcon = styled(MenuIcon)(({ theme }) => ({
-  cursor: "pointer",
+  ...menuIconStyle,
   color: theme.palette.primary.light,
-  fontSize: "1.5rem",
 }));
 
 const StyledMenuOpenIcon = styled(MenuOpenIcon)(({ theme }) => ({
-  cursor: "pointer",
+  ...menuIconStyle,
   color: theme.palette.primary.light,
-  fontSize: "1.5rem",
 }));
 
 const TableBedList = ({ data, selectedKey }) => {
@@ -167,18 +186,12 @@ const TableBedList = ({ data, selectedKey }) => {
       <Table aria-label="simple table">
         <TableHead>
           <TableRow>
-            <StyledTableCellHeader sx={{ minWidth: 30 }}>
-              Bed
-            </StyledTableCellHeader>
+            <StyledTableCellHeader>Bed</StyledTableCellHeader>
             <StyledTableCellHeader sx={{ width: "100%" }}>
               Patient
             </StyledTableCellHeader>
-            <StyledTableCellHeader sx={{ minWidth: 30, maxWidth: 30 }}>
-              Team
-            </StyledTableCellHeader>
-            <StyledTableCellHeader
-              sx={{ minWidth: "30px", maxWidth: "30px" }}
-            />
+            <StyledTableCellHeader>Team</StyledTableCellHeader>
+            <StyledTableCellHeader sx={{}} />
           </TableRow>
         </TableHead>
         <MyTableBody
@@ -245,58 +258,59 @@ const MyTableBody = ({ data, page, rowsPerPage, selectedKey }) => {
   );
 };
 
-// eslint-disable-next-line react/display-name
-const MyTableRow = memo(
-  ({ shouldHighlight, adjustedKey, isSelected, value }) => {
-    const emptyBed = isBedEmpty(value);
+const MyTableRow = memo(function MyTableRow({
+  shouldHighlight,
+  adjustedKey,
+  isSelected,
+  value,
+}) {
+  const emptyBed = isBedEmpty(value);
 
-    return (
-      <StyledTableRow key={value.bed} hover selected={isSelected}>
-        <StyledTableCell
-          component="th"
-          scope="row"
-          align="center"
+  return (
+    <TableRow key={value.bed} hover selected={isSelected}>
+      <StyledTableCell
+        component="th"
+        scope="row"
+        align="center"
+        shouldHighlight={shouldHighlight}
+        isSelected={isSelected}
+      >
+        <StyledTypographyBedNumber
+          variant="h5"
           shouldHighlight={shouldHighlight}
           isSelected={isSelected}
         >
-          <StyledTypographyBedNumber
-            variant="h5"
-            shouldHighlight={shouldHighlight}
-            isSelected={isSelected}
-          >
-            {value.bed}
-          </StyledTypographyBedNumber>
-        </StyledTableCell>
-        <StyledTableCell align="left" isSelected={isSelected}>
-          <Typography
-            variant="body1"
-            sx={{
-              pl: 1.5,
-              fontWeight: isSelected ? "fontWeightBold" : "fontWeightRegular",
-            }}
-          >
-            {value["lastName"]}
-            {value["lastName"] && value["firstName"] && ", "}
-            {value["firstName"]}
-          </Typography>
-        </StyledTableCell>
-        <StyledTableCell align="center">
-          <Typography>{value["teamNumber"]}</Typography>
-        </StyledTableCell>
-        <StyledTableCell>
-          <BedActions
-            isSelected={isSelected}
-            bedKey={adjustedKey}
-            emptyBed={emptyBed}
-          />
-        </StyledTableCell>
-      </StyledTableRow>
-    );
-  }
-);
+          {value.bed}
+        </StyledTypographyBedNumber>
+      </StyledTableCell>
+      <StyledTableCell align="left" isSelected={isSelected}>
+        <Typography
+          variant="body1"
+          sx={{
+            pl: 1.5,
+            fontWeight: isSelected ? "fontWeightBold" : "fontWeightRegular",
+          }}
+        >
+          {value["lastName"]}
+          {value["lastName"] && value["firstName"] && ", "}
+          {value["firstName"]}
+        </Typography>
+      </StyledTableCell>
+      <StyledTableCell align="center">
+        <Typography>{value["teamNumber"]}</Typography>
+      </StyledTableCell>
+      <StyledTableCell>
+        <BedActions
+          isSelected={isSelected}
+          bedKey={adjustedKey}
+          emptyBed={emptyBed}
+        />
+      </StyledTableCell>
+    </TableRow>
+  );
+});
 
-// eslint-disable-next-line react/display-name
-const BedActions = memo(({ isSelected, bedKey, emptyBed }) => {
+const BedActions = memo(function BedActions({ isSelected, bedKey, emptyBed }) {
   const { bedActionEdit, bedActionClear, bedActionDelete } =
     useContext(BedActionsContext);
 
@@ -314,13 +328,20 @@ const BedActions = memo(({ isSelected, bedKey, emptyBed }) => {
     <StyledBedActionsDiv>
       {
         <>
-          <Radio checked={isSelected} onClick={() => bedActionEdit(bedKey)} />
+          <Radio
+            checked={isSelected}
+            onClick={() => bedActionEdit(bedKey)}
+            sx={{ ...buttonPaddingSx }}
+          />
         </>
       }
       {
         <StyledMenuIconButton
           onClick={(e) => handleOnClickMenu(e, bedKey)}
           size="large"
+          sx={{
+            ...buttonPaddingSx,
+          }}
         >
           {popupState.isOpen ? (
             <StyledMenuOpenIcon fontSize="small" />
