@@ -21,7 +21,7 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import { List as MovableList, arrayMove } from "react-movable";
 
 // Components
-import QuickAddInput from "./QuickAddInput";
+//import QuickAddInput from "./QuickAddInput";
 
 // Context
 import { useDebouncedContext } from "../../pages/UpdatePage/DebouncedContext";
@@ -48,6 +48,7 @@ const StyledHeaderBox = styled(Box, {
   display: "flex",
   flexDirection: "row",
   padding: "4px 6px",
+  justifyContent: "space-between",
   alignItems: "center",
   backgroundColor: theme.palette.primary.light,
   borderTopLeftRadius: theme.shape.borderRadius,
