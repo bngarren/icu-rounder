@@ -1,4 +1,5 @@
-import "./App.css";
+import CssBaseline from "@mui/material/CssBaseline";
+import Container from "@mui/material/Container";
 
 // Theme
 import { ThemeProvider, StyledEngineProvider } from "@mui/material/styles";
@@ -30,11 +31,16 @@ function App() {
       <SettingsProvider>
         <StyledEngineProvider injectFirst>
           <ThemeProvider theme={theme}>
+            <CssBaseline />
             <AuthStateProvider Firebase={fb}>
               <GridStateProvider Firebase={fb}>
                 <BrowserRouter>
-                  <Header />
-                  <PageRouter />
+                  <Container maxWidth="xl">
+                    <Header />
+                    <main>
+                      <PageRouter />
+                    </main>
+                  </Container>
                   <Footer />
                 </BrowserRouter>
               </GridStateProvider>
