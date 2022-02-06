@@ -1,4 +1,6 @@
 import { useState } from "react";
+
+// MUI
 import {
   Grid,
   List,
@@ -6,49 +8,49 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   IconButton,
-  InputBase,
+  TextField,
 } from "@mui/material";
-import { makeStyles, useTheme } from "@mui/styles";
+import { styled } from "@mui/system";
 import ClearIcon from "@mui/icons-material/Clear";
 
-const useStyles = makeStyles(() => ({
-  root: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  input: {
-    borderBottom: "3px solid #dcdcdc40",
-  },
-  list: {
-    maxHeight: "200px",
-    overflowY: "auto",
-    maxWidth: "300px",
-    padding: "12px 0px",
-  },
-  listItemContainer: {
-    "&:hover": {
-      borderLeft: "5px solid #dcdcdc40",
+/* Styling */
+const StyledGridRoot = styled(Grid, {
+  name: "ContingencyOptionsEditor",
+  slot: "Root",
+})(() => ({
+  alignItems: "center",
+  justifyContent: "center",
+}));
+
+const StyledList = styled(List, {
+  name: "ContingencyOptionsEditor",
+  slot: "list",
+})(({ theme }) => ({
+  maxHeight: "75vh",
+  overflowY: "auto",
+  maxWidth: "300px",
+  padding: "12px 0px",
+  "& .MuiListItem-container": {
+    padding: "2px 0px 2px 5px",
+    marginBottom: 1,
+    width: "100%",
+    "&:hover .MuiListItem-root": {
+      background: theme.palette.grey[100],
     },
-    "&:hover $listItemSecondaryAction": {
+    "& .MuiListItemSecondaryAction-root": {
+      visibility: "hidden",
+    },
+    "&:hover .MuiListItemSecondaryAction-root": {
       visibility: "inherit",
     },
   },
-  listItem: {
-    padding: "2px 0px 2px 5px",
-    marginBottom: 1,
-    width: "max-content",
-  },
-  listItemText: {
-    fontSize: "10pt",
-    margin: 0,
-  },
-  listItemSecondaryAction: {
-    visibility: "hidden",
-  },
-  clearIconButton: {
-    fontSize: "9pt",
-    padding: "2px",
-  },
+}));
+
+const StyledListItem = styled(ListItem, {
+  name: "ContingencyOptionsEditor",
+  slot: "listItem",
+})(() => ({
+  padding: "4px",
 }));
 
 const ContingencyOptionsEditor = ({
@@ -56,9 +58,6 @@ const ContingencyOptionsEditor = ({
   onSubmit = (f) => f,
   onRemove = (f) => f,
 }) => {
-  const theme = useTheme();
-  const classes = useStyles(theme);
-
   const [inputValue, setInputValue] = useState("");
 
   const handleInputKeyDown = (e) => {
@@ -75,54 +74,61 @@ const ContingencyOptionsEditor = ({
   });
 
   return (
-    <Grid container className={classes.root}>
+    <StyledGridRoot container>
       <Grid item xs={12} md={6}>
-        <InputBase
-          className={classes.input}
+        <TextField
           placeholder={"Add new..."}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleInputKeyDown}
+          inputProps={{
+            sx: {
+              p: 1,
+            },
+          }}
         />
       </Grid>
       <Grid item xs md>
-        <List className={classes.list}>
+        <StyledList>
           {sortedData != null &&
             sortedData.length > 0 &&
             sortedData.map((value, index) => {
               return (
-                <ListItem
-                  classes={{
-                    container: classes.listItemContainer,
-                    root: classes.listItem,
-                  }}
-                  key={`${value}-${index}`}
-                >
+                <StyledListItem key={`${value}-${index}`}>
                   <ListItemText
                     primary={value}
                     primaryTypographyProps={{
-                      classes: {
-                        root: classes.listItemText,
+                      sx: {
+                        fontSize: "formFontSizeLevel2",
+                        margin: 0,
                       },
                     }}
                   />
-                  <ListItemSecondaryAction
-                    className={classes.listItemSecondaryAction}
-                  >
+                  <ListItemSecondaryAction>
                     <IconButton
-                      className={classes.clearIconButton}
+                      sx={{
+                        fontSize: "1rem",
+                        padding: "2px",
+                      }}
                       onClick={() => onRemove(index)}
                       size="large"
                     >
-                      <ClearIcon />
+                      <ClearIcon
+                        sx={{
+                          color: "primary.light",
+                          "&:hover": {
+                            color: "primary.main",
+                          },
+                        }}
+                      />
                     </IconButton>
                   </ListItemSecondaryAction>
-                </ListItem>
+                </StyledListItem>
               );
             })}
-        </List>
+        </StyledList>
       </Grid>
-    </Grid>
+    </StyledGridRoot>
   );
 };
 

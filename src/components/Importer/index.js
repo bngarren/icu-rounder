@@ -1,17 +1,8 @@
 import { useEffect, useState } from "react";
 
 import { TextField, Button } from "@mui/material";
-import makeStyles from "@mui/styles/makeStyles";
-
-const useStyles = makeStyles({
-  inputFile: {},
-  preview: {
-    fontSize: "10pt",
-  },
-});
 
 const Importer = ({ onNewDataSelected = (f) => f }) => {
-  const classes = useStyles();
   const [file, setFile] = useState();
   const [data, setData] = useState();
 
@@ -53,20 +44,14 @@ const Importer = ({ onNewDataSelected = (f) => f }) => {
     <div>
       <input
         id="inputFile"
-        className={classes.inputFile}
         type="file"
         accept="application/json"
         style={{ display: "none" }}
         onChange={handleImportAction}
       />
       <label htmlFor="inputFile">
-        <Button
-          variant="contained"
-          color="secondary"
-          component="span"
-          size="small"
-        >
-          File...
+        <Button variant="contained" component="span" size="small">
+          Import Grid
         </Button>
         {file && file.name}
       </label>
@@ -80,8 +65,8 @@ const Importer = ({ onNewDataSelected = (f) => f }) => {
             maxRows={20}
             value={formatted}
             InputProps={{
-              classes: {
-                root: classes.preview,
+              sx: {
+                fontSize: "formFontSizeLevel3",
               },
             }}
           />

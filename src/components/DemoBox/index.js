@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
+
+// MUI
 import { Paper, Collapse } from "@mui/material";
+import { styled } from "@mui/system";
 import makeStyles from "@mui/styles/makeStyles";
 import StopIcon from "@mui/icons-material/Stop";
 
@@ -8,15 +11,6 @@ import { useSettings } from "../../context/Settings";
 import { getWidth } from "../../components/MyDocument";
 
 const useStyles = makeStyles({
-  demoBox: {
-    position: "relative",
-    backgroundColor: "white",
-    height: "250pt",
-    margin: "auto",
-    border: "1px solid #1e1e1e",
-    fontSize: "9pt",
-    fontFamily: "Roboto",
-  },
   demoBoxHeader: {
     display: "flex",
     flexDirection: "row",
@@ -94,7 +88,25 @@ const useStyles = makeStyles({
   },
 });
 
-/* The demo grid box */
+/* Styling */
+const StyledPaperRoot = styled(Paper, {
+  name: "DemoBox",
+  slot: "Root",
+  shouldForwardProp: (prop) => prop !== "convertedWidth",
+})(({ convertedWidth }) => ({
+  position: "relative",
+  backgroundColor: "white",
+  height: "250pt",
+  margin: "auto",
+  border: "1px solid",
+  borderColor: "primary.main",
+  fontSize: "9pt",
+  fontFamily: "Roboto",
+  minWidth: convertedWidth,
+  maxWidth: convertedWidth,
+}));
+
+/* The demo grid box used for displaying what the grid box might look like */
 const DemoBox = ({ data: propsData, collapsed }) => {
   const classes = useStyles();
   const [data, setData] = useState({});
@@ -115,10 +127,7 @@ const DemoBox = ({ data: propsData, collapsed }) => {
   return (
     <>
       <Collapse in={!collapsed}>
-        <Paper
-          className={classes.demoBox}
-          style={{ minWidth: convertedWidth, maxWidth: convertedWidth }}
-        >
+        <StyledPaperRoot convertedWidth={convertedWidth}>
           <div className={classes.demoBoxHeader}>
             <div className={classes.demoBoxHeaderBed}>{data.bed}</div>
             <div className={classes.demoBoxHeaderName}>
@@ -179,7 +188,7 @@ const DemoBox = ({ data: propsData, collapsed }) => {
               })}
           </div>
           <div className={classes.demoBoxBottomText}>{data.bottomText}</div>
-        </Paper>
+        </StyledPaperRoot>
       </Collapse>
     </>
   );
