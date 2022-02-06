@@ -1,6 +1,5 @@
-// Material UI
+// MUI
 import { Grid } from "@mui/material";
-// import { makeStyles } from "@mui/styles";
 
 // Custom components
 import CustomTextField from "../CustomTextField";
@@ -12,17 +11,13 @@ import { useGridStateContext } from "../../../context/GridState";
 // Util
 import { getPrettyBedLayout } from "../../../utils/Utility";
 
-// const useStyles = makeStyles((theme) => ({}));
-
-const GeneralSection = ({ parentCss, onSave = (f) => f }) => {
-  // const classes = useStyles();
-
+const GeneralSection = ({ onSave = (f) => f }) => {
   /* Get GridData and BedLayout from context */
   const { bedLayout } = useGridStateContext();
 
   return (
     <>
-      <Grid item className={parentCss.sectionGridItem}>
+      <Grid item>
         <CustomFormControlSetting
           label="Bed Layout"
           id="bedLayout"

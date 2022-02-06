@@ -1,8 +1,5 @@
-//import {  } from "react";
-
-// Material UI
-import { Grid, Typography, Button } from "@mui/material";
-import { makeStyles } from "@mui/styles";
+// MUI
+import { Grid, InputAdornment, Typography, Button } from "@mui/material";
 
 // Custom components
 import CustomTextField from "../CustomTextField";
@@ -12,25 +9,7 @@ import CustomFormControlSetting from "../../../components/CustomFormControl/Cust
 // Context
 import { useSettings } from "../../../context/Settings";
 
-const useStyles = makeStyles(() => ({
-  exportFilenameTextfieldInput: {
-    textAlign: "right",
-    paddingRight: "4px",
-  },
-  textEndAdornment: {
-    backgroundColor: "#dcdcdc",
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignContent: "center",
-    padding: "6px 3px",
-  },
-}));
-
-const ExportSection = ({ parentCss, onSave = (f) => f }) => {
-  const classes = useStyles();
-
+const ExportSection = ({ onSave = (f) => f }) => {
   /* Get Settings context */
   const { settings } = useSettings();
 
@@ -38,7 +17,7 @@ const ExportSection = ({ parentCss, onSave = (f) => f }) => {
 
   return (
     <>
-      <Grid item className={parentCss.sectionGridItem}>
+      <Grid item>
         <CustomFormControlSetting
           label="Filename"
           id="export_filename"
@@ -47,28 +26,43 @@ const ExportSection = ({ parentCss, onSave = (f) => f }) => {
         >
           <CustomTextField
             id="exportFilenameTextField"
-            style={{ maxWidth: "300px", minWidth: "100px" }}
-            endAdornment={
-              <div className={classes.textEndAdornment}>
-                <Typography variant="caption">.json</Typography>
-              </div>
-            }
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                paddingRight: 0,
+              },
+            }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment
+                  position="end"
+                  sx={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignContent: "center",
+                    padding: "6px 6px 6px 3px",
+                    margin: 0,
+                  }}
+                >
+                  <Typography variant="caption">.json</Typography>
+                </InputAdornment>
+              ),
+            }}
             inputProps={{
-              className: classes.exportFilenameTextfieldInput,
+              sx: {
+                textAlign: "right",
+                paddingRight: "3px",
+              },
             }}
           />
         </CustomFormControlSetting>
-        <br />
+
         <Exporter
           filename={settings.export_filename}
           onExported={handleOnExport}
         >
-          <Button
-            variant="contained"
-            color="secondary"
-            disableElevation
-            size="small"
-          >
+          <Button variant="contained" disableElevation size="small">
             Export Grid
           </Button>
         </Exporter>

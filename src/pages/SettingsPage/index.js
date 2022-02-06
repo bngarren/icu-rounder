@@ -1,5 +1,6 @@
-import { Container, Grid, Typography, Divider } from "@mui/material";
-import { makeStyles } from "@mui/styles";
+//MUI
+import { Container, Box, Grid, Typography, Divider } from "@mui/material";
+import { styled } from "@mui/system";
 
 // custom components
 import SettingsPageSection from "./SettingsPageSection";
@@ -10,43 +11,23 @@ import ImportSection from "./ImportSection";
 import ContingenciesSection from "./ContingenciesSection";
 import { useDialog } from "../../components/Dialog";
 
-// context
+// Context
 import { useSettings } from "../../context/Settings";
-
-// GridData context
 import { useGridStateContext } from "../../context/GridState";
 
 // Utility
 import { isBedEmpty, getDataForBed } from "../../utils/Utility";
 
-const useStyles = makeStyles(() => ({
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  title: {
-    marginBottom: 15,
-  },
-  mainGridContainer: {
-    flexDirection: "column",
-  },
-  sectionGridItem: {
-    marginBottom: "20px",
-    width: "100%",
-  },
-  selectInputRoot: {
-    paddingLeft: "5px",
-  },
-  selectInputSelect: {
-    "&:focus": {
-      backgroundColor: "transparent",
-    },
-  },
+/* Styling */
+const StyledBodyBox = styled(Box, {
+  name: "SettingsPage",
+  slot: "body",
+})(() => ({
+  display: "flex",
+  flexDirection: "column",
 }));
 
 const SettingsPage = () => {
-  const classes = useStyles();
-
   /* Get Settings context */
   const { dispatchSettings } = useSettings();
 
@@ -148,48 +129,46 @@ const SettingsPage = () => {
 
   return (
     <Container maxWidth="sm">
-      <Grid container className={classes.header}>
-        <Typography className={classes.title} variant="h5">
+      <Box>
+        <Typography variant="h4" sx={{ marginBottom: "15px" }}>
           Settings
         </Typography>
-      </Grid>
+      </Box>
 
-      <Grid container className={classes.mainGridContainer}>
+      <StyledBodyBox>
         {/* - - - - - section GENERAL - - - - - */}
-        <SettingsPageSection title="General">
-          <GeneralSection parentCss={classes} onSave={handleOnSave} />
-        </SettingsPageSection>
+        <SettingsPageSection
+          title="General"
+          section={<GeneralSection onSave={handleOnSave} />}
+        />
         <Divider />
         {/* - - - - - section DOCUMENT - - - - - */}
-        <SettingsPageSection title="Document">
-          <DocumentSection parentCss={classes} onSave={handleOnSave} />
-        </SettingsPageSection>
+        <SettingsPageSection
+          title="Document"
+          section={<DocumentSection onSave={handleOnSave} />}
+        />
         <Divider />
         {/* - - - - - section EXPORT - - - - - */}
         <SettingsPageSection
           title="Export"
           subtitle="Download the current grid as a .json file."
-        >
-          <ExportSection parentCss={classes} onSave={handleOnSave} />
-        </SettingsPageSection>
-
+          section={<ExportSection onSave={handleOnSave} />}
+        />
         <Divider />
         {/* - - - - - section IMPORT - - - - - */}
         <SettingsPageSection
           title="Import"
           subtitle="Upload a previously saved .json file to populate the grid."
-        >
-          <ImportSection parentCss={classes} />
-        </SettingsPageSection>
+          section={<ImportSection />}
+        />
         <Divider />
         {/* - - - - - section CONTINGENCIES - - - - - */}
         <SettingsPageSection
           title="Contingencies"
           subtitle="Save your custom contingencies for later use."
-        >
-          <ContingenciesSection parentCss={classes} onSave={handleOnSave} />
-        </SettingsPageSection>
-      </Grid>
+          section={<ContingenciesSection onSave={handleOnSave} />}
+        />
+      </StyledBodyBox>
       {dialogIsOpen && dialog}
     </Container>
   );

@@ -1,10 +1,9 @@
 import { useState, useCallback } from "react";
 
-// Material UI
-import { Grid, Typography, Button } from "@mui/material";
+// MUI
+import { Grid, Box, Typography, Button } from "@mui/material";
 import WarningIcon from "@mui/icons-material/Warning";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
-import { makeStyles } from "@mui/styles";
 
 // Custom components
 import Importer from "../../../components/Importer";
@@ -12,28 +11,7 @@ import Importer from "../../../components/Importer";
 // GridData context
 import { useGridStateContext } from "../../../context/GridState";
 
-const useStyles = makeStyles((theme) => ({
-  confirmImportButton: {
-    color: "white",
-    backgroundColor: theme.palette.warning.main,
-  },
-  confirmImportText: {
-    color: theme.palette.warning.main,
-  },
-  followingImportText: {
-    color: theme.palette.primary.main,
-    fontSize: "11pt",
-  },
-  followingImportIcon: {
-    color: theme.palette.primary.main,
-    fontSize: "13pt",
-    marginRight: "2px",
-  },
-}));
-
-const ImportSection = ({ parentCss }) => {
-  const classes = useStyles();
-
+const ImportSection = () => {
   /* Use this hook to updateGridData once new data is imported */
   const { updateGridData } = useGridStateContext();
 
@@ -60,10 +38,10 @@ const ImportSection = ({ parentCss }) => {
 
   return (
     <>
-      <Grid item className={parentCss.sectionGridItem}>
+      <Grid item>
         <Importer onNewDataSelected={handleNewDataImported} />
-        <div
-          style={{
+        <Box
+          sx={{
             display: "flex",
             justifyContent: "space-around",
             flexWrap: "wrap",
@@ -74,7 +52,10 @@ const ImportSection = ({ parentCss }) => {
           {pendingDataImport ? (
             <div align="center">
               <Button
-                className={classes.confirmImportButton}
+                sx={{
+                  color: "white",
+                  backgroundColor: "warning.main",
+                }}
                 variant="contained"
                 size="small"
                 onClick={() => handleUpdateGridData(pendingDataImport)}
@@ -84,7 +65,9 @@ const ImportSection = ({ parentCss }) => {
               </Button>
               <Typography
                 variant="caption"
-                className={classes.confirmImportText}
+                sx={{
+                  color: "warning.main",
+                }}
               >
                 <br />
                 (This will overwrite your current grid. Consider exporting it
@@ -92,21 +75,28 @@ const ImportSection = ({ parentCss }) => {
               </Typography>
             </div>
           ) : (
-            <div>
-              {confirmedDataImport && (
-                <div style={{ display: "inline-flex", alignItems: "center" }}>
-                  <CheckBoxIcon className={classes.followingImportIcon} />
-                  <Typography
-                    variant="caption"
-                    className={classes.followingImportText}
-                  >
-                    Successfully imported.
-                  </Typography>
-                </div>
-              )}
-            </div>
+            confirmedDataImport && (
+              <Box style={{ display: "inline-flex", alignItems: "center" }}>
+                <CheckBoxIcon
+                  sx={{
+                    color: "primary.main",
+                    fontSize: "1.2rem",
+                    marginRight: "2px",
+                  }}
+                />
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "primary.main",
+                    fontSize: "1rem",
+                  }}
+                >
+                  Successfully imported.
+                </Typography>
+              </Box>
+            )
           )}
-        </div>
+        </Box>
       </Grid>
     </>
   );

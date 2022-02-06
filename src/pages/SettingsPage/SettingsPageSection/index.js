@@ -1,19 +1,19 @@
-import { Typography } from "@mui/material";
-import { makeStyles } from "@mui/styles";
+// MUI
+import { Box, Typography } from "@mui/material";
+import { styled } from "@mui/system";
 
-const useStyles = makeStyles(() => ({
-  sectionTitle: {
-    marginTop: "5px",
-    marginBottom: "10px",
-  },
+/* Styling */
+const StyledSectionBox = styled(Box, {
+  name: "SettingsPageSection",
+  slot: "Root",
+})(() => ({
+  marginBottom: "0.5rem",
 }));
 
-const SettingsPageSection = ({ title, subtitle, children }) => {
-  const classes = useStyles();
-
+const SettingsPageSection = ({ title, subtitle, section }) => {
   return (
-    <>
-      <Typography className={classes.sectionTitle} variant="h6">
+    <StyledSectionBox>
+      <Typography variant="h5" sx={{ marginTop: "5px", marginBottom: "10px" }}>
         {title}
       </Typography>
       {subtitle != null ? (
@@ -21,9 +21,8 @@ const SettingsPageSection = ({ title, subtitle, children }) => {
       ) : (
         ""
       )}
-      <br />
-      {children}
-    </>
+      {section && section}
+    </StyledSectionBox>
   );
 };
 
