@@ -223,7 +223,7 @@ const UpdatePage = () => {
         () => {
           //should delete callback
           let updatedData = [...gridData];
-          // let deleted = updatedData.splice(key, 1);
+          updatedData.splice(key, 1); // will return the deleted items, but we don't use them for now
           updateGridData(updatedData); //send new data to GridStateContext (handles truth data)
           setNeedsSave(false);
           setSelectedKey(null);
