@@ -1,114 +1,62 @@
 import { useState, useEffect } from "react";
 
 // MUI
-import { Paper, Collapse } from "@mui/material";
+import { Box, Paper, Collapse, Typography } from "@mui/material";
 import { styled } from "@mui/system";
-import makeStyles from "@mui/styles/makeStyles";
 import StopIcon from "@mui/icons-material/Stop";
 
+// Context and utility
 import { useSettings } from "../../context/Settings";
-
 import { getWidth } from "../../components/MyDocument";
-
-const useStyles = makeStyles({
-  demoBoxHeader: {
-    display: "flex",
-    flexDirection: "row",
-    width: "100%",
-    borderBottom: "1pt solid black",
-  },
-  demoBoxHeaderBed: {
-    marginRight: "4px",
-    paddingLeft: "0.5em",
-    paddingRight: "0.5em",
-    borderRight: "1px solid black",
-    fontWeight: "bold",
-  },
-  demoBoxHeaderName: {
-    flexGrow: "4",
-  },
-  demoBoxHeaderTeam: {
-    marginLeft: "4px",
-    paddingLeft: "0.5em",
-    paddingRight: "0.5em",
-    borderLeft: "1px solid black",
-  },
-  demoBoxBodyOneLiner: {
-    fontSize: "8.25pt",
-    marginBottom: "2px",
-  },
-  demoBoxBodyContingencies: {
-    display: "flex",
-    flexDirection: "row",
-    fontSize: "7pt",
-    fontWeight: "bold",
-    justifyContent: "flex-start",
-    flexWrap: "wrap",
-    alignContent: "center",
-    marginBottom: "4px",
-  },
-  demoBoxBodyContingencyItem: {
-    border: "1pt solid #9a9a9a",
-    borderRadius: "2pt",
-    padding: "0 2px 0px 2px",
-    marginTop: "1pt",
-    marginRight: "2pt",
-  },
-  demoBoxBody: {
-    fontSize: "7.5pt",
-    padding: "3px 7px 7px 3px",
-    whiteSpace: "pre-line",
-  },
-  demoBoxNestedContentSectionRoot: {
-    marginTop: "3px",
-    fontSize: "8pt",
-  },
-  demoBoxNestedContentTopText: {
-    minHeight: "6.25pt",
-  },
-  demoBoxNestedContentTitle: {
-    fontWeight: "bold",
-    marginRight: "2px",
-  },
-  demoBoxNestedContentItemRoot: {
-    display: "flex",
-    flexDirection: "row",
-    marginLeft: "4pt",
-  },
-  demoBoxNestedContentItemText: {
-    marginLeft: "1.5pt",
-  },
-  demoBoxBottomText: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    textAlign: "right",
-    fontSize: "8pt",
-    padding: "2pt 4pt 2pt 2pt",
-  },
-});
 
 /* Styling */
 const StyledPaperRoot = styled(Paper, {
   name: "DemoBox",
   slot: "Root",
   shouldForwardProp: (prop) => prop !== "convertedWidth",
-})(({ convertedWidth }) => ({
+})(({ theme, convertedWidth }) => ({
   position: "relative",
   backgroundColor: "white",
   height: "250pt",
   margin: "auto",
   border: "1px solid",
-  borderColor: "primary.main",
+  borderColor: theme.palette.primary.main,
   fontSize: "9pt",
   fontFamily: "Roboto",
   minWidth: convertedWidth,
   maxWidth: convertedWidth,
 }));
 
+const StyledHeaderBox = styled(Box, {
+  name: "DemoBox",
+  slot: "header",
+})(({ theme }) => ({
+  display: "flex",
+  flexDirection: "row",
+  width: "100%",
+  borderBottom: `1pt solid ${theme.palette.primary.main}`,
+}));
+
+const StyledBodyBox = styled(Box, {
+  name: "DemoBox",
+  slot: "body",
+})(() => ({
+  fontSize: "7.5pt",
+  padding: "3px 7px 7px 3px",
+  whiteSpace: "pre-line",
+  lineHeight: "0.75rem",
+}));
+
+const StyledNestedContentBox = styled(Box, {
+  name: "DemoBox",
+  slot: "nestedContent",
+})(() => ({
+  marginTop: "3px",
+  fontSize: "8pt",
+}));
+
 /* The demo grid box used for displaying what the grid box might look like */
 const DemoBox = ({ data: propsData, collapsed }) => {
-  const classes = useStyles();
   const [data, setData] = useState({});
   const { settings } = useSettings();
 
@@ -128,66 +76,132 @@ const DemoBox = ({ data: propsData, collapsed }) => {
     <>
       <Collapse in={!collapsed}>
         <StyledPaperRoot convertedWidth={convertedWidth}>
-          <div className={classes.demoBoxHeader}>
-            <div className={classes.demoBoxHeaderBed}>{data.bed}</div>
-            <div className={classes.demoBoxHeaderName}>
+          <StyledHeaderBox>
+            <Box
+              sx={{
+                marginRight: "4px",
+                paddingLeft: "0.5em",
+                paddingRight: "0.5em",
+                borderRight: "1px solid black",
+                fontWeight: "bold",
+              }}
+            >
+              {data.bed}
+            </Box>
+            <Box sx={{ flexGrow: "1" }}>
               {data.lastName}
               {renderNameComma()}
               {data.firstName}
-            </div>
-            <div className={classes.demoBoxHeaderTeam}>{data.teamNumber}</div>
-          </div>
-          <div className={classes.demoBoxBody}>
-            <div className={classes.demoBoxBodyOneLiner}>{data.oneLiner}</div>
-            <div className={classes.demoBoxBodyContingencies}>
+            </Box>
+            <Box
+              sx={{
+                marginLeft: "4px",
+                paddingLeft: "0.5em",
+                paddingRight: "0.5em",
+                borderLeft: "1px solid black",
+              }}
+            >
+              {data.teamNumber}
+            </Box>
+          </StyledHeaderBox>
+          <StyledBodyBox>
+            <Box
+              sx={{
+                fontSize: "8.25pt",
+                marginBottom: "2px",
+              }}
+            >
+              {data.oneLiner}
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                fontSize: "7pt",
+                fontWeight: "bold",
+                justifyContent: "flex-start",
+                flexWrap: "wrap",
+                alignContent: "center",
+                marginBottom: "4px",
+              }}
+            >
               {data.contingencies &&
                 data.contingencies.map((item, index) => {
                   return (
-                    <div
-                      className={classes.demoBoxBodyContingencyItem}
+                    <Box
+                      sx={{
+                        border: "1pt solid #9a9a9a",
+                        borderRadius: "2pt",
+                        padding: "0 2px 0px 2px",
+                        marginTop: "1pt",
+                        marginRight: "2pt",
+                      }}
                       key={`${item}-${index}`}
                     >
                       {item}
-                    </div>
+                    </Box>
                   );
                 })}
-            </div>
+            </Box>
             {data.contentType === "simple" && data.simpleContent}
             {data.contentType === "nested" &&
               data.nestedContent?.map((sectionData) => {
                 return (
-                  <div
-                    key={sectionData.id}
-                    className={classes.demoBoxNestedContentSectionRoot}
-                  >
-                    <div className={classes.demoBoxNestedContentTopText}>
+                  <StyledNestedContentBox key={sectionData.id}>
+                    <Box sx={{ minHeight: "6.25pt" }}>
                       {sectionData.title && (
-                        <span className={classes.demoBoxNestedContentTitle}>
+                        <Typography
+                          variant="body1"
+                          component="span"
+                          sx={{
+                            fontWeight: "bold",
+                            marginRight: "2px",
+                          }}
+                        >
                           {`${sectionData.title}:`}
-                        </span>
+                        </Typography>
                       )}
                       {sectionData.top}
-                    </div>
+                    </Box>
                     {sectionData?.items?.map((item) => {
                       return (
-                        <div
+                        <Box
                           key={item.id}
-                          className={classes.demoBoxNestedContentItemRoot}
+                          sx={{
+                            display: "flex",
+                            flexDirection: "row",
+                            marginLeft: "4pt",
+                          }}
                         >
                           <StopIcon style={{ fontSize: "8pt" }} />
-                          <span
-                            className={classes.demoBoxNestedContentItemText}
+                          <Typography
+                            variant="body2"
+                            component="span"
+                            sx={{
+                              marginLeft: "1.5pt",
+                            }}
                           >
                             {item.value}
-                          </span>
-                        </div>
+                          </Typography>
+                        </Box>
                       );
                     })}
-                  </div>
+                  </StyledNestedContentBox>
                 );
               })}
-          </div>
-          <div className={classes.demoBoxBottomText}>{data.bottomText}</div>
+          </StyledBodyBox>
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              textAlign: "right",
+              fontSize: "8pt",
+              padding: "2pt 4pt 2pt 2pt",
+            }}
+          >
+            {data.bottomText}
+          </Box>
         </StyledPaperRoot>
       </Collapse>
     </>
