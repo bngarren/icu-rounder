@@ -1,52 +1,27 @@
 import { useState } from "react";
+
+// MUI
 import {
+  Box,
   OutlinedInput,
   InputAdornment,
   IconButton,
-  Typography,
   Zoom,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
-import AddIcon from "@material-ui/icons/Add";
+} from "@mui/material";
+import { styled } from "@mui/system";
+import AddIcon from "@mui/icons-material/Add";
 
 // Context
 import { useGridStateContext } from "../../context/GridState";
 
-const useStyles = makeStyles((theme) => ({
-  text: {
-    marginRight: 6,
-    color: "#626060",
-    fontStyle: "italic",
-  },
-  textFieldRoot: {
-    paddingRight: 2,
-    "&$textFieldNotchedOutline": {
-      borderWidth: 1,
-    },
-    "&$textFieldFocused": {
-      borderWidth: 1,
-    },
-    "&$textFieldFocused $textFieldNotchedOutline": {
-      borderWidth: 2,
-      borderColor: theme.palette.secondary.main,
-    },
-  },
-  textFieldFocused: {},
-  textFieldNotchedOutline: {},
-  textFieldInput: {
-    padding: "4px 0px 4px 6px",
-    width: 40,
-  },
-  addIconButton: {
-    padding: 1,
-    "&:hover": {
-      color: theme.palette.secondary.main,
-    },
-  },
-}));
+/* Styling */
+
+const StyledOutlinedInput = styled(OutlinedInput, {
+  name: "AddNewBedspaceForm",
+  slot: "input",
+})(() => ({}));
 
 const AddNewBedspaceForm = ({ onSubmit = (f) => f }) => {
-  const classes = useStyles();
   const { bedLayout, gridData, updateGridData } = useGridStateContext();
   const [value, setValue] = useState("");
 
@@ -95,26 +70,25 @@ const AddNewBedspaceForm = ({ onSubmit = (f) => f }) => {
   };
 
   return (
-    <div>
-      <Typography variant="caption" className={classes.text}>
-        Add bed
-      </Typography>
-      <OutlinedInput
-        classes={{
-          root: classes.textFieldRoot,
-          input: classes.textFieldInput,
-          notchedOutline: classes.textFieldNotchedOutline,
-          focused: classes.textFieldFocused,
-        }}
+    <Box>
+      <StyledOutlinedInput
+        placeholder="Add bed"
+        size="small"
         value={value}
         onChange={(e) => handleOnChange(e.target.value)}
         onKeyPress={handleOnKeyPress}
+        inputProps={{
+          size: 10,
+        }}
         endAdornment={
           <Zoom in={value.trim() !== ""}>
             <InputAdornment position="end">
               <IconButton
-                className={classes.addIconButton}
                 onClick={handleOnSubmit}
+                size="large"
+                sx={{
+                  padding: "3px",
+                }}
               >
                 <AddIcon />
               </IconButton>
@@ -122,7 +96,7 @@ const AddNewBedspaceForm = ({ onSubmit = (f) => f }) => {
           </Zoom>
         }
       />
-    </div>
+    </Box>
   );
 };
 

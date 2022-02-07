@@ -1,60 +1,28 @@
-import { useState, useEffect, cloneElement, useRef } from "react";
-import { Grid, Typography, Zoom, Button } from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
-import clsx from "clsx";
+import { useState, useEffect, cloneElement } from "react";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-    flexDirection: "column",
-    paddingLeft: 10,
-    "&:hover": {
-      backgroundColor: "#dbdbdb24",
-    },
+// MUI
+import { Grid, Typography, Zoom, Button } from "@mui/material";
+import { styled } from "@mui/system";
+
+/* Styling */
+
+const StyledGridRoot = styled(Grid, {
+  name: "CustomFormControlSetting",
+  slot: "Root",
+  shouldForwardProp: (prop) => prop !== "diff",
+})(({ theme, diff }) => ({
+  display: "flex",
+  flexDirection: "column",
+  paddingLeft: "1rem",
+  paddingBottom: "1rem",
+  "&:hover": {
+    // backgroundColor: theme.palette.grey[100],
   },
-  rootEditing: {
-    borderLeft: `4px solid ${theme.palette.secondary.light}`,
-    paddingLeft: 6,
-  },
-  rootDiff: {
-    borderLeft: `4px solid ${theme.palette.primary.main}`,
-    paddingLeft: 6,
-  },
-  label: {
-    fontSize: "11pt",
-    fontWeight: "bold",
-  },
-  initialValue: {
-    fontSize: "11pt",
-    border: "1px solid #d7d7d7",
-    borderRadius: "3px",
-    padding: "2px 6px",
-  },
-  gridForInput: {
-    flexGrow: "1",
-  },
-  revertButton: {
-    marginLeft: "5px",
-    fontSize: "9pt",
-    padding: "0px 4px",
-    minWidth: "40px",
-    "&:hover": {
-      color: "#6a6a6a",
-    },
-    color: "#a2a2a2",
-  },
-  saveButton: {
-    marginLeft: "5px",
-    fontSize: "9pt",
-    padding: "0px 4px",
-    minWidth: "40px",
-    textDecoration: "underline",
-    "&:hover": {
-      textDecoration: "underline",
-    },
-    color: theme.palette.primary.main,
-    fontWeight: "bold",
-  },
+  // "diff" refers to having new/different, unsaved data
+  ...(diff === true && {
+    borderLeft: `4px solid ${theme.palette.secondary.dark}`,
+    paddingLeft: "6px",
+  }),
 }));
 
 const CustomFormControlSetting = ({
@@ -64,7 +32,6 @@ const CustomFormControlSetting = ({
   onSave = (f) => f,
   children,
 }) => {
-  const classes = useStyles();
   const [value, setValue] = useState("");
   const [diff, setDiff] = useState(false);
 
@@ -101,29 +68,50 @@ const CustomFormControlSetting = ({
   };
 
   return (
-    <Grid
-      container
-      className={clsx(classes.root, {
-        [classes.rootDiff]: diff,
-      })}
-    >
+    <StyledGridRoot container diff={diff}>
       <Grid item xs={12} container wrap="nowrap" alignItems="center">
         <Grid item>
-          <Typography className={classes.label} variant="caption">
+          <Typography
+            sx={{ fontSize: "1rem", fontWeight: "bold" }}
+            variant="caption"
+          >
             {label}
           </Typography>
         </Grid>
 
         <Grid item xs>
-          <Zoom in={diff} disableStrictModeCompat={true} timeout={300}>
+          <Zoom in={diff} timeout={300}>
             <Grid container>
               <Button
-                className={classes.revertButton}
+                sx={{
+                  marginLeft: "5px",
+                  fontSize: "formFontSizeLevel3",
+                  padding: "0px 4px",
+                  minWidth: "40px",
+                  color: "primary.light",
+                  "&:hover": {
+                    color: "primary.main",
+                  },
+                }}
                 onClick={handleOnClickRevert}
               >
                 Revert
               </Button>
-              <Button onClick={handleOnSave} className={classes.saveButton}>
+              <Button
+                onClick={handleOnSave}
+                sx={{
+                  marginLeft: "5px",
+                  fontSize: "formFontSizeLevel3",
+                  padding: "0px 4px",
+                  minWidth: "40px",
+                  textDecoration: "underline",
+                  "&:hover": {
+                    textDecoration: "underline",
+                  },
+                  color: "secondary.dark",
+                  fontWeight: "bold",
+                }}
+              >
                 Save
               </Button>
             </Grid>
@@ -133,7 +121,7 @@ const CustomFormControlSetting = ({
       <Grid item xs>
         {childElement}
       </Grid>
-    </Grid>
+    </StyledGridRoot>
   );
 };
 

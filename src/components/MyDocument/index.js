@@ -244,7 +244,6 @@ const MyDocument = ({ bedLayout, title, colsPerPage, data, census }) => {
                   return (
                     <GridBox
                       bedspaceData={objIndex >= 0 ? data[objIndex] : null}
-                      box={box}
                       width={getWidth(colsPerPage)}
                       removeLeftBorder={cIndex !== 0}
                       key={`grid-${cIndex}-${box}`}
@@ -260,7 +259,7 @@ const MyDocument = ({ bedLayout, title, colsPerPage, data, census }) => {
   );
 };
 
-const GridBox = ({ bedspaceData, box, width, removeLeftBorder }) => {
+const GridBox = ({ bedspaceData, width, removeLeftBorder }) => {
   if (bedspaceData) {
     return (
       <View
@@ -294,9 +293,12 @@ const GridBox = ({ bedspaceData, box, width, removeLeftBorder }) => {
           </Text>
           <View style={pdfStyles.gridBoxBodyContingencies}>
             {bedspaceData.contingencies &&
-              bedspaceData.contingencies.map((item) => {
+              bedspaceData.contingencies.map((item, index) => {
                 return (
-                  <Text style={pdfStyles.gridBoxBodyContingencyItem}>
+                  <Text
+                    style={pdfStyles.gridBoxBodyContingencyItem}
+                    key={`${index}-${item}`}
+                  >
                     {item}
                   </Text>
                 );

@@ -1,6 +1,31 @@
-import { createMuiTheme } from "@material-ui/core/styles";
+import { createTheme } from "@mui/material/styles";
 
-export const theme = createMuiTheme({
+/* Palette created here: https://material.io/resources/color/#!/?view.left=0&view.right=0&primary.color=455A64&secondary.color=B2FF59 */
+
+export const theme = createTheme({
+  mode: "light",
+  palette: {
+    primary: {
+      main: "#455a64",
+      light: "#718792",
+      dark: "#1c313a",
+      contrastText: "#ffffff",
+    },
+    secondary: {
+      main: "#b2ff59",
+      light: "#e7ff8c",
+      dark: "#7ecb20",
+      contrastText: "#000000",
+    },
+  },
+  typography: {
+    formFontSizeLevel1: "0.98rem",
+    formFontSizeLevel2: "0.90rem",
+    formFontSizeLevel3: "0.85rem",
+  },
+});
+
+/* export const theme = createTheme(adaptV4Theme({
   palette: {
     primary: {
       main: "#00A90B",
@@ -24,4 +49,4 @@ export const theme = createMuiTheme({
       main: "#D70500",
     },
   },
-});
+})); */

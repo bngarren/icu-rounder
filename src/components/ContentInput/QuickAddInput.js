@@ -1,26 +1,32 @@
 import { useState, useEffect } from "react";
 
-import { InputAdornment, IconButton, Fade } from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
-import AddBoxIcon from "@material-ui/icons/AddBox";
+// MUI
+import { InputAdornment, IconButton, Fade, TextField } from "@mui/material";
+import { styled } from "@mui/system";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 
-//components
-import CustomTextField from "./CustomTextField";
+/* Styling */
 
-const useStylesForQuickAddInput = makeStyles((theme) => ({
-  iconButton: {
-    padding: 2,
-  },
-  icon: {
-    color: theme.palette.secondary.main,
-    "&:hover": {
-      color: theme.palette.secondary.light,
+const StyledTextField = styled(TextField, {
+  name: "QuickAddInput",
+  slot: "textfield",
+})(({ theme }) => ({
+  "& .MuiOutlinedInput-root": {
+    padding: "8px 0px 4px 8px",
+    "&.Mui-focused fieldset": {
+      borderWidth: "0.1em",
+      borderColor: theme.palette.primary.main,
+      boxShadow: "rgba(17, 17, 26, 0.15) 0px 1px 0px",
     },
+  },
+  "& .MuiOutlinedInput-input": {
+    // the input element
+    fontSize: theme.typography.formFontSizeLevel2,
+    padding: 0,
   },
 }));
 
 const QuickAddInput = ({ onSubmit = (f) => f, reset, ...props }) => {
-  const classes = useStylesForQuickAddInput();
   const [value, setValue] = useState("");
 
   const handleSubmit = () => {
@@ -47,19 +53,41 @@ const QuickAddInput = ({ onSubmit = (f) => f, reset, ...props }) => {
 
   return (
     <div>
-      <CustomTextField
+      <StyledTextField
         value={value}
         onChange={handleOnChange}
         onKeyDown={handleKeyDown}
+        size="small"
+        inputProps={{
+          size: "15",
+        }}
+        InputLabelProps={{
+          shrink: true,
+        }}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
               <Fade in={value !== null && value !== ""}>
                 <IconButton
                   onClick={handleSubmit}
-                  className={classes.iconButton}
+                  sx={{
+                    p: "1.5px",
+                    color: "gray.100",
+                    "&:hover": {
+                      backgroundColor: "transparent",
+                    },
+                  }}
+                  size="large"
                 >
-                  <AddBoxIcon className={classes.icon} />
+                  <AddBoxIcon
+                    sx={{
+                      padding: 0.3,
+                      color: "primary.light",
+                      "&:hover": {
+                        color: "primary.main",
+                      },
+                    }}
+                  />
                 </IconButton>
               </Fade>
             </InputAdornment>
