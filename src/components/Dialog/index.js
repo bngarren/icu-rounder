@@ -1,4 +1,6 @@
 import { useState, useCallback } from "react";
+
+// MUI
 import {
   Dialog,
   DialogActions,
@@ -6,18 +8,9 @@ import {
   DialogContentText,
   Button,
 } from "@mui/material";
-import { makeStyles } from "@mui/styles";
-
-const useStyles = makeStyles({
-  paper: {
-    whiteSpace: "pre-line",
-  },
-});
 
 const TRANSITION_DURATION = 50; //ms
-
 export const useDialog = () => {
-  const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [dialog, setDialog] = useState(null);
 
@@ -47,7 +40,11 @@ export const useDialog = () => {
 
       setDialog(
         <Dialog
-          classes={{ paper: classes.paper }}
+          sx={{
+            "&. MuiPaper-root": {
+              whiteSpace: "pre-line",
+            },
+          }}
           open={true}
           onClose={handleOnClose}
           transitionDuration={TRANSITION_DURATION}
@@ -61,7 +58,7 @@ export const useDialog = () => {
         </Dialog>
       );
     },
-    [classes.paper, handleOnAction, open]
+    [handleOnAction, open]
   );
 
   return {
