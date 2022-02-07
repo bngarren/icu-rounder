@@ -2,7 +2,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Container from "@mui/material/Container";
 
 // Theme
-import { ThemeProvider, StyledEngineProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "./Theme";
 
 // Settings
@@ -29,24 +29,22 @@ function App() {
   return (
     <div className="app">
       <SettingsProvider>
-        <StyledEngineProvider injectFirst>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <AuthStateProvider Firebase={fb}>
-              <GridStateProvider Firebase={fb}>
-                <BrowserRouter>
-                  <Container maxWidth="xl">
-                    <Header />
-                    <main>
-                      <PageRouter />
-                    </main>
-                  </Container>
-                  <Footer />
-                </BrowserRouter>
-              </GridStateProvider>
-            </AuthStateProvider>
-          </ThemeProvider>
-        </StyledEngineProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <AuthStateProvider Firebase={fb}>
+            <GridStateProvider Firebase={fb}>
+              <BrowserRouter>
+                <Container maxWidth="xl">
+                  <Header />
+                  <main>
+                    <PageRouter />
+                  </main>
+                </Container>
+                <Footer />
+              </BrowserRouter>
+            </GridStateProvider>
+          </AuthStateProvider>
+        </ThemeProvider>
       </SettingsProvider>
     </div>
   );
