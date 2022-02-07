@@ -154,6 +154,7 @@ const DemoBox = ({ data: propsData, collapsed }) => {
                           variant="body1"
                           component="span"
                           sx={{
+                            fontSize: "8pt",
                             fontWeight: "bold",
                             marginRight: "2px",
                           }}
@@ -179,6 +180,7 @@ const DemoBox = ({ data: propsData, collapsed }) => {
                             component="span"
                             sx={{
                               marginLeft: "1.5pt",
+                              fontSize: "7.8pt",
                             }}
                           >
                             {item.value}
