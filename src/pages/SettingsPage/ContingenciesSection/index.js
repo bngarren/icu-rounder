@@ -1,6 +1,5 @@
-// Material UI
-import { Grid } from "@material-ui/core";
-// import { makeStyles } from "@material-ui/styles";
+// MUI
+import { Grid } from "@mui/material";
 
 // Custom component
 import ContingencyOptionsEditor from "../../../components/ContingencyOptionsEditor";
@@ -8,11 +7,7 @@ import ContingencyOptionsEditor from "../../../components/ContingencyOptionsEdit
 // Context
 import { useSettings } from "../../../context/Settings";
 
-// const useStyles = makeStyles((theme) => ({}));
-
-const ContingenciesSection = ({ parentCss, onSave = (f) => f }) => {
-  // const classes = useStyles();
-
+const ContingenciesSection = ({ onSave = (f) => f }) => {
   /* Get Settings context */
   const { settings } = useSettings();
 
@@ -32,7 +27,7 @@ const ContingenciesSection = ({ parentCss, onSave = (f) => f }) => {
 
   return (
     <>
-      <Grid item className={parentCss.sectionGridItem}>
+      <Grid item>
         <ContingencyOptionsEditor
           data={contingencyOptions}
           onSubmit={handleNewContingencyOption}

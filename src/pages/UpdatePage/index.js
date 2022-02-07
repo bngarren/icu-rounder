@@ -6,8 +6,10 @@ import {
   useCallback,
   useMemo,
 } from "react";
-import { useMediaQuery, Grid, Typography } from "@material-ui/core";
-import { makeStyles, useTheme } from "@material-ui/styles";
+
+// MUI
+import { useMediaQuery, Grid, Box, Typography } from "@mui/material";
+import { useTheme } from "@mui/styles";
 
 // Components
 import TableBedList from "../../components/TableBedList";
@@ -18,24 +20,13 @@ import { useDialog } from "../../components/Dialog";
 import { DebouncedContextProvider } from "./DebouncedContext";
 
 // Firebase
-import { useAuthStateContext } from "../../context/AuthState";
 import { useGridStateContext } from "../../context/GridState";
-
-const useStyles = makeStyles((theme) => ({
-  censusRoot: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    padding: "8px 4px 4px 4px",
-  },
-}));
 
 /* This holds the functions we pass way down to the TableBedList's buttons */
 export const BedActionsContext = createContext();
 
 const UpdatePage = () => {
   const theme = useTheme();
-  const classes = useStyles();
 
   // Media queries for CSS
   const media_atleast_md = useMediaQuery("(min-width:960px)");
@@ -43,13 +34,11 @@ const UpdatePage = () => {
   // The truth GridState and gridData
   const { gridData, census, updateGridData } = useGridStateContext();
 
-  // Authentication
-  const { authState, userIsLoggedIn } = useAuthStateContext();
-
   const [selectedKey, setSelectedKey] = useState(); // index of the bedspace being "edited"
   const [needsSave, setNeedsSave] = useState(false); // true, if an unsaved changed has occurred in bedspaceEditor
 
   const [defaultBedData, setDefaultBedData] = useState();
+
   /* Default bed data */
   const defaults = useRef({
     bed: "",
@@ -218,7 +207,7 @@ const UpdatePage = () => {
             <b>
               <span style={{ color: theme.palette.warning.main }}>REMOVE</span>
             </b>{" "}
-            this bedspace and it's data?
+            this bedspace and it&#39;s data?
           </div>
           <div>
             Bed: {gridData[key].bed}
@@ -234,7 +223,7 @@ const UpdatePage = () => {
         () => {
           //should delete callback
           let updatedData = [...gridData];
-          let deleted = updatedData.splice(key, 1);
+          updatedData.splice(key, 1); // will return the deleted items, but we don't use them for now
           updateGridData(updatedData); //send new data to GridStateContext (handles truth data)
           setNeedsSave(false);
           setSelectedKey(null);
@@ -361,19 +350,21 @@ const UpdatePage = () => {
   if (gridData != null) {
     return (
       <div>
-        <Grid container className={classes.root}>
-          <Grid
-            item
-            md={4}
-            sm={7}
-            xs={12}
-            style={{ padding: "0 6px", marginBottom: "8px" }}
-          >
+        <Grid container>
+          <Grid item lg={4} md={5} sm={10} xs={12} sx={{ py: 0, px: 1, mb: 1 }}>
             <BedActionsContext.Provider value={bedActions}>
               <TableBedList data={gridData} selectedKey={selectedKey} />
             </BedActionsContext.Provider>
             {census ? (
-              <div className={classes.censusRoot}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-around",
+                  p: 0.5,
+                  pt: 1,
+                }}
+              >
                 <Typography variant="caption">
                   {`${census.filledTotal}/${census.total}`}{" "}
                   {census.emptyBeds.length > 0 &&
@@ -387,12 +378,12 @@ const UpdatePage = () => {
                     </Typography>
                   );
                 })}
-              </div>
+              </Box>
             ) : (
               <></>
             )}
           </Grid>
-          <Grid item lg md={8} sm={12} xs={12} ref={refToBedspaceEditorDiv}>
+          <Grid item lg md sm={0} xs ref={refToBedspaceEditorDiv}>
             {selectedKey != null && (
               <DebouncedContextProvider>
                 <DemoAndEditorController

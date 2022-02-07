@@ -1,16 +1,19 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+
+// MUI
 import {
   Grid,
+  Box,
   Button,
   Toolbar,
   Typography,
   Switch,
   IconButton,
   Tooltip,
-} from "@material-ui/core";
-import { makeStyles, useTheme } from "@material-ui/styles";
-import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
-import NavigateNextIcon from "@material-ui/icons/NavigateNext";
+} from "@mui/material";
+import { styled } from "@mui/system";
+import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
 // Lodash
 import { uniqueId } from "lodash";
@@ -19,70 +22,41 @@ import { uniqueId } from "lodash";
 import DemoBox from "../../components/DemoBox";
 import BedspaceEditor from "../../components/BedspaceEditor";
 
-// context
+// Context
 import { useDebouncedContext } from "../../pages/UpdatePage/DebouncedContext";
 
-// Style
-const useStyles = makeStyles((theme) => ({
-  root: {
-    padding: "0 1vw",
-    justifyContent: "center",
+/* Styling */
+
+const StyledNavigateIconButton = styled(IconButton)(({ theme }) => ({
+  color: theme.palette.primary.light,
+  padding: 5,
+  "&:hover": {
+    color: theme.palette.secondary.dark,
+    cursor: "pointer",
+    backgroundColor: "transparent",
   },
-  bedspaceEditorToolbar: {
-    borderBottom: "2px solid #f6f8fa",
-  },
-  navigationDiv: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    minWidth: "235px",
-  },
-  bedspaceEditorToolbarBedNumber: {
-    color: "#8c888821",
-  },
-  navigateIconButton: {
-    color: theme.palette.secondary.veryLight,
-    padding: 5,
-    "&:hover": {
-      color: theme.palette.secondary.light,
-      cursor: "pointer",
-      backgroundColor: "transparent",
-    },
-  },
-  navigateIcon: {
-    fontSize: "50px",
-  },
-  saveButton: {
+}));
+
+// for Save and Reset
+const StyledButton = styled(Button, {
+  shouldForwardProp: (prop) => prop !== "save",
+})(({ save, theme }) => ({
+  fontSize: "0.85rem",
+  backgroundColor: theme.palette.primary.light,
+  color: theme.palette.primary.contrastText,
+  ...(save && {
     backgroundColor: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText,
-    "&:hover": {
-      backgroundColor: theme.palette.primary.light,
-      color: theme.palette.primary.contrastText,
-    },
-    marginRight: "3px",
+    color: theme.palette.secondary.light,
+  }),
+  "&.Mui-disabled": {
+    backgroundColor: theme.palette.grey[50],
+    color: theme.palette.grey[500],
   },
-  saveButtonDisabled: {
-    backgroundColor: "#f4f4f466",
-  },
-  resetButton: {
-    backgroundColor: theme.palette.secondary.main,
+  "&:hover": {
+    backgroundColor: theme.palette.secondary.light,
     color: theme.palette.secondary.contrastText,
-    "&:hover": {
-      backgroundColor: theme.palette.secondary.light,
-      color: theme.palette.secondary.contrastText,
-    },
-    marginRight: "3px",
   },
-  resetButtonDisabled: {
-    backgroundColor: "#f4f4f466",
-  },
-  bedspaceEditorGridItem: {
-    background: "white",
-  },
-  bedspaceEditorGridItemNeedsSave: {
-    background:
-      "repeating-linear-gradient( -45deg, #017c820a, #017c820a 10px, #fff0 5px, #0000 20px )",
-  },
+  marginRight: "3px",
 }));
 
 const DemoAndEditorController = ({
@@ -92,8 +66,6 @@ const DemoAndEditorController = ({
   onNextBedspace = (f) => f,
   onSave = (f) => f,
 }) => {
-  const classes = useStyles();
-
   /* Holds the Editor's own version of this bedspace's data
    */
   const [bedspaceEditorData, _setBedspaceEditorData] = useState(); // i.e. "Working" data
@@ -184,53 +156,52 @@ const DemoAndEditorController = ({
   /* Renders the Toolbar associated with the BedspaceEditor, includes
   Navigation arrows, Save, and Reset buttons */
   const renderToolbar = () => (
-    <Toolbar variant="dense" className={classes.bedspaceEditorToolbar}>
-      <div className={classes.navigationDiv}>
-        <IconButton
+    <Toolbar variant="dense">
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          minWidth: "235px",
+        }}
+      >
+        <StyledNavigateIconButton
           disabled={needsSave}
-          className={classes.navigateIconButton}
           disableRipple
           onClick={() => onNextBedspace(true)}
+          size="large"
         >
-          <NavigateBeforeIcon className={classes.navigateIcon} />
-        </IconButton>
-        <Typography
-          variant="h1"
-          className={classes.bedspaceEditorToolbarBedNumber}
-        >
+          <NavigateBeforeIcon
+            sx={{ fontSize: "4rem", textShadow: "shadows.1" }}
+          />
+        </StyledNavigateIconButton>
+        <Typography variant="h1" sx={{ color: "grey.300" }}>
           {defaultBedData.bed || ""}
         </Typography>
-        <IconButton
+        <StyledNavigateIconButton
           disabled={needsSave}
-          className={classes.navigateIconButton}
           disableRipple
           onClick={() => onNextBedspace(false)}
+          size="large"
         >
-          <NavigateNextIcon className={classes.navigateIcon} />
-        </IconButton>
-      </div>
-      <Button
-        classes={{
-          root: classes.saveButton,
-          disabled: classes.saveButtonDisabled,
-        }}
+          <NavigateNextIcon sx={{ fontSize: "4rem" }} />
+        </StyledNavigateIconButton>
+      </Box>
+      <StyledButton
         size="small"
         disabled={!needsSave}
         onClick={() => onSave(bedspaceEditorData)}
+        save
       >
         Save
-      </Button>
-      <Button
-        classes={{
-          root: classes.resetButton,
-          disabled: classes.resetButtonDisabled,
-        }}
+      </StyledButton>
+      <StyledButton
         size="small"
         disabled={!needsSave}
         onClick={(e) => handleOnReset(e)}
       >
         Reset
-      </Button>
+      </StyledButton>
     </Toolbar>
   );
 
@@ -245,7 +216,6 @@ const DemoAndEditorController = ({
             <Switch
               checked={!demoBoxCollapsed}
               onChange={() => setDemoBoxCollapsed((prevValue) => !prevValue)}
-              color="secondary"
             />
           </Tooltip>
           <DemoBox data={bedspaceEditorData} collapsed={demoBoxCollapsed} />
@@ -256,11 +226,9 @@ const DemoAndEditorController = ({
         <Grid
           item
           xs={12}
-          className={
-            needsSave
-              ? classes.bedspaceEditorGridItemNeedsSave
-              : classes.bedspaceEditorGridItem
-          }
+          sx={{
+            ...(needsSave ? {} : {}),
+          }}
         >
           <BedspaceEditor
             data={bedspaceEditorData}

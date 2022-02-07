@@ -1,145 +1,29 @@
-import { useEffect, useState, useCallback, useRef, memo } from "react";
-import { debounce } from "lodash";
+import { useEffect, useCallback, useRef } from "react";
 
-import { TextField, Paper } from "@material-ui/core";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-
-import clsx from "clsx";
-
-import { getCursorPos, setCursorPos } from "../../utils/CursorPos";
+// MUI
+import { Box, Paper } from "@mui/material";
 
 import { usePopupState } from "material-ui-popup-state/hooks";
-import SnippetPopover from "../SnippetPopover";
 
 // Components
+import EditorTextField from "./EditorTextField";
 import CustomFormControlEditor from "../../components/CustomFormControl/CustomFormControlEditor";
 import ToggleContentType from "../ToggleContentType";
 import ContentInput from "../ContentInput";
-import ContingencyInput from "../ContingencyInput";
+import ContingencyInput from "./ContingencyInput";
+import SnippetPopover from "../SnippetPopover";
 
-// Settings context
+// Context
 import { useSettings } from "../../context/Settings";
-
 import { useDebouncedContext } from "../../pages/UpdatePage/DebouncedContext";
 
 // lodash
-import { uniqueId } from "lodash";
+import { uniqueId, debounce } from "lodash";
 
-const useStyles = makeStyles((theme) => ({
-  editorRoot: {
-    padding: "10px",
-    backgroundColor: "transparent",
-    boxShadow: "none",
-  },
-  form: {},
-  textFieldRoot: {
-    border: "1px solid #e2e2e1",
-    overflow: "hidden",
-    borderRadius: "3px",
-    backgroundColor: "white",
-    "&:hover": {
-      backgroundColor: "white",
-    },
-    "&$textFieldFocused": {
-      backgroundColor: "#fff",
-      borderColor: theme.palette.secondary.light,
-      boxShadow:
-        "0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
-    },
-    paddingBottom: "2px",
-  },
-  textFieldFocused: {},
-  textFieldInputLabelRoot: {
-    color: theme.palette.secondary.main,
-    fontSize: "11pt",
-    "&$textFieldInputLabelFocused": {
-      color: theme.palette.secondary.light,
-    },
-  },
-  textFieldInputLabelFocused: {},
-  textFieldInputLabelUnsaved: {
-    color: theme.palette.primary.main,
-  },
-  textFieldInputLabelFocusedUnsaved: {
-    color: theme.palette.primary.main,
-  },
-  textFieldBed: {
-    margin: "2px",
-    width: "75px",
-  },
-  textFieldLastNameFirstName: {
-    margin: "2px",
-  },
-  textFieldTeam: {
-    margin: "2px",
-    width: "75px",
-  },
-  textFieldOneLiner: {
-    margin: "2px",
-    marginTop: "8px",
-    width: "100%",
-  },
-  textFieldContingencies: {
-    margin: "2px",
-    marginTop: "8px",
-  },
-  textFieldBody: {
-    margin: "2px",
-    marginTop: "8px",
-    width: "100%",
-  },
-  textFieldBottomText: {
-    width: "100%",
-    margin: "2px",
-    marginTop: "8px",
-  },
-  contingenciesRoot: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    marginLeft: "2px",
-    marginTop: "8px",
-  },
-  contingencyItem: {
-    borderBottom: "1px solid gray",
-    marginRight: "2px",
-  },
-}));
+// Util
+import { getCursorPos, setCursorPos } from "../../utils/CursorPos";
 
-const CustomTextField = memo(function ({
-  id,
-  customStyle: classes,
-  diff,
-  ...props
-}) {
-  return (
-    <TextField
-      InputProps={{
-        classes: {
-          root: classes.textFieldRoot,
-          focused: classes.textFieldFocused,
-        },
-        disableUnderline: true,
-        inputProps: {
-          style: { fontSize: "10.5pt" },
-        },
-      }}
-      InputLabelProps={{
-        shrink: true,
-        classes: {
-          root: clsx(classes.textFieldInputLabelRoot, {
-            [classes.textFieldInputLabelUnsaved]: diff,
-          }),
-          focused: clsx(classes.textFieldInputLabelFocused, {
-            [classes.textFieldInputLabelFocusedUnsaved]: diff,
-          }),
-        },
-      }}
-      id={id}
-      {...props}
-    />
-  );
-});
+/* Styling */
 
 const BedspaceEditor = ({
   data,
@@ -150,9 +34,6 @@ const BedspaceEditor = ({
   setNeedsSave = (f) => f,
   debounceInterval,
 }) => {
-  const theme = useTheme();
-  const classes = useStyles(theme);
-
   const { settings } = useSettings();
 
   /* For each input in the Editor, tracks whether it needs a save or not */
@@ -373,14 +254,24 @@ const BedspaceEditor = ({
   /*  - - - - - RETURN - - - -  */
   if (data) {
     return (
-      <Paper className={classes.editorRoot}>
-        <form
-          className={classes.form}
-          autoComplete="off"
-          spellCheck="false"
-          key={resetKey}
-        >
-          <div>
+      <Paper
+        sx={{
+          p: 1,
+          backgroundColor: "transparent",
+          boxShadow: "none",
+        }}
+      >
+        <form autoComplete="off" spellCheck="false" key={resetKey}>
+          {/* Box containing Bed, Names, and Team */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              flexWrap: "nowrap",
+              justifyContent: "flex-start",
+              gap: "4px",
+            }}
+          >
             <CustomFormControlEditor
               id="bed"
               initialValue={defaultValues.bed}
@@ -388,13 +279,7 @@ const BedspaceEditor = ({
               onDiffChange={onDiffChange}
               onBlur={handleInputOnBlur}
             >
-              <CustomTextField
-                className={classes.textFieldBed}
-                label="Bed"
-                variant="filled"
-                size="small"
-                customStyle={classes}
-              />
+              <EditorTextField label="Bed" size="small" inputSize={3} />
             </CustomFormControlEditor>
             <CustomFormControlEditor
               id="lastName"
@@ -403,12 +288,9 @@ const BedspaceEditor = ({
               onDiffChange={onDiffChange}
               onBlur={handleInputOnBlur}
             >
-              <CustomTextField
-                className={classes.textFieldLastNameFirstName}
+              <EditorTextField
                 label="Last Name"
-                variant="filled"
                 size="small"
-                customStyle={classes}
                 autoFocus
                 inputRef={lastNameInputRef}
               />
@@ -420,13 +302,7 @@ const BedspaceEditor = ({
               onDiffChange={onDiffChange}
               onBlur={handleInputOnBlur}
             >
-              <CustomTextField
-                className={classes.textFieldLastNameFirstName}
-                label="First Name"
-                variant="filled"
-                size="small"
-                customStyle={classes}
-              />
+              <EditorTextField label="First Name" size="small" />
             </CustomFormControlEditor>
             <CustomFormControlEditor
               id="teamNumber"
@@ -435,16 +311,10 @@ const BedspaceEditor = ({
               onDiffChange={onDiffChange}
               onBlur={handleInputOnBlur}
             >
-              <CustomTextField
-                className={classes.textFieldTeam}
-                label="Team"
-                variant="filled"
-                size="small"
-                customStyle={classes}
-              />
+              <EditorTextField label="Team" size="small" inputSize={10} />
             </CustomFormControlEditor>
-          </div>
-          <div>
+          </Box>
+          <Box>
             <CustomFormControlEditor
               id="oneLiner"
               initialValue={defaultValues.oneLiner}
@@ -452,16 +322,21 @@ const BedspaceEditor = ({
               onDiffChange={onDiffChange}
               onBlur={handleInputOnBlur}
             >
-              <CustomTextField
-                className={classes.textFieldOneLiner}
+              <EditorTextField
                 label="One Liner"
-                variant="filled"
                 multiline
-                rows={2}
-                customStyle={classes}
+                minRows={2}
+                maxRows={4}
+                fullWidth
               />
             </CustomFormControlEditor>
-            <div className={classes.contingenciesRoot}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
               <CustomFormControlEditor
                 id="contingencies"
                 initialValue={defaultValues.contingencies}
@@ -470,13 +345,10 @@ const BedspaceEditor = ({
                 onBlur={handleInputOnBlur}
                 onChangeArgument={1}
               >
-                <ContingencyInput
-                  customStyle={classes}
-                  options={settings.contingencyOptions}
-                />
+                <ContingencyInput options={settings.contingencyOptions} />
               </CustomFormControlEditor>
-            </div>
-            <div>
+            </Box>
+            <Box>
               <CustomFormControlEditor
                 id={
                   data.contentType === "nested"
@@ -516,7 +388,7 @@ const BedspaceEditor = ({
                   </CustomFormControlEditor>
                 </ContentInput>
               </CustomFormControlEditor>
-            </div>
+            </Box>
 
             <CustomFormControlEditor
               id="bottomText"
@@ -525,14 +397,13 @@ const BedspaceEditor = ({
               onDiffChange={onDiffChange}
               onBlur={handleInputOnBlur}
             >
-              <CustomTextField
-                className={classes.textFieldBottomText}
+              <EditorTextField
                 label="Bottom Right Text"
-                variant="filled"
-                customStyle={classes}
+                inputSize={30}
+                size="small"
               />
             </CustomFormControlEditor>
-          </div>
+          </Box>
         </form>
         <SnippetPopover popupState={popupState} onSelect={onSnippetSelected} />
       </Paper>

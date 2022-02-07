@@ -1,108 +1,93 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 
+// MUI
 import {
+  Box,
   List,
   InputAdornment,
   IconButton,
   Typography,
   Tooltip,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
-import StopIcon from "@material-ui/icons/Stop";
-import ClearIcon from "@material-ui/icons/Clear";
-import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
-import CancelIcon from "@material-ui/icons/Cancel";
+  TextField,
+} from "@mui/material";
+import { styled } from "@mui/system";
+import StopIcon from "@mui/icons-material/Stop";
+import ClearIcon from "@mui/icons-material/Clear";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import CancelIcon from "@mui/icons-material/Cancel";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 
 // React Movable
 import { List as MovableList, arrayMove } from "react-movable";
 
-// components
-import CustomTextField from "./CustomTextField";
-import QuickAddInput from "./QuickAddInput";
+// Components
+//import QuickAddInput from "./QuickAddInput";
 
-// context
+// Context
 import { useDebouncedContext } from "../../pages/UpdatePage/DebouncedContext";
 
 //lodash
 import { uniqueId, debounce } from "lodash";
 
-const useStylesForContentInputForm = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-    flexDirection: "column",
-    borderLeft: `4px solid ${theme.palette.secondary.light}`,
-    borderImageSource: theme.palette.primary.verticalGradient,
-    borderImageSlice: 1,
-    marginTop: "4px",
-    padding: "2px 4px 30px 4px",
-    boxShadow:
-      "rgb(0 0 0 / 7%) 0px 6px 24px 0px, rgb(0 0 0 / 35%) 0px 0px 0px 1px",
-    borderRadius: "4px",
+/* Styling */
+const StyledRootBox = styled(Box, {
+  name: "ContentInputForm",
+  slot: "Root",
+})(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  margin: 0,
+  borderRadius: theme.shape.borderRadius,
+  boxShadow: "0px 3px 7px -2px rgba(0,0,0,0.30)",
+}));
+
+const StyledHeaderBox = styled(Box, {
+  name: "ContentInputForm",
+  slot: "header",
+})(({ theme }) => ({
+  display: "flex",
+  flexDirection: "row",
+  padding: "4px 6px",
+  justifyContent: "space-between",
+  alignItems: "center",
+  backgroundColor: theme.palette.primary.light,
+  borderTopLeftRadius: theme.shape.borderRadius,
+  borderTopRightRadius: theme.shape.borderRadius,
+}));
+
+const StyledContentBox = styled(Box, {
+  name: "ContentInputForm",
+  slot: "body",
+})(() => ({
+  display: "flex",
+  flexDirection: "column",
+  padding: "8px 8px 20px 14px",
+}));
+
+const StyledTextField = styled(TextField, {
+  name: "ContentInputForm",
+  slot: "textfield",
+})(({ theme }) => ({
+  "& .MuiOutlinedInput-root": {
+    padding: 0,
+    fontSize: "1rem",
+    lineHeight: "1.2rem",
+
+    "& > fieldset": {
+      border: "none",
+    },
   },
-  header: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  headerText: {
-    color: theme.palette.primary.main,
-    fontSize: "11pt",
-    fontWeight: "bold",
-    textTransform: "uppercase",
-    marginBottom: "4px",
-    flexGrow: "1",
-    textAlign: "center",
-    letterSpacing: "1px",
-  },
-  closeButton: {
-    padding: "4px",
-    transform: "translate(6px, -2px)",
-    color: theme.palette.primary.main,
+  "& .MuiOutlinedInput-input": {
+    padding: "1px 2px 1px 2px",
+    //paddingBottom: "2px",
+    //paddingLeft: "4px",
     "&:hover": {
+      backgroundColor: theme.palette.grey[100],
+    },
+    "&:focus": {
       color: theme.palette.primary.light,
+      backgroundColor: "transparent",
     },
-  },
-  closeButtonIcon: {
-    fontSize: "14pt",
-  },
-  itemList: {
-    padding: "0px 0px 10px 12px",
-  },
-  endAdornment: {
-    visibility: "hidden",
-    opacity: 0,
-    transition: "opacity linear 0.2s",
-  },
-  addIconButton: {
-    padding: 6,
-  },
-  removeIconButton: {
-    padding: 2,
-  },
-  removeIcon: {
-    fontSize: "18px",
-  },
-  dragIcon: {
-    fontSize: "18px",
-    color: "#626060",
-    "&:hover": {
-      color: theme.palette.secondary.light,
-    },
-    transform: "rotate(90deg)",
-  },
-  inputItem: {
-    width: "100%",
-    "&:hover $endAdornment": {
-      visibility: "inherit",
-      opacity: 1,
-    },
-  },
-  bullet: {
-    fontSize: "10px",
-    color: "#626060",
-  },
-  quickAddInput: {
-    width: "85%",
   },
 }));
 
@@ -114,8 +99,6 @@ const ContentInputForm = ({
   onClose = (f) => f,
   ...props
 }) => {
-  const classes = useStylesForContentInputForm();
-
   const [title, setTitle] = useState("");
   const [topText, setTopText] = useState("");
   const [items, setItems] = useState([]);
@@ -162,10 +145,10 @@ const ContentInputForm = ({
     });
   };
 
-  const handleAddItem = (value) => {
+  const handleAddItem = (value = "") => {
     setItems((prevValue) => {
       let arr = [...prevValue];
-      arr.push({ id: uniqueId("item-"), value: value || "" });
+      arr.push({ id: uniqueId("item-"), value: value });
 
       debouncedNotifyParent({ ...getSectionObject(), items: arr });
       return arr;
@@ -232,112 +215,170 @@ const ContentInputForm = ({
   );
 
   return (
-    <div className={classes.root} {...props}>
-      <div className={classes.header}>
-        <Typography variant="h4" className={classes.headerText}>
+    <StyledRootBox {...props}>
+      <StyledHeaderBox>
+        <Typography
+          variant="h4"
+          sx={{
+            mr: "1rem",
+            color: "secondary.light",
+            fontSize: {
+              xs: "0.85rem",
+              lg: "1rem",
+            },
+            fontWeight: "bold",
+            textTransform: "uppercase",
+            letterSpacing: "1px",
+          }}
+        >
           Edit Section
         </Typography>
         <Tooltip title="Close">
-          <IconButton className={classes.closeButton} onClick={onClose}>
-            <CancelIcon className={classes.closeButtonIcon} />
+          <IconButton
+            onClick={onClose}
+            size="small"
+            sx={{
+              padding: "0px",
+              color: "grey.200",
+
+              "&:hover": {
+                backgroundColor: "transparent",
+                color: "secondary.light",
+              },
+            }}
+          >
+            <CancelIcon sx={{ fontSize: "1.1rem" }} />
           </IconButton>
         </Tooltip>
-      </div>
-      <CustomTextField
-        ref={refToTitle}
-        placeholder="Title"
-        tooltip="Section Title"
-        value={title}
-        onChange={(e) => handleOnTitleChange(e.target.value)}
-        inputProps={{
-          style: { fontWeight: "bold", fontSize: "11.5pt" },
-        }}
-      />
-      <CustomTextField
-        placeholder="Content"
-        tooltip="Content"
-        multiline
-        rows={2}
-        rowsMax={3}
-        value={topText}
-        onChange={(e) => handleOnTopTextChange(e.target.value)}
-        style={{ paddingTop: "5px" }}
-      />
-      {items?.length > 0 && (
-        <MovableList
-          values={items}
-          onChange={handleMoveItem}
-          lockVertically={true}
-          renderList={({ children, props }) => (
-            <List className={classes.itemList} {...props}>
-              {children}
-            </List>
-          )}
-          renderItem={({ value, props, isDragged }) => (
-            <li
-              {...props}
-              style={{
-                ...props.style,
-                listStyleType: "none",
-              }}
-            >
-              <CustomTextField
-                className={classes.inputItem}
-                key={value.id}
-                value={value.value}
-                onChange={(e) => handleOnItemChange(e.target.value, value.id)}
-                multiline
-                rows={1}
-                rowsMax={3}
-                style={{ padding: 0 }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment
-                      position="start"
-                      style={{
-                        marginRight: "2px",
-                        alignSelf: "flex-start",
-                        marginTop: "10px",
-                      }}
-                    >
-                      <StopIcon className={classes.bullet} />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment
-                      position="end"
-                      className={classes.endAdornment}
-                    >
-                      <DragIndicatorIcon
-                        className={classes.dragIcon}
-                        data-movable-handle
-                        style={{ cursor: isDragged ? "grabbing" : "grab" }}
-                      />
-                      <IconButton
-                        onClick={() => handleRemoveItem(value.id)}
-                        className={classes.removeIconButton}
-                      >
-                        <ClearIcon className={classes.removeIcon} />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
+      </StyledHeaderBox>
+      <StyledContentBox>
+        <StyledTextField
+          ref={refToTitle}
+          placeholder="Title"
+          value={title}
+          onChange={(e) => handleOnTitleChange(e.target.value)}
+          size="small"
+          inputProps={{
+            sx: { fontWeight: "bold", fontSize: "1.3rem" },
+          }}
+        />
+        <StyledTextField
+          placeholder="Content"
+          multiline
+          minRows={1}
+          maxRows={4}
+          value={topText}
+          onChange={(e) => handleOnTopTextChange(e.target.value)}
+          size="small"
+        />
+        {items?.length > 0 && (
+          <MovableList
+            values={items}
+            onChange={handleMoveItem}
+            lockVertically={true}
+            renderList={({ children, props }) => (
+              <List
+                sx={{ mt: "0.5rem", padding: "0px 0px 10px 12px" }}
+                {...props}
+              >
+                {children}
+              </List>
+            )}
+            renderItem={({ value, props, isDragged }) => (
+              <li
+                {...props}
+                style={{
+                  ...props.style,
+                  listStyleType: "none",
                 }}
-              />
-            </li>
-          )}
-        />
-      )}
+              >
+                <StyledTextField
+                  key={value.id}
+                  value={value.value}
+                  onChange={(e) => handleOnItemChange(e.target.value, value.id)}
+                  size="small"
+                  multiline
+                  minRows={1}
+                  maxRows={10}
+                  sx={{
+                    width: "100%",
+                    padding: 0,
+                    "& .MuiOutlinedInput-input": {
+                      fontSize: "formFontSizeLevel1",
+                    },
+                    "&:hover .MuiInputAdornment-root": {
+                      visibility: "inherit",
+                      opacity: 1,
+                    },
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment
+                        position="start"
+                        style={{
+                          marginRight: "2px",
+                          alignSelf: "flex-start",
+                          marginTop: "10px",
+                        }}
+                      >
+                        <StopIcon
+                          sx={{
+                            fontSize: "0.8rem",
+                            color: "primary.light",
+                          }}
+                        />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment
+                        position="end"
+                        sx={{
+                          visibility: "hidden",
+                          opacity: 0,
+                          transition: "opacity linear 0.2s",
+                        }}
+                      >
+                        <DragIndicatorIcon
+                          data-movable-handle
+                          sx={{
+                            cursor: isDragged ? "grabbing" : "grab",
+                            fontSize: "1.3rem",
+                            color: "primary.main",
+                            "&:hover": {
+                              color: "primary.light",
+                            },
+                            transform: "rotate(90deg)",
+                          }}
+                        />
+                        <IconButton
+                          onClick={() => handleRemoveItem(value.id)}
+                          sx={{ padding: "2px" }}
+                          size="large"
+                        >
+                          <ClearIcon sx={{ fontSize: "1.3rem" }} />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </li>
+            )}
+          />
+        )}
 
-      <div style={{ marginTop: 10, marginLeft: 10 }}>
-        <QuickAddInput
-          className={classes.quickAddInput}
-          placeholder="+ Add Item"
-          tooltip="Add Item"
-          onSubmit={handleAddItem}
-          reset={initialData}
-        />
-      </div>
-    </div>
+        <div style={{}}>
+          {/* <QuickAddInput
+            label="Balls"
+            placeholder="+ Add Item"
+            onSubmit={handleAddItem}
+            reset={initialData}
+          /> */}
+          <IconButton onClick={() => handleAddItem()}>
+            <AddBoxIcon />
+          </IconButton>
+        </div>
+      </StyledContentBox>
+    </StyledRootBox>
   );
 };
 

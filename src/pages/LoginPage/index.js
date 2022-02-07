@@ -1,4 +1,8 @@
 import { useState } from "react";
+// React router
+import { useNavigate, useLocation } from "react-router-dom";
+
+// Context
 import { useAuthStateContext } from "../../context/AuthState";
 
 const LoginPage = () => {
@@ -8,14 +12,28 @@ const LoginPage = () => {
   const [inputPassword, setInputPassword] = useState("");
   const [error, setError] = useState(null);
 
+  // React router
+  const navigate = useNavigate();
+  const location = useLocation();
+  /* try to get the location the user was trying to go to before
+  getting redirected to login */
+  const from = location.state?.from?.pathname || "/";
+
   const handleLogin = () => {
     if (inputEmail && inputPassword) {
       setError(null);
       signInWithEmailAndPassword(
         inputEmail,
         inputPassword,
-        (user) => {
+        () => {
           // success
+          /* Send them back to the page they tried to visit when they were
+          redirected to the login page. Use { replace: true } so we don't create
+          another entry in the history stack for the login page.  This means that
+          when they get to the protected page and click the back button, they
+          won't end up back on the login page, which is also really nice for the
+          user experience. */
+          navigate(from, { replace: true });
         },
         (error) => {
           console.log(error);

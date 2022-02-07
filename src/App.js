@@ -1,7 +1,8 @@
-import "./App.css";
+import CssBaseline from "@mui/material/CssBaseline";
+import Container from "@mui/material/Container";
 
 // Theme
-import { ThemeProvider } from "@material-ui/core/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "./Theme";
 
 // Settings
@@ -13,7 +14,7 @@ import Footer from "./components/Footer";
 
 // Where all of our pages come from
 // ! Using HashRouter instead of BrowserRouter to work with GitHub pages deployment
-import { HashRouter as Router } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import PageRouter from "./components/PageRouter";
 
 // Firebase
@@ -29,13 +30,18 @@ function App() {
     <div className="app">
       <SettingsProvider>
         <ThemeProvider theme={theme}>
+          <CssBaseline />
           <AuthStateProvider Firebase={fb}>
             <GridStateProvider Firebase={fb}>
-              <Router>
-                <Header />
-                <PageRouter />
+              <BrowserRouter>
+                <Container maxWidth="xl">
+                  <Header />
+                  <main>
+                    <PageRouter />
+                  </main>
+                </Container>
                 <Footer />
-              </Router>
+              </BrowserRouter>
             </GridStateProvider>
           </AuthStateProvider>
         </ThemeProvider>

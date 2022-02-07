@@ -1,13 +1,13 @@
-import { makeStyles } from "@material-ui/styles";
-import { Menu, MenuItem, Divider } from "@material-ui/core";
+// MUI
+import { Menu, MenuItem } from "@mui/material";
+import { styled } from "@mui/system";
 
 import { bindMenu } from "material-ui-popup-state/hooks";
 
-const useStyles = makeStyles({
-  menuItem: {
-    fontSize: "10pt",
-  },
-});
+/* Styling */
+const StyledMenuItem = styled(MenuItem)(() => ({
+  fontSize: "1rem",
+}));
 
 const TableBedListPopover = ({
   popupState,
@@ -15,8 +15,6 @@ const TableBedListPopover = ({
   onSelectDelete = (f) => f,
   onSelectClear = (f) => f,
 }) => {
-  const classes = useStyles();
-
   const handleSelectDelete = () => {
     popupState.close();
     onSelectDelete();
@@ -27,31 +25,22 @@ const TableBedListPopover = ({
   };
 
   return (
-    <div className={classes.root}>
+    <>
       <Menu
         {...bindMenu(popupState)}
-        getContentAnchorEl={null}
         anchorOrigin={{ vertical: "center", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "left" }}
       >
         {!emptyBed && (
-          <MenuItem
-            className={classes.menuItem}
-            onClick={handleSelectClear}
-            key="clear"
-          >
-            Clear
-          </MenuItem>
+          <StyledMenuItem onClick={handleSelectClear} key="clear">
+            Clear bed
+          </StyledMenuItem>
         )}
-        <MenuItem
-          className={classes.menuItem}
-          onClick={handleSelectDelete}
-          key="delete"
-        >
+        <StyledMenuItem onClick={handleSelectDelete} key="delete">
           Remove bed
-        </MenuItem>
+        </StyledMenuItem>
       </Menu>
-    </div>
+    </>
   );
 };
 

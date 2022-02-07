@@ -1,112 +1,85 @@
 import { useState } from "react";
-import { AppBar, Toolbar, Divider, MenuItem } from "@material-ui/core";
 
-import { makeStyles } from "@material-ui/styles";
+// MUI
+import { AppBar, Toolbar, Divider, MenuItem, TextField } from "@mui/material";
+import { styled } from "@mui/system";
 
-import CustomTextField from "./CustomTextField";
+// Components
 import QuickAddInput from "./QuickAddInput";
 
-const useStylesForContentInputToolbar = makeStyles((theme) => ({
-  appBarRoot: {
-    backgroundColor: "transparent",
-    flexShrink: "inherit",
-    zIndex: "100",
-  },
-  toolbar: {
-    minHeight: "auto",
-    padding: "2px 6px",
-  },
-  divider: {
-    margin: "0 6px",
-  },
+/* Styling */
+const StyledAppBar = styled(AppBar, {
+  name: "ContentInputToolbar",
+  slot: "appbar",
+})(() => ({
+  backgroundColor: "transparent",
+  flexShrink: "inherit",
+  zIndex: "100",
 }));
+
+const StyledToolBar = styled(Toolbar, {
+  name: "ContentInputToolbar",
+  slot: "toolbar",
+})(() => ({
+  padding: "0px 6px 0px 6px",
+  marginLeft: 1,
+  minHeight: "auto",
+}));
+
+const dividerSx = {
+  margin: "0 6px",
+};
 
 const ContentInputToolbar = ({
   contentType,
   onAddSection = (f) => f,
   onSelectTemplate = (f) => f,
 }) => {
-  const classes = useStylesForContentInputToolbar();
   return (
-    <AppBar
-      position="static"
-      className={classes.appBarRoot}
-      square={true}
-      elevation={0}
-    >
-      <Toolbar
-        disableGutters
-        variant="dense"
-        classes={{
-          dense: classes.toolbar,
-        }}
-      >
+    <StyledAppBar position="static" square={true} elevation={0}>
+      <StyledToolBar disableGutters variant="dense" sx={{}}>
         {contentType === "nestedContent" && (
           <>
-            <Divider
-              orientation="vertical"
-              flexItem
-              className={classes.divider}
-            />
             <QuickAddInput label="Add Section" onSubmit={onAddSection} />
-            <Divider
-              orientation="vertical"
-              flexItem
-              className={classes.divider}
-            />
+            <Divider orientation="vertical" flexItem sx={{ ...dividerSx }} />
             <SelectTemplate onSelect={onSelectTemplate} />
           </>
         )}
-      </Toolbar>
-    </AppBar>
+      </StyledToolBar>
+    </StyledAppBar>
   );
 };
 
-const useStylesForSelectTemplate = makeStyles((theme) => ({
-  select: {
-    minWidth: "100px",
-    background: "white",
-    color: "#676767",
-    borderBottom: "1px dotted transparent",
-    borderRadius: "0px",
-    "&:hover": {
-      color: "black",
-    },
-    "&:focus": {
-      background: "white",
-      borderStyle: "solid",
-      borderTop: 0,
-      borderRight: 0,
-      borderBottomWidth: 1,
-      borderLeft: 0,
-      borderColor: theme.palette.secondary.main,
+/* Styling for SelectTemplate */
+
+const StyledTextField = styled(TextField, {
+  name: "SelectTemplate",
+  slot: "textfield",
+})(({ theme }) => ({
+  "& .MuiOutlinedInput-root": {
+    padding: "8px 0px 4px 8px",
+    lineHeight: "inherit",
+    "&.Mui-focused fieldset": {
+      borderWidth: "0.1em",
+      borderColor: theme.palette.primary.main,
+      boxShadow: "rgba(17, 17, 26, 0.15) 0px 1px 0px",
     },
   },
-  menuPaper: {
-    maxWidth: "200px",
-  },
-  menuList: {
-    paddingTop: 0,
-    paddingBottom: 0,
-    background: "#f6f8fa",
-    "& li.Mui-selected": {
-      fontWeight: 700,
-    },
-  },
-  menuItemPlaceholder: {
-    fontSize: "10pt",
-  },
-  menuItem: {
-    fontSize: "10pt",
-    overflow: "hidden",
-    whiteSpace: "nowrap",
-    textOverflow: "ellipsis",
+  "& .MuiOutlinedInput-input": {
+    fontSize: theme.typography.formFontSizeLevel2,
+    padding: 0,
   },
 }));
 
-const SelectTemplate = ({ onSelect = (f) => f }) => {
-  const classes = useStylesForSelectTemplate();
+const selectSx = {
+  background: "white",
+  color: "#676767",
+  "& .MuiOutlinedInput-input.MuiSelect-select": {
+    height: "inherit",
+  },
+};
 
+const SelectTemplate = ({ onSelect = (f) => f }) => {
   const [value, setValue] = useState("");
 
   const handleChange = (e) => {
@@ -122,24 +95,22 @@ const SelectTemplate = ({ onSelect = (f) => f }) => {
   };
 
   return (
-    <CustomTextField
+    <StyledTextField
       value={value}
       onChange={handleChange}
       select
       id="selectTemplate"
       label="Template"
       overflow="hidden"
+      size="small"
+      InputLabelProps={{
+        shrink: true,
+      }}
       SelectProps={{
-        classes: {
-          root: classes.select,
-        },
+        sx: selectSx,
         displayEmpty: true,
         MenuProps: {
-          classes: {
-            list: classes.menuList,
-          },
           PaperProps: {
-            className: classes.menuPaper,
             elevation: 2,
           },
           anchorOrigin: {
@@ -150,11 +121,10 @@ const SelectTemplate = ({ onSelect = (f) => f }) => {
             vertical: "top",
             horizontal: "left",
           },
-          getContentAnchorEl: null,
         },
       }}
     >
-      <MenuItem value="" className={classes.menuItemPlaceholder}>
+      <MenuItem value="" sx={{ fontSize: "formFontSizeLevel2" }}>
         Select...
       </MenuItem>
 
@@ -163,13 +133,18 @@ const SelectTemplate = ({ onSelect = (f) => f }) => {
           <MenuItem
             key={option.id}
             value={option.value}
-            className={classes.menuItem}
+            sx={{
+              fontSize: "formFontSizeLevel1",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+            }}
           >
             {option.name}
           </MenuItem>
         );
       })}
-    </CustomTextField>
+    </StyledTextField>
   );
 };
 
