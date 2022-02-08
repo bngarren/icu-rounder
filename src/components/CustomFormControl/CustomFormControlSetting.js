@@ -63,7 +63,15 @@ const CustomFormControlSetting = ({
 
   const handleOnSave = () => {
     if (id !== null) {
-      onSave(id, value);
+      let success = onSave(id, value);
+
+      /* If a save goes through, reset to original state. Sometimes a save will
+      go successfully but the data isn't different, so we need to reset it here
+      manually. */
+      if (success) {
+        setDiff(false);
+        setValue(initialValue);
+      }
     }
   };
 
