@@ -9,6 +9,7 @@ import DocumentSection from "./DocumentSection";
 import ExportSection from "./ExportSection";
 import ImportSection from "./ImportSection";
 import ContingenciesSection from "./ContingenciesSection";
+import SecuritySection from "./SecuritySection";
 import { useDialog } from "../../components/Dialog";
 
 // Context
@@ -167,6 +168,13 @@ const SettingsPage = () => {
           title="Contingencies"
           subtitle="Save your custom contingencies for later use."
           section={<ContingenciesSection onSave={handleOnSave} />}
+        />
+        <Divider />
+        {/* - - - - - section SECURITY - - - - - */}
+        <SettingsPageSection
+          title="Security & Privacy"
+          subtitle="Manage your browser data."
+          section={<SecuritySection showYesNoDialog={showYesNoDialog} />}
         />
       </StyledBodyBox>
       {dialogIsOpen && dialog}
