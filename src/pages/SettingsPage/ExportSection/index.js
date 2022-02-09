@@ -5,6 +5,7 @@ import { Grid, InputAdornment, Typography, Button } from "@mui/material";
 import CustomTextField from "../CustomTextField";
 import Exporter from "../../../components/Exporter";
 import CustomFormControlSetting from "../../../components/CustomFormControl/CustomFormControlSetting";
+import ExportList from "./ExportList";
 
 // Context
 import { useSettings } from "../../../context/Settings";
@@ -66,6 +67,7 @@ const ExportSection = ({ onSave = (f) => f }) => {
             Export Grid
           </Button>
         </Exporter>
+        <ExportList />
       </Grid>
     </>
   );
