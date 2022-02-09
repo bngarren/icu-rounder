@@ -13,8 +13,7 @@ const StyledGridRoot = styled(Grid, {
 })(({ theme, diff }) => ({
   display: "flex",
   flexDirection: "column",
-  paddingLeft: "1rem",
-  paddingBottom: "1rem",
+  flexBasis: "fit-content",
   "&:hover": {
     // backgroundColor: theme.palette.grey[100],
   },
@@ -63,13 +62,21 @@ const CustomFormControlSetting = ({
 
   const handleOnSave = () => {
     if (id !== null) {
-      onSave(id, value);
+      let success = onSave(id, value);
+
+      /* If a save goes through, reset to original state. Sometimes a save will
+      go successfully but the data isn't different, so we need to reset it here
+      manually. */
+      if (success) {
+        setDiff(false);
+        setValue(initialValue);
+      }
     }
   };
 
   return (
     <StyledGridRoot container diff={diff}>
-      <Grid item xs={12} container wrap="nowrap" alignItems="center">
+      <Grid item container wrap="nowrap" alignItems="center">
         <Grid item>
           <Typography
             sx={{ fontSize: "1rem", fontWeight: "bold" }}
@@ -79,7 +86,7 @@ const CustomFormControlSetting = ({
           </Typography>
         </Grid>
 
-        <Grid item xs>
+        <Grid item>
           <Zoom in={diff} timeout={300}>
             <Grid container>
               <Button
@@ -118,9 +125,7 @@ const CustomFormControlSetting = ({
           </Zoom>
         </Grid>
       </Grid>
-      <Grid item xs>
-        {childElement}
-      </Grid>
+      <Grid item>{childElement}</Grid>
     </StyledGridRoot>
   );
 };

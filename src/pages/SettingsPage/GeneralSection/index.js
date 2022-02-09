@@ -1,5 +1,5 @@
 // MUI
-import { Grid } from "@mui/material";
+import { Box } from "@mui/material";
 
 // Custom components
 import CustomTextField from "../CustomTextField";
@@ -16,18 +16,16 @@ const GeneralSection = ({ onSave = (f) => f }) => {
   const { bedLayout } = useGridStateContext();
 
   return (
-    <>
-      <Grid item>
-        <CustomFormControlSetting
-          label="Bed Layout"
-          id="bedLayout"
-          initialValue={getPrettyBedLayout(bedLayout)}
-          onSave={onSave}
-        >
-          <CustomTextField id="bedLayoutTextField" fullWidth multiline />
-        </CustomFormControlSetting>
-      </Grid>
-    </>
+    <Box>
+      <CustomFormControlSetting
+        label="Bed Layout"
+        id="bedLayout"
+        initialValue={getPrettyBedLayout(bedLayout)}
+        onSave={onSave}
+      >
+        <CustomTextField id="bedLayoutTextField" fullWidth multiline />
+      </CustomFormControlSetting>
+    </Box>
   );
 };
 

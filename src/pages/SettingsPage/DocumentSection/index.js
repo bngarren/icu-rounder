@@ -1,5 +1,5 @@
 // MUI
-import { Grid, Select, MenuItem } from "@mui/material";
+import { Box, Stack, Select, MenuItem } from "@mui/material";
 
 // Custom components
 import CustomTextField from "../CustomTextField";
@@ -13,8 +13,8 @@ const DocumentSection = ({ onSave = (f) => f }) => {
   const { settings } = useSettings();
 
   return (
-    <>
-      <Grid item>
+    <Box>
+      <Stack direction="column" spacing={1}>
         <CustomFormControlSetting
           label="Title"
           id="document_title"
@@ -23,8 +23,7 @@ const DocumentSection = ({ onSave = (f) => f }) => {
         >
           <CustomTextField id="documentTitleTextField" fullWidth />
         </CustomFormControlSetting>
-      </Grid>
-      <Grid item>
+
         <CustomFormControlSetting
           label="Grids per Row"
           id="document_cols_per_page"
@@ -39,8 +38,8 @@ const DocumentSection = ({ onSave = (f) => f }) => {
             <MenuItem value={5}>5</MenuItem>
           </Select>
         </CustomFormControlSetting>
-      </Grid>
-    </>
+      </Stack>
+    </Box>
   );
 };
 

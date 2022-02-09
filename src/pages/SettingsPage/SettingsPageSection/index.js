@@ -1,9 +1,9 @@
 // MUI
-import { Box, Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import { styled } from "@mui/system";
 
 /* Styling */
-const StyledSectionBox = styled(Box, {
+const StyledSectionStack = styled(Stack, {
   name: "SettingsPageSection",
   slot: "Root",
 })(() => ({
@@ -12,8 +12,8 @@ const StyledSectionBox = styled(Box, {
 
 const SettingsPageSection = ({ title, subtitle, section }) => {
   return (
-    <StyledSectionBox>
-      <Typography variant="h5" sx={{ marginTop: "5px", marginBottom: "10px" }}>
+    <StyledSectionStack direction="column" spacing={1}>
+      <Typography variant="h5" sx={{ marginTop: "5px" }}>
         {title}
       </Typography>
       {subtitle != null ? (
@@ -22,7 +22,7 @@ const SettingsPageSection = ({ title, subtitle, section }) => {
         ""
       )}
       {section && section}
-    </StyledSectionBox>
+    </StyledSectionStack>
   );
 };
 

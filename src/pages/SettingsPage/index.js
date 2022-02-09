@@ -9,6 +9,7 @@ import DocumentSection from "./DocumentSection";
 import ExportSection from "./ExportSection";
 import ImportSection from "./ImportSection";
 import ContingenciesSection from "./ContingenciesSection";
+import SecuritySection from "./SecuritySection";
 import { useDialog } from "../../components/Dialog";
 
 // Context
@@ -44,6 +45,8 @@ const SettingsPage = () => {
   updating bedLayout variable of GridStateContext
   **
   */
+  /**
+   * @return {bool} Returns true if save action was successful, false if not */
   const handleOnSave = (id, value) => {
     if (id == null || value == null) {
       throw new Error(
@@ -51,8 +54,10 @@ const SettingsPage = () => {
       );
     }
 
+    let success = false;
+
     if (id === "bedLayout") {
-      handleSaveBedLayout(value);
+      success = handleSaveBedLayout(value);
     } else {
       try {
         dispatchSettings({
@@ -61,10 +66,12 @@ const SettingsPage = () => {
             [id]: value,
           },
         });
+        success = true;
       } catch (error) {
         console.error(`Could not save [${id}].`);
       }
     }
+    return success;
   };
 
   /* 
@@ -77,9 +84,10 @@ const SettingsPage = () => {
   /**
    *
    * @param {string} newBedLayout The "new" bedLayout string from user input
+   * @return {bool} Returns true if save was successful, false if not
    */
   const handleSaveBedLayout = (newBedLayout) => {
-    /* Convert the inputted bedLayout string (CSV format) to an array */
+    /* Convert the input bedLayout string (CSV format) to an array */
     const formattedBedLayout = getBedLayoutArrayFromCsv(newBedLayout);
 
     /* Find the beds that differ between the current and new bedLayouts */
@@ -115,15 +123,17 @@ const SettingsPage = () => {
         () => {
           // chose to continue
           updateGridData(gridData, formattedBedLayout);
+          return true;
         },
         () => {
           // chose to cancel
-          return;
+          return false;
         },
         { yes: "Continue", no: "Cancel" }
       );
     } else {
       updateGridData(gridData, formattedBedLayout);
+      return true;
     }
   };
 
@@ -168,6 +178,13 @@ const SettingsPage = () => {
           subtitle="Save your custom contingencies for later use."
           section={<ContingenciesSection onSave={handleOnSave} />}
         />
+        <Divider />
+        {/* - - - - - section SECURITY - - - - - */}
+        <SettingsPageSection
+          title="Security & Privacy"
+          subtitle="Manage your browser data."
+          section={<SecuritySection showYesNoDialog={showYesNoDialog} />}
+        />
       </StyledBodyBox>
       {dialogIsOpen && dialog}
     </Container>
@@ -175,15 +192,27 @@ const SettingsPage = () => {
 };
 
 /* Helper function for taking the input bedLayout (CSV format) and 
-  converting it to a valid array */
+  converting it to a valid array. This is NOT where
+  validation happens. It does take accepted characters, i.e, commas,
+  and converts them to an appropriate format. */
+/**
+ * @param {string} csv String containing comma-separated values
+ * @return {array} Array containing bedLayout, e.g. ["1", "2", "3"]
+ */
 const getBedLayoutArrayFromCsv = (csv) => {
   let res = [];
   if (csv == null || csv === "") return res;
-  let arr = csv.split(",");
+
+  /* This regex looks for zero or more spaces, followed by a comma,
+  followed by zero or more spaces—and, when found, removes the spaces
+  and the comma from the string */
+  const remove = /\s*(?:,|$)\s*/;
+  let arr = csv.split(remove);
   arr.forEach((element) => {
     if (element === "") return;
     res.push(element.trim());
   });
+
   return res;
 };
 
