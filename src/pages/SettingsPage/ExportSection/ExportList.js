@@ -81,14 +81,22 @@ const ExportItem = ({ value, selected, toggleSelected }) => {
   }
 };
 
-const ExportList = () => {
+const ExportList = ({ onChangeSelected = (f) => f }) => {
   const { gridData } = useGridStateContext();
 
   const [selected, setSelected] = React.useState([]);
 
+  /* If new gridData comes in, reset the list so that all of them
+  start off selected */
   React.useEffect(() => {
     setSelected([...gridData]);
   }, [gridData]);
+
+  /* Each time a new selection is made, send this back to parent so
+  that this new group can be exported */
+  React.useEffect(() => {
+    onChangeSelected(selected);
+  }, [selected, onChangeSelected]);
 
   const handleToggle = (value) => () => {
     const currentIndex = selected.indexOf(value);

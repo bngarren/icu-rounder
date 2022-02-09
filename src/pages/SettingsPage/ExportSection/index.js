@@ -1,3 +1,5 @@
+import * as React from "react";
+
 // MUI
 import { Grid, InputAdornment, Typography, Button } from "@mui/material";
 
@@ -11,6 +13,15 @@ import ExportList from "./ExportList";
 import { useSettings } from "../../../context/Settings";
 
 const ExportSection = ({ onSave = (f) => f }) => {
+  /* This is what we will actually send to the Exporter component */
+  const [gridDataToExport, setGridDataToExport] = React.useState([]);
+
+  /* Handles when the ExportList component changes its selection. This
+  prepares a new slice of data to be exported. */
+  const onNewSelectionOfItemsToExport = React.useCallback((selectedItems) => {
+    setGridDataToExport(selectedItems);
+  }, []);
+
   /* Get Settings context */
   const { settings } = useSettings();
 
@@ -62,12 +73,13 @@ const ExportSection = ({ onSave = (f) => f }) => {
         <Exporter
           filename={settings.export_filename}
           onExported={handleOnExport}
+          gridDataToExport={gridDataToExport}
         >
           <Button variant="contained" disableElevation size="small">
             Export Grid
           </Button>
         </Exporter>
-        <ExportList />
+        <ExportList onChangeSelected={onNewSelectionOfItemsToExport} />
       </Grid>
     </>
   );
