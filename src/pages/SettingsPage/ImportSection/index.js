@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 
 // MUI
-import { Grid, Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
 import WarningIcon from "@mui/icons-material/Warning";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 
@@ -37,68 +37,66 @@ const ImportSection = () => {
   };
 
   return (
-    <>
-      <Grid item>
-        <Importer onNewDataSelected={handleNewDataImported} />
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-around",
-            flexWrap: "wrap",
-            alignItems: "center",
-            margin: "5px 0px",
-          }}
-        >
-          {pendingDataImport ? (
-            <div align="center">
-              <Button
+    <Box>
+      <Importer onNewDataSelected={handleNewDataImported} />
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-around",
+          flexWrap: "wrap",
+          alignItems: "center",
+          margin: "5px 0px",
+        }}
+      >
+        {pendingDataImport ? (
+          <div align="center">
+            <Button
+              sx={{
+                color: "white",
+                backgroundColor: "warning.main",
+              }}
+              variant="contained"
+              size="small"
+              onClick={() => handleUpdateGridData(pendingDataImport)}
+              startIcon={<WarningIcon />}
+            >
+              Use this data?
+            </Button>
+            <Typography
+              variant="caption"
+              sx={{
+                color: "warning.main",
+              }}
+            >
+              <br />
+              (This will overwrite your current grid. Consider exporting it
+              first.)
+            </Typography>
+          </div>
+        ) : (
+          confirmedDataImport && (
+            <Box style={{ display: "inline-flex", alignItems: "center" }}>
+              <CheckBoxIcon
                 sx={{
-                  color: "white",
-                  backgroundColor: "warning.main",
+                  color: "primary.main",
+                  fontSize: "1.2rem",
+                  marginRight: "2px",
                 }}
-                variant="contained"
-                size="small"
-                onClick={() => handleUpdateGridData(pendingDataImport)}
-                startIcon={<WarningIcon />}
-              >
-                Use this data?
-              </Button>
+              />
               <Typography
                 variant="caption"
                 sx={{
-                  color: "warning.main",
+                  color: "primary.main",
+                  fontSize: "1rem",
                 }}
               >
-                <br />
-                (This will overwrite your current grid. Consider exporting it
-                first.)
+                Successfully imported.
               </Typography>
-            </div>
-          ) : (
-            confirmedDataImport && (
-              <Box style={{ display: "inline-flex", alignItems: "center" }}>
-                <CheckBoxIcon
-                  sx={{
-                    color: "primary.main",
-                    fontSize: "1.2rem",
-                    marginRight: "2px",
-                  }}
-                />
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: "primary.main",
-                    fontSize: "1rem",
-                  }}
-                >
-                  Successfully imported.
-                </Typography>
-              </Box>
-            )
-          )}
-        </Box>
-      </Grid>
-    </>
+            </Box>
+          )
+        )}
+      </Box>
+    </Box>
   );
 };
 

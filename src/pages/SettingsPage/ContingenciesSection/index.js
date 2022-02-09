@@ -1,5 +1,5 @@
 // MUI
-import { Grid } from "@mui/material";
+import { Box } from "@mui/material";
 
 // Custom component
 import ContingencyOptionsEditor from "../../../components/ContingencyOptionsEditor";
@@ -26,15 +26,13 @@ const ContingenciesSection = ({ onSave = (f) => f }) => {
   };
 
   return (
-    <>
-      <Grid item>
-        <ContingencyOptionsEditor
-          data={contingencyOptions}
-          onSubmit={handleNewContingencyOption}
-          onRemove={handleRemoveContingenyOption}
-        />
-      </Grid>
-    </>
+    <Box>
+      <ContingencyOptionsEditor
+        data={contingencyOptions}
+        onSubmit={handleNewContingencyOption}
+        onRemove={handleRemoveContingenyOption}
+      />
+    </Box>
   );
 };
 
