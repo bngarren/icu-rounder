@@ -4,7 +4,6 @@ import * as React from "react";
 import {
   Grid,
   Stack,
-  Box,
   Divider,
   Typography,
   ButtonUnstyled,
@@ -14,8 +13,11 @@ import {
   Checkbox,
   IconButton,
   Tooltip,
+  Collapse,
 } from "@mui/material";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { styled } from "@mui/system";
 
 // Context
@@ -25,7 +27,6 @@ import { useGridStateContext } from "../../../context/GridState";
 import { isBedEmpty } from "../../../utils/Utility";
 
 /* Styling */
-
 const StyledButton = styled(ButtonUnstyled, {
   name: "StyledButton",
 })(({ theme }) => ({
@@ -35,6 +36,7 @@ const StyledButton = styled(ButtonUnstyled, {
   cursor: "pointer",
 }));
 
+/* This component renders the Checkbox for each bedspace */
 const ExportItem = ({ value, selected, toggleSelected }) => {
   if (value != null) {
     /* Check if properties exist and are non-empty */
@@ -63,6 +65,7 @@ const ExportItem = ({ value, selected, toggleSelected }) => {
 
     return (
       <FormControlLabel
+        sx={{ margin: 0 }}
         control={
           <Checkbox
             size="small"
@@ -70,6 +73,10 @@ const ExportItem = ({ value, selected, toggleSelected }) => {
             onClick={toggleSelected(value)}
             sx={{
               p: "3px",
+              color: "primary.light",
+              "&.Mui-checked": {
+                color: "primary.light",
+              },
             }}
           />
         }
@@ -81,9 +88,13 @@ const ExportItem = ({ value, selected, toggleSelected }) => {
   }
 };
 
+/* A component that allows choosing a portion of the gridData to
+be selected for export. Each time a new selection is made, a callback
+is fired on the parent (ExportSection) to let it update it's object for export. */
 const ExportList = ({ onChangeSelected = (f) => f }) => {
   const { gridData } = useGridStateContext();
 
+  const [expanded, setExpanded] = React.useState(false);
   const [selected, setSelected] = React.useState([]);
 
   /* If new gridData comes in, reset the list so that all of them
@@ -98,7 +109,13 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
     onChangeSelected(selected);
   }, [selected, onChangeSelected]);
 
-  const handleToggle = (value) => () => {
+  const error = selected.length < 1;
+
+  const handleToggleExpanded = () => {
+    setExpanded((prev) => !prev);
+  };
+
+  const handleToggleSelection = (value) => () => {
     const currentIndex = selected.indexOf(value);
     const newSelected = [...selected];
 
@@ -111,6 +128,9 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
     setSelected(newSelected);
   };
 
+  /* The following are functions that help the user select/filter the list. 
+  TODO Consider adding an Autocomplete field that allows user to choose certain filters
+   */
   const handleSelectAll = () => {
     setSelected([...gridData]);
   };
@@ -124,9 +144,12 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
     setSelected(newSelected);
   };
 
+  /* Generates the list of items. Divides list into 2 columns if 
+  longer than threshold */
+  const THRESHOLD = 15;
   const listOfExportItems = () => {
     /* Single column, if less than this size */
-    if (gridData.length <= 15) {
+    if (gridData.length <= THRESHOLD) {
       return (
         <Stack>
           {gridData.map((value, key) => {
@@ -135,7 +158,7 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
                 key={`${value.bed}-${key}`}
                 value={value}
                 selected={selected.indexOf(value) !== -1}
-                toggleSelected={handleToggle}
+                toggleSelected={handleToggleSelection}
               />
             );
           })}
@@ -159,7 +182,7 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
                         key={`${value.bed}-${key}`}
                         value={value}
                         selected={selected.indexOf(value) !== -1}
-                        toggleSelected={handleToggle}
+                        toggleSelected={handleToggleSelection}
                       />
                     );
                   })}
@@ -173,15 +196,31 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
   };
 
   return (
-    <Box>
+    <FormControl
+      error={error}
+      component="fieldset"
+      variant="standard"
+      sx={{ width: "100%" }}
+    >
       <Stack
         direction="row"
         spacing={1}
         divider={<Divider orientation="vertical" flexItem />}
       >
-        <Typography variant="overline">
-          <b>{selected.length}</b> of {gridData.length} selected
-        </Typography>
+        <Stack direction="row" spacing={1}>
+          <Typography variant="overline" sx={{ color: error && "error.main" }}>
+            <b>{selected.length}</b> of {gridData.length} beds selected
+          </Typography>
+          <Tooltip title={expanded ? "Show less" : "Show more"}>
+            <IconButton
+              size="small"
+              onClick={handleToggleExpanded}
+              sx={{ p: "1px 3px" }}
+            >
+              {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </IconButton>
+          </Tooltip>
+        </Stack>
 
         <StyledButton onClick={handleSelectAll}>Select All</StyledButton>
         <StyledButton onClick={handleClearAll}>Clear All</StyledButton>
@@ -195,15 +234,11 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
           </IconButton>
         </Tooltip>
       </Stack>
-      <FormControl
-        component="fieldset"
-        variant="standard"
-        sx={{ width: "100%" }}
-      >
-        <FormHelperText></FormHelperText>
-        {listOfExportItems()}
-      </FormControl>
-    </Box>
+      <FormHelperText>
+        {error && "Please select at least 1 item."}
+      </FormHelperText>
+      <Collapse in={expanded}>{listOfExportItems()}</Collapse>
+    </FormControl>
   );
 };
 
