@@ -1,10 +1,39 @@
 import * as React from "react";
 
 // MUI
-import { Grid, Stack, Box, Typography, Checkbox } from "@mui/material";
+import {
+  Grid,
+  Stack,
+  Box,
+  Divider,
+  Typography,
+  ButtonUnstyled,
+  FormControl,
+  FormControlLabel,
+  FormHelperText,
+  Checkbox,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import { styled } from "@mui/system";
 
 // Context
 import { useGridStateContext } from "../../../context/GridState";
+
+// Utility
+import { isBedEmpty } from "../../../utils/Utility";
+
+/* Styling */
+
+const StyledButton = styled(ButtonUnstyled, {
+  name: "StyledButton",
+})(({ theme }) => ({
+  border: 0,
+  backgroundColor: "transparent",
+  fontSize: theme.typography.formFontSizeLevel3,
+  cursor: "pointer",
+}));
 
 const ExportItem = ({ value, selected, toggleSelected }) => {
   if (value != null) {
@@ -15,15 +44,37 @@ const ExportItem = ({ value, selected, toggleSelected }) => {
       value.lastName.length &&
       value.lastName;
 
+    const empty = isBedEmpty(value);
+
+    const label = (
+      <>
+        <Typography
+          variant="body2"
+          component="span"
+          sx={{ color: empty && "grey.600" }}
+        >
+          {bed}
+        </Typography>
+        <Typography variant="body2" component="span">
+          {lastName && ` - ${lastName}`}
+        </Typography>
+      </>
+    );
+
     return (
-      <Box>
-        <Checkbox
-          size="small"
-          checked={selected}
-          onClick={toggleSelected(value)}
-        />
-        {bed} {lastName && `- ${lastName}`}
-      </Box>
+      <FormControlLabel
+        control={
+          <Checkbox
+            size="small"
+            checked={selected}
+            onClick={toggleSelected(value)}
+            sx={{
+              p: "3px",
+            }}
+          />
+        }
+        label={label}
+      />
     );
   } else {
     return <></>;
@@ -49,6 +100,19 @@ const ExportList = () => {
       newSelected.splice(currentIndex, 1);
     }
 
+    setSelected(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    setSelected([...gridData]);
+  };
+
+  const handleClearAll = () => {
+    setSelected([]);
+  };
+
+  const handleFilterNonEmpty = () => {
+    const newSelected = selected.filter((el) => !isBedEmpty(el));
     setSelected(newSelected);
   };
 
@@ -102,10 +166,35 @@ const ExportList = () => {
 
   return (
     <Box>
-      <Typography variant="caption">
-        {selected.length} of {gridData.length} selected.
-      </Typography>
-      {listOfExportItems()}
+      <Stack
+        direction="row"
+        spacing={1}
+        divider={<Divider orientation="vertical" flexItem />}
+      >
+        <Typography variant="overline">
+          <b>{selected.length}</b> of {gridData.length} selected
+        </Typography>
+
+        <StyledButton onClick={handleSelectAll}>Select All</StyledButton>
+        <StyledButton onClick={handleClearAll}>Clear All</StyledButton>
+        <Tooltip title="Filter empty beds">
+          <IconButton
+            size="small"
+            onClick={handleFilterNonEmpty}
+            sx={{ p: "2px" }}
+          >
+            <FilterAltIcon />
+          </IconButton>
+        </Tooltip>
+      </Stack>
+      <FormControl
+        component="fieldset"
+        variant="standard"
+        sx={{ width: "100%" }}
+      >
+        <FormHelperText></FormHelperText>
+        {listOfExportItems()}
+      </FormControl>
     </Box>
   );
 };
