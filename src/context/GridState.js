@@ -37,30 +37,11 @@ const mergeWithBedLayout = (arr, bedLayout) => {
   return resultArray;
 };
 
-/* Helper used for importing/exporting actual .Json to file */
-const getJsonObjectFromSortedArray = (arr) => {
-  // converts the array back to a JSON "object of objects"
-
-  //? using a map here because i had difficulty adding to an Object directly
-  const map = new Map();
-
-  /* Go through each bed in the array and create a key/value pair
-  in this new map. A map keeps the order of the elements */
-  arr.forEach((el) => {
-    map.set(el.bed, el);
-  });
-
-  // Convert the map to JSON
-  const json = JSON.stringify(Object.fromEntries(map), null, 2);
-  return json;
-};
-
 const GridStateContext = createContext();
 
 export default function GridStateProvider({ children }) {
   const [bedLayout, setBedLayout] = useState();
   const [gridData, setGridData] = useState();
-  const [gridDataJson, setGridDataJson] = useState();
   const [census, setCensus] = useState();
 
   /* Takes input data (full grid) and stores it in state as gridData.
@@ -101,7 +82,6 @@ export default function GridStateProvider({ children }) {
       const mergedData = mergeWithBedLayout(arr, bl);
       const sortedArrayData = sortByBed(mergedData);
       setGridData(sortedArrayData);
-      setGridDataJson(getJsonObjectFromSortedArray(sortedArrayData));
       setBedLayout(bl);
       return sortedArrayData;
     } catch (error) {
@@ -182,7 +162,7 @@ export default function GridStateProvider({ children }) {
 
   return (
     <GridStateContext.Provider
-      value={{ bedLayout, gridData, census, gridDataJson, updateGridData }}
+      value={{ bedLayout, gridData, census, updateGridData }}
     >
       {children}
     </GridStateContext.Provider>
