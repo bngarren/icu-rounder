@@ -10,3 +10,6 @@
    > git merge --no-ff release/x.x.x
 6. Push the develop branch to remote (origin)
 7. Create pull request on Github, develop --> master
+8. Review the pull request for consistency. Make sure issues that the PR resolves have been mentioned using a keyword in the commit or by directly linking the issue to the PR in Github.
+9. Merge the pull request to master
+10. Tag master with new version vX.x.x
