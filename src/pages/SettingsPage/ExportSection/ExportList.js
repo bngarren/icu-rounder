@@ -28,12 +28,19 @@ import { isBedEmpty } from "../../../utils/Utility";
 
 /* Styling */
 const StyledButton = styled(ButtonUnstyled, {
-  name: "StyledButton",
-})(({ theme }) => ({
+  name: "ExportList",
+  slot: "button",
+})(({ theme, disabled }) => ({
   border: 0,
   backgroundColor: "transparent",
   fontSize: theme.typography.formFontSizeLevel3,
-  cursor: "pointer",
+  cursor: disabled ? "inherit" : "pointer",
+  // not disabled
+  ...(!disabled && {
+    "&:hover": {
+      backgroundColor: theme.palette.grey[100],
+    },
+  }),
 }));
 
 /* This component renders the Checkbox for each bedspace */
@@ -109,7 +116,15 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
     onChangeSelected(selected);
   }, [selected, onChangeSelected]);
 
-  const error = selected.length < 1;
+  const errorNoBeds = gridData.length < 1;
+  const errorNoneSelected = selected.length < 1;
+  const errorMessage = () => {
+    if (errorNoneSelected) {
+      return errorNoBeds
+        ? "There are no beds to export. Add beds to your grid."
+        : "Please select at least 1 item to export.";
+    }
+  };
 
   const handleToggleExpanded = () => {
     setExpanded((prev) => !prev);
@@ -197,7 +212,7 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
 
   return (
     <FormControl
-      error={error}
+      error={errorNoneSelected}
       component="fieldset"
       variant="standard"
       sx={{ width: "100%" }}
@@ -208,7 +223,10 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
         divider={<Divider orientation="vertical" flexItem />}
       >
         <Stack direction="row" spacing={1}>
-          <Typography variant="overline" sx={{ color: error && "error.main" }}>
+          <Typography
+            variant="overline"
+            sx={{ color: errorNoneSelected && "error.main" }}
+          >
             <b>{selected.length}</b> of {gridData.length} beds selected
           </Typography>
           <Tooltip title={expanded ? "Show less" : "Show more"}>
@@ -216,27 +234,31 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
               size="small"
               onClick={handleToggleExpanded}
               sx={{ p: "1px 3px" }}
+              disabled={errorNoBeds}
             >
               {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </IconButton>
           </Tooltip>
         </Stack>
 
-        <StyledButton onClick={handleSelectAll}>Select All</StyledButton>
-        <StyledButton onClick={handleClearAll}>Clear All</StyledButton>
+        <StyledButton onClick={handleSelectAll} disabled={errorNoBeds}>
+          Select All
+        </StyledButton>
+        <StyledButton onClick={handleClearAll} disabled={errorNoBeds}>
+          Clear All
+        </StyledButton>
         <Tooltip title="Filter empty beds">
           <IconButton
             size="small"
             onClick={handleFilterNonEmpty}
             sx={{ p: "2px" }}
+            disabled={errorNoBeds}
           >
             <FilterAltIcon />
           </IconButton>
         </Tooltip>
       </Stack>
-      <FormHelperText>
-        {error && "Please select at least 1 item."}
-      </FormHelperText>
+      <FormHelperText>{errorMessage()}</FormHelperText>
       <Collapse in={expanded}>{listOfExportItems()}</Collapse>
     </FormControl>
   );
