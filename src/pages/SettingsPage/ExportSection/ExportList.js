@@ -33,6 +33,8 @@ const StyledButton = styled(ButtonUnstyled, {
   slot: "button",
 })(({ theme, disabled }) => ({
   border: 0,
+  borderRadius: 2,
+  padding: "0px 6px",
   backgroundColor: "transparent",
   fontSize: theme.typography.formFontSizeLevel3,
   cursor: "pointer",
@@ -229,7 +231,7 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
     >
       <Stack
         direction="row"
-        spacing={1}
+        spacing={0}
         divider={<Divider orientation="vertical" flexItem />}
         sx={{
           justifyContent: "space-evenly",
@@ -276,7 +278,9 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
         <FormHelperText sx={{ textAlign: "center" }}>
           {errorMessage()}
         </FormHelperText>
-        <Collapse in={expanded}>{listOfExportItems()}</Collapse>
+        <Collapse in={expanded} sx={{ ...(expanded && { pt: "8px" }) }}>
+          {listOfExportItems()}
+        </Collapse>
       </Paper>
     </FormControl>
   );

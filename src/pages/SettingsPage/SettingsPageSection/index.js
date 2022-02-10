@@ -26,17 +26,20 @@ const SettingsPageSection = ({ title, subtitle, section }) => {
         sx={{
           backgroundColor: "primary.dark",
           color: "primary.contrastText",
+          boxShadow: 25, // custom shadow in Theme
           py: 0.3,
           px: 1,
           borderTopLeftRadius: 3,
           borderTopRightRadius: 3,
+          borderBottomRightRadius: 2,
+          borderBottomLeftRadius: 2,
         }}
       >
         {title}
       </Typography>
 
       {subtitle != null ? (
-        <Typography variant="body2" sx={{ pl: "2px", pb: "8px" }}>
+        <Typography variant="subtitle" sx={{ pl: "2px", pb: "8px" }}>
           {subtitle}
         </Typography>
       ) : (

@@ -3,7 +3,7 @@ import Container from "@mui/material/Container";
 
 // Theme
 import { ThemeProvider } from "@mui/material/styles";
-import { theme } from "./Theme";
+import theme from "./Theme";
 
 // Settings
 import { SettingsProvider } from "./context/Settings";
