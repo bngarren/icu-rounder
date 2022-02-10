@@ -8,6 +8,9 @@
 
 #### Changed
 
+- Improved styling to SettingsPage
+- Theme.js now uses default export instead of named export [17a79a0](https://github.com/bngarren/icu-rounder/commit/17a79a03527f8fbcc86429be7e1ed9a4c44ab4ab)
+
 #### Removed
 
 #### Fixed
