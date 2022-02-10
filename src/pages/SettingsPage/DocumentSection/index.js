@@ -21,7 +21,7 @@ const DocumentSection = ({ onSave = (f) => f }) => {
           initialValue={settings.document_title}
           onSave={onSave}
         >
-          <CustomTextField id="documentTitleTextField" fullWidth />
+          <CustomTextField id="documentTitleTextField" />
         </CustomFormControlSetting>
 
         <CustomFormControlSetting

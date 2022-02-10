@@ -1,5 +1,5 @@
 //MUI
-import { Container, Box, Grid, Typography, Divider } from "@mui/material";
+import { Container, Stack, Box, Typography } from "@mui/material";
 import { styled } from "@mui/system";
 
 // custom components
@@ -20,13 +20,10 @@ import { useGridStateContext } from "../../context/GridState";
 import { isBedEmpty, getDataForBed } from "../../utils/Utility";
 
 /* Styling */
-const StyledBodyBox = styled(Box, {
+const StyledBodyStack = styled(Stack, {
   name: "SettingsPage",
   slot: "body",
-})(() => ({
-  display: "flex",
-  flexDirection: "column",
-}));
+})(() => ({}));
 
 const SettingsPage = () => {
   /* Get Settings context */
@@ -138,54 +135,55 @@ const SettingsPage = () => {
   };
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="md">
       <Box>
         <Typography variant="h4" sx={{ marginBottom: "15px" }}>
           Settings
         </Typography>
       </Box>
 
-      <StyledBodyBox>
+      <StyledBodyStack direction="column" spacing={4}>
         {/* - - - - - section GENERAL - - - - - */}
         <SettingsPageSection
           title="General"
           section={<GeneralSection onSave={handleOnSave} />}
         />
-        <Divider />
+
         {/* - - - - - section DOCUMENT - - - - - */}
         <SettingsPageSection
           title="Document"
+          subtitle="Adjust the appearance of the downloadable PDF."
           section={<DocumentSection onSave={handleOnSave} />}
         />
-        <Divider />
+
         {/* - - - - - section EXPORT - - - - - */}
         <SettingsPageSection
           title="Export"
           subtitle="Download the current grid as a .json file."
           section={<ExportSection onSave={handleOnSave} />}
         />
-        <Divider />
+
         {/* - - - - - section IMPORT - - - - - */}
         <SettingsPageSection
           title="Import"
           subtitle="Upload a previously saved .json file to populate the grid."
           section={<ImportSection />}
         />
-        <Divider />
+
         {/* - - - - - section CONTINGENCIES - - - - - */}
         <SettingsPageSection
           title="Contingencies"
           subtitle="Save your custom contingencies for later use."
           section={<ContingenciesSection onSave={handleOnSave} />}
         />
-        <Divider />
+
         {/* - - - - - section SECURITY - - - - - */}
         <SettingsPageSection
           title="Security & Privacy"
           subtitle="Manage your browser data."
           section={<SecuritySection showYesNoDialog={showYesNoDialog} />}
         />
-      </StyledBodyBox>
+      </StyledBodyStack>
       {dialogIsOpen && dialog}
     </Container>
   );

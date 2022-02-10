@@ -18,6 +18,9 @@ const StyledTextField = styled(TextField, {
     backgroundColor: "white",
     borderColor: theme.palette.secondary.dark,
   },
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "2px",
+  },
   "& .MuiOutlinedInput-input": {
     fontSize: theme.typography.formFontSizeLevel1,
     paddingTop: "6px",
