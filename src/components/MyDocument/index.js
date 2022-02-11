@@ -353,7 +353,7 @@ const GridBox = ({ bedspaceData, width, removeLeftBorder }) => {
           )}
         </View>
         <View style={pdfStyles.gridBoxBottomText}>
-          <Text>{bedspaceData.bottomText}</Text>
+          <Text>DEBUG</Text>
         </View>
       </View>
     );
