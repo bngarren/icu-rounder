@@ -152,7 +152,10 @@ const pdfStyles = StyleSheet.create({
   gridBoxBottomText: {
     position: "absolute",
     bottom: 0,
-    textAlign: "right",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    width: "100%",
     fontSize: "7pt",
     padding: "2pt 4pt 2pt 2pt",
   },

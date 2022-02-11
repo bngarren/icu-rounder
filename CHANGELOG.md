@@ -12,6 +12,14 @@
 
 ---
 
+## [2.2.1](https://github.com/bngarren/icu-rounder/compare/2.1.0...2.2.0) (2022-02-11)
+
+### Hotfix
+
+- With the [2.2.0](https://github.com/bngarren/icu-rounder/compare/2.1.0...2.2.0) release came a critical error in the rendering of the PDF document. This was due to an inadvertent upgrade in @react-pdf/renderer's dependencies. We are now upgraded to @react-pdf/renderer v2.1.1 and we have a working PDF render.
+
+---
+
 ## [2.2.0](https://github.com/bngarren/icu-rounder/compare/2.1.0...2.2.0) (2022-02-11)
 
 ### Changed
