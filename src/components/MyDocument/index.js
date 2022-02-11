@@ -152,7 +152,10 @@ const pdfStyles = StyleSheet.create({
   gridBoxBottomText: {
     position: "absolute",
     bottom: 0,
-    textAlign: "right",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    width: "100%",
     fontSize: "7pt",
     padding: "2pt 4pt 2pt 2pt",
   },
@@ -206,7 +209,7 @@ const MyDocument = ({ bedLayout, title, colsPerPage, data, census }) => {
       <Page size="letter" style={pdfStyles.page}>
         <View style={pdfStyles.header}>
           <View style={pdfStyles.titleRoot}>
-            <Text>{title}</Text>
+            <Text>{title || " "}</Text>
           </View>
 
           <View style={pdfStyles.censusRoot}>
@@ -274,39 +277,41 @@ const GridBox = ({ bedspaceData, width, removeLeftBorder }) => {
       >
         <View style={pdfStyles.gridBoxHeader}>
           <View style={pdfStyles.gridBoxHeaderBed}>
-            <Text>{bedspaceData.bed}</Text>
+            <Text>{bedspaceData.bed || " "}</Text>
           </View>
           <View style={pdfStyles.gridBoxHeaderName}>
             <Text>
-              {bedspaceData.lastName}
+              {bedspaceData.lastName || " "}
               {bedspaceData.lastName && bedspaceData.firstName && ", "}
-              {bedspaceData.firstName}
+              {bedspaceData.firstName || " "}
             </Text>
           </View>
           <View style={pdfStyles.gridBoxHeaderTeam}>
-            <Text>{bedspaceData.teamNumber}</Text>
+            <Text>{bedspaceData.teamNumber || " "}</Text>
           </View>
         </View>
         <View style={pdfStyles.gridBoxBody}>
           <Text style={pdfStyles.gridBoxBodyOneLiner}>
-            {bedspaceData.oneLiner}
+            {bedspaceData.oneLiner || " "}
           </Text>
           <View style={pdfStyles.gridBoxBodyContingencies}>
             {bedspaceData.contingencies &&
               bedspaceData.contingencies.map((item, index) => {
-                return (
-                  <Text
-                    style={pdfStyles.gridBoxBodyContingencyItem}
-                    key={`${index}-${item}`}
-                  >
-                    {item}
-                  </Text>
-                );
+                if (item != null)
+                  return (
+                    <Text
+                      style={pdfStyles.gridBoxBodyContingencyItem}
+                      key={`${index}-${item}`}
+                    >
+                      {item || " "}
+                    </Text>
+                  );
               })}
           </View>
           {bedspaceData.contentType === "simple" && (
-            <Text>{bedspaceData.simpleContent}</Text>
+            <Text>{bedspaceData.simpleContent || " "}</Text>
           )}
+
           {bedspaceData.contentType === "nested" && (
             <View>
               {bedspaceData.nestedContent?.map((sectionData) => {
@@ -317,9 +322,9 @@ const GridBox = ({ bedspaceData, width, removeLeftBorder }) => {
                   >
                     <Text style={pdfStyles.gridBoxNestedContentTopText}>
                       <Text style={pdfStyles.gridBoxNestedContentTitle}>
-                        {sectionData.title && `${sectionData.title}: `}
+                        {sectionData.title ? `${sectionData.title}: ` : " "}
                       </Text>
-                      {sectionData.top}
+                      {sectionData.top || " "}
                     </Text>
                     {sectionData?.items?.map((item) => {
                       return (
@@ -338,7 +343,7 @@ const GridBox = ({ bedspaceData, width, removeLeftBorder }) => {
                             />
                           </Svg>
                           <Text style={pdfStyles.gridBoxNestedContentItemText}>
-                            {item.value}
+                            {item.value || " "}
                           </Text>
                         </View>
                       );
@@ -350,7 +355,7 @@ const GridBox = ({ bedspaceData, width, removeLeftBorder }) => {
           )}
         </View>
         <View style={pdfStyles.gridBoxBottomText}>
-          <Text>{bedspaceData.bottomText}</Text>
+          <Text>{bedspaceData.bottomText || " "}</Text>
         </View>
       </View>
     );
