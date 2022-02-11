@@ -1,6 +1,6 @@
 {
   "name": "grid-maker",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "homepage": "",
   "private": true,
   "dependencies": {
@@ -10,7 +10,7 @@
     "@mui/lab": "^5.0.0-alpha.66",
     "@mui/material": "^5.3.1",
     "@mui/styles": "^5.3.0",
-    "@react-pdf/renderer": "2.0.12",
+    "@react-pdf/renderer": "2.1.1",
     "file-saver": "~2.0.5",
     "firebase": "~8.10.0",
     "lodash": "^4.17.21",
