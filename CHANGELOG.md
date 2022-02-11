@@ -1,10 +1,22 @@
-## Changelog
+# Changelog
 
-### Unreleased
+## Unreleased
 
 > yyyy-mm-dd
 
 #### Added
+
+#### Changed
+
+#### Removed
+
+#### Fixed
+
+---
+
+## [2.2.0](https://github.com/bngarren/icu-rounder/compare/2.1.0...2.2.0)
+
+> 2022-02-11
 
 #### Changed
 
@@ -13,9 +25,7 @@
 
 #### Removed
 
-#### Fixed
-
----
+- React scripts 'predeploy' and 'deploy' since we aren't targeting GH pages anymore
 
 ### [2.1.0](https://github.com/bngarren/icu-rounder/compare/2.0.0...2.1.0)
 
