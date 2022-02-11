@@ -4,9 +4,9 @@ import * as React from "react";
 import {
   Grid,
   Stack,
+  Paper,
   Divider,
   Typography,
-  ButtonUnstyled,
   FormControl,
   FormControlLabel,
   FormHelperText,
@@ -15,6 +15,7 @@ import {
   Tooltip,
   Collapse,
 } from "@mui/material";
+import ButtonUnstyled from "@mui/base/ButtonUnstyled";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -32,9 +33,12 @@ const StyledButton = styled(ButtonUnstyled, {
   slot: "button",
 })(({ theme, disabled }) => ({
   border: 0,
+  borderRadius: 2,
+  padding: "0px 6px",
   backgroundColor: "transparent",
   fontSize: theme.typography.formFontSizeLevel3,
-  cursor: disabled ? "inherit" : "pointer",
+  cursor: "pointer",
+  pointerEvents: disabled ? "none" : "inherit",
   // not disabled
   ...(!disabled && {
     "&:hover": {
@@ -166,7 +170,7 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
     /* Single column, if less than this size */
     if (gridData.length <= THRESHOLD) {
       return (
-        <Stack>
+        <Stack sx={{ pl: 4 }}>
           {gridData.map((value, key) => {
             return (
               <ExportItem
@@ -186,10 +190,18 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
       const secondHalf = gridData.slice(halfwayIndex, gridData.length);
 
       return (
-        <Grid container>
+        <Grid
+          container
+          sx={{
+            justifyContent: {
+              xs: "flex-start",
+              sm: "space-evenly",
+            },
+          }}
+        >
           {[firstHalf, secondHalf].map((data, key) => {
             return (
-              <Grid item xs={6} key={key}>
+              <Grid item xs="auto" key={key}>
                 <Stack>
                   {data.map((value, key) => {
                     return (
@@ -219,26 +231,30 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
     >
       <Stack
         direction="row"
-        spacing={1}
+        spacing={0}
         divider={<Divider orientation="vertical" flexItem />}
+        sx={{
+          justifyContent: "space-evenly",
+        }}
       >
         <Stack direction="row" spacing={1}>
           <Typography
             variant="overline"
-            sx={{ color: errorNoneSelected && "error.main" }}
+            sx={{
+              color: errorNoneSelected && "error.main",
+            }}
           >
             <b>{selected.length}</b> of {gridData.length} beds selected
           </Typography>
-          <Tooltip title={expanded ? "Show less" : "Show more"}>
-            <IconButton
-              size="small"
-              onClick={handleToggleExpanded}
-              sx={{ p: "1px 3px" }}
-              disabled={errorNoBeds}
-            >
-              {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            </IconButton>
-          </Tooltip>
+
+          <IconButton
+            size="small"
+            onClick={handleToggleExpanded}
+            sx={{ p: "1px 3px" }}
+            disabled={errorNoBeds}
+          >
+            {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </IconButton>
         </Stack>
 
         <StyledButton onClick={handleSelectAll} disabled={errorNoBeds}>
@@ -258,8 +274,14 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
           </IconButton>
         </Tooltip>
       </Stack>
-      <FormHelperText>{errorMessage()}</FormHelperText>
-      <Collapse in={expanded}>{listOfExportItems()}</Collapse>
+      <Paper elevation={expanded ? 1 : 0} sx={{ pb: "8px" }} square={true}>
+        <FormHelperText sx={{ textAlign: "center" }}>
+          {errorMessage()}
+        </FormHelperText>
+        <Collapse in={expanded} sx={{ ...(expanded && { pt: "8px" }) }}>
+          {listOfExportItems()}
+        </Collapse>
+      </Paper>
     </FormControl>
   );
 };

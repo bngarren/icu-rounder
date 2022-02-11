@@ -78,10 +78,7 @@ const CustomFormControlSetting = ({
     <StyledGridRoot container diff={diff}>
       <Grid item container wrap="nowrap" alignItems="center">
         <Grid item>
-          <Typography
-            sx={{ fontSize: "1rem", fontWeight: "bold" }}
-            variant="caption"
-          >
+          <Typography sx={{ fontSize: "1rem" }} variant="caption">
             {label}
           </Typography>
         </Grid>

@@ -2,7 +2,7 @@ import { createTheme } from "@mui/material/styles";
 
 /* Palette created here: https://material.io/resources/color/#!/?view.left=0&view.right=0&primary.color=455A64&secondary.color=B2FF59 */
 
-export const theme = createTheme({
+const theme = createTheme({
   mode: "light",
   palette: {
     primary: {
@@ -25,28 +25,6 @@ export const theme = createTheme({
   },
 });
 
-/* export const theme = createTheme(adaptV4Theme({
-  palette: {
-    primary: {
-      main: "#00A90B",
-      light: "#1AC625",
-      dark: "#008A09",
-      verticalGradient:
-        "linear-gradient(to bottom, #00a90b73 0%,#1ac6256b 50%,#00a90b69 92%,#1ac6256b 100%)",
-    },
-    secondary: {
-      main: "#017C82",
-      light: "#159298",
-      veryLight: "#017C8270",
-      veryVeryLight: "#017C824A",
-      faint: "#017C820F",
-      dark: "#01656A",
-    },
-    warning: {
-      main: "#D76300",
-    },
-    error: {
-      main: "#D70500",
-    },
-  },
-})); */
+theme.shadows.push("0px 11px 10px -12px rgba(0,0,0,0.46)"); // shadow #25 is a soft bottom shadow
+
+export default theme;
