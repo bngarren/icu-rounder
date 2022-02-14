@@ -18,7 +18,7 @@ import { BrowserRouter } from "react-router-dom";
 import PageRouter from "./components/PageRouter";
 
 // Firebase
-import Firebase from "./components/Firebase/Firebase";
+import { Firebase } from "./components/Firebase/Firebase";
 import { config } from "./components/Firebase/credentials";
 import AuthStateProvider from "./context/AuthState";
 import GridStateProvider from "./context/GridState";
