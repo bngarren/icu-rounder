@@ -4,20 +4,29 @@
         "es2021": true
     },
     "extends": [
+        "react-app",
         "eslint:recommended",
         "plugin:react/recommended",
         "plugin:react-hooks/recommended",
-        "plugin:prettier/recommended"
+        "plugin:prettier/recommended",
+        "plugin:import/errors",
+        "plugin:import/warnings"
     ],
+    "parser": "@babel/eslint-parser",
     "parserOptions": {
+        "requireConfigFile": false,
+        "babelOptions": {
+            "presets": [
+                "@babel/preset-react"
+            ]
+        },
         "ecmaFeatures": {
             "jsx": true
         },
-        "ecmaVersion": 12,
         "sourceType": "module"
     },
     "plugins": [
-        "react"
+        "react", "import"
     ],
     "rules": {
     // suppress errors for missing 'import React' in files

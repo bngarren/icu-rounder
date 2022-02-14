@@ -257,5 +257,3 @@ export class Firebase {
     return autoId;
   };
 }
-
-export default Firebase;

@@ -10,7 +10,7 @@ const SecuritySection = ({ showYesNoDialog = (f) => f }) => {
       () => {
         // confirmed
         localStorage.clear();
-        location.reload(false);
+        window.location.reload(false);
       },
       () => {
         // chose to cancel
