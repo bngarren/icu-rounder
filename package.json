@@ -27,16 +27,8 @@
     "build": "react-scripts build",
     "analyze": "source-map-explorer build/static/js/*.js",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "rules": {
-    "no-unused-vars": "warn"
+    "eject": "react-scripts eject",
+    "lint": "eslint ./src"
   },
   "browserslist": {
     "production": [
@@ -51,8 +43,11 @@
     ]
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.17.0",
+    "@babel/preset-react": "^7.16.7",
     "@welldone-software/why-did-you-render": "^6.2.0",
     "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
