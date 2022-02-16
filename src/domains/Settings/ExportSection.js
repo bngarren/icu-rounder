@@ -1,9 +1,10 @@
 import * as React from "react";
 
 // MUI
-import { Box, Stack, InputAdornment, Typography, Button } from "@mui/material";
+import { Box, Stack, InputAdornment, Typography } from "@mui/material";
 
 // Custom components
+import { ButtonStandard } from "../../components";
 import CustomTextField from "./CustomTextField";
 import Exporter from "../../domains/IO/Exporter";
 import CustomFormControlSetting from "./CustomFormControlSetting";
@@ -84,15 +85,9 @@ const ExportSection = ({ onSave = (f) => f }) => {
             gridDataToExport={gridDataToExport}
           >
             {/* //! Button's padding is kinda hard coded to match nearby TextField */}
-            <Button
-              variant="contained"
-              disableElevation
-              size="small"
-              sx={{ p: "5.3px 10px" }}
-              disabled={error}
-            >
+            <ButtonStandard sx={{ p: "5.3px 10px" }} disabled={error} secondary>
               Export Grid
-            </Button>
+            </ButtonStandard>
           </Exporter>
         </Stack>
         <ExportList onChangeSelected={onNewSelectionOfItemsToExport} />

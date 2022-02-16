@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 
-import { TextField, Button } from "@mui/material";
+import { TextField } from "@mui/material";
+
+// Custom components
+import { ButtonStandard } from "../../components";
 
 const Importer = ({ onNewDataSelected = (f) => f }) => {
   const [file, setFile] = useState();
@@ -50,9 +53,9 @@ const Importer = ({ onNewDataSelected = (f) => f }) => {
         onChange={handleImportAction}
       />
       <label htmlFor="inputFile">
-        <Button variant="contained" component="span" size="small">
+        <ButtonStandard component="span" secondary>
           Import Grid
-        </Button>
+        </ButtonStandard>
         {file && file.name}
       </label>
       {data && (

@@ -1,5 +1,8 @@
 // MUI
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
+
+// Custom components
+import { ButtonStandard } from "../../components";
 
 const SecuritySection = ({ showYesNoDialog = (f) => f }) => {
   const handleClearStorage = () => {
@@ -22,14 +25,9 @@ const SecuritySection = ({ showYesNoDialog = (f) => f }) => {
 
   return (
     <Box>
-      <Button
-        variant="contained"
-        component="span"
-        size="small"
-        onClick={handleClearStorage}
-      >
+      <ButtonStandard component="span" onClick={handleClearStorage}>
         Clear local storage
-      </Button>
+      </ButtonStandard>
       <i>(Will refresh the page)</i>
     </Box>
   );
