@@ -12,15 +12,23 @@
 
 ---
 
-## [2.2.1](https://github.com/bngarren/icu-rounder/compare/2.1.0...2.2.0) (2022-02-11)
+## [2.2.2](https://github.com/bngarren/icu-rounder/compare/v2.1.1...v2.2.2) (2022-02-16)
 
 ### Hotfix
 
-- With the [2.2.0](https://github.com/bngarren/icu-rounder/compare/2.1.0...2.2.0) release came a critical error in the rendering of the PDF document. This was due to an inadvertent upgrade in @react-pdf/renderer's dependencies. We are now upgraded to @react-pdf/renderer v2.1.1 and we have a working PDF render.
+- Fixed problem with DemoBox width being too large when gridsPerRow is set to 1 [6f487e8](https://github.com/bngarren/icu-rounder/commit/6f487e8b22fa0c5320b4a8e4f04b99be8816e9ec)
 
 ---
 
-## [2.2.0](https://github.com/bngarren/icu-rounder/compare/2.1.0...2.2.0) (2022-02-11)
+## [2.2.1](https://github.com/bngarren/icu-rounder/compare/v2.1.0...v2.2.1) (2022-02-11)
+
+### Hotfix
+
+- With the [2.2.0](https://github.com/bngarren/icu-rounder/compare/v2.1.0...v2.2.0) release came a critical error in the rendering of the PDF document. This was due to an inadvertent upgrade in @react-pdf/renderer's dependencies. We are now upgraded to @react-pdf/renderer v2.1.1 and we have a working PDF render.
+
+---
+
+## [2.2.0](https://github.com/bngarren/icu-rounder/compare/v2.1.0...v2.2.0) (2022-02-11)
 
 ### Changed
 
@@ -33,7 +41,7 @@
 
 ---
 
-## [2.1.0](https://github.com/bngarren/icu-rounder/compare/2.0.0...2.1.0) (2022-02-09)
+## [2.1.0](https://github.com/bngarren/icu-rounder/compare/v2.0.0...v2.1.0) (2022-02-09)
 
 ### Added
 
@@ -51,14 +59,14 @@
 
 ---
 
-## [2.0.0](https://github.com/bngarren/icu-rounder/compare/1.1.0...2.0.0) (2022-02-07)
+## [2.0.0](https://github.com/bngarren/icu-rounder/compare/v1.1.0...v2.0.0) (2022-02-07)
 
 - Fully upgraded to Material UI v5! Style overhaul to the entire app. [`64b8419`](https://github.com/bngarren/icu-rounder/commit/64b8419e8da6325d1262fe1fb77aca2a595110de)
 - Added the new Material UI v5 @mui packages and peer dep. @emotion packages [`fe41539`](https://github.com/bngarren/icu-rounder/commit/fe4153961e3350f26023b2b98d8b3f9386c5b13f)
 
 ---
 
-## [1.1.0](https://github.com/bngarren/icu-rounder/compare/1.0...1.1.0) (2022-01-24)
+## [1.1.0](https://github.com/bngarren/icu-rounder/compare/1.0...v1.1.0) (2022-01-24)
 
 - Fixed problem with Exporter. [`#33`](https://github.com/bngarren/icu-rounder/issues/33)
 - Split the SettingsPage into different components for each section [`dfb5e09`](https://github.com/bngarren/icu-rounder/commit/dfb5e090f3eaf05c4b3b5a1e2c164ac13180c89e)
