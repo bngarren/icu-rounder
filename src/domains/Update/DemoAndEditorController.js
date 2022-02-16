@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Grid,
   Box,
+  Stack,
   Toolbar,
   Typography,
   Switch,
@@ -165,19 +166,21 @@ const DemoAndEditorController = ({
           <NavigateNextIcon sx={{ fontSize: "4rem" }} />
         </StyledNavigateIconButton>
       </Box>
-      <ButtonStandard
-        disabled={!needsSave}
-        onClick={() => onSave(bedspaceEditorData)}
-      >
-        Save
-      </ButtonStandard>
-      <ButtonStandard
-        disabled={!needsSave}
-        secondary
-        onClick={(e) => handleOnReset(e)}
-      >
-        Reset
-      </ButtonStandard>
+      <Stack direction="row" spacing={1}>
+        <ButtonStandard
+          disabled={!needsSave}
+          onClick={() => onSave(bedspaceEditorData)}
+        >
+          Save
+        </ButtonStandard>
+        <ButtonStandard
+          disabled={!needsSave}
+          secondary
+          onClick={(e) => handleOnReset(e)}
+        >
+          Reset
+        </ButtonStandard>
+      </Stack>
     </Toolbar>
   );
 
