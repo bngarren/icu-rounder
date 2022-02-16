@@ -4,9 +4,9 @@
   font-style: normal;
   font-weight: 400;
   src: local(""),
-    url("./fonts/roboto/roboto-v27-latin-regular.woff2") format("woff2"),
+    url("./assets/fonts/roboto/roboto-v27-latin-regular.woff2") format("woff2"),
     /* Chrome 26+, Opera 23+, Firefox 39+ */
-      url("./fonts/roboto/roboto-v27-latin-regular.woff") format("woff"); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+      url("./assets/fonts/roboto/roboto-v27-latin-regular.woff") format("woff"); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 
 /* roboto-700 - latin */
@@ -15,21 +15,7 @@
   font-style: normal;
   font-weight: 700;
   src: local(""),
-    url("./fonts/roboto/roboto-v27-latin-700.woff2") format("woff2"),
+    url("./assets/fonts/roboto/roboto-v27-latin-700.woff2") format("woff2"),
     /* Chrome 26+, Opera 23+, Firefox 39+ */
-      url("./fonts/roboto/roboto-v27-latin-700.woff") format("woff"); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
-}
-
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+      url("./assets/fonts/roboto/roboto-v27-latin-700.woff") format("woff"); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }

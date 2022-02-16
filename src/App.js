@@ -3,23 +3,20 @@ import Container from "@mui/material/Container";
 
 // Theme
 import { ThemeProvider } from "@mui/material/styles";
-import theme from "./Theme";
+import theme from "./context/Theme";
 
 // Settings
 import { SettingsProvider } from "./context/Settings";
 
 // Components
-import Header from "./components/Header";
-import Footer from "./components/Footer";
+import { Header, Footer, PageRouter } from "./components";
 
-// Where all of our pages come from
-// ! Using HashRouter instead of BrowserRouter to work with GitHub pages deployment
+// Routing
 import { BrowserRouter } from "react-router-dom";
-import PageRouter from "./components/PageRouter";
 
 // Firebase
-import { Firebase } from "./components/Firebase/Firebase";
-import { config } from "./components/Firebase/credentials";
+import { Firebase } from "./api/Firebase";
+import { config } from "./api/credentials";
 import AuthStateProvider from "./context/AuthState";
 import GridStateProvider from "./context/GridState";
 

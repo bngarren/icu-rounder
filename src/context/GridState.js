@@ -7,7 +7,7 @@ import {
 } from "react";
 
 // Utility
-import { sortByBed, isBedEmpty } from "../utils/Utility";
+import { sortByBed, isBedEmpty } from "../utils";
 
 /* Takes the array of non-empty beds (i.e. the data)
     and merges with a "bedLayout" which is the array of available bedspaces. */

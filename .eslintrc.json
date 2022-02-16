@@ -6,11 +6,9 @@
     "extends": [
         "react-app",
         "eslint:recommended",
-        "plugin:react/recommended",
+        //"plugin:react/recommended",
         "plugin:react-hooks/recommended",
-        "plugin:prettier/recommended",
-        "plugin:import/errors",
-        "plugin:import/warnings"
+        "plugin:import/errors"
     ],
     "parser": "@babel/eslint-parser",
     "parserOptions": {
@@ -26,13 +24,20 @@
         "sourceType": "module"
     },
     "plugins": [
-        "react", "import"
+        "react", "prettier", "import", "react-hooks"
     ],
     "rules": {
+    // Include .prettierrc.js rules
+    "prettier/prettier": ["error", {}, { "usePrettierrc": true }],
     // suppress errors for missing 'import React' in files
     "react/react-in-jsx-scope": "off",
     /* eslint-disable react/prop-types */
     "react/prop-types": "off",
     "no-unused-vars": "warn"
+    },
+    "settings": {
+        "react": {
+            "version": "detect"
+        }
     }
 }

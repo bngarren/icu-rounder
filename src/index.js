@@ -5,10 +5,10 @@ import "./index.css";
 import App from "./App";
 
 // Fonts
-import "./fonts/roboto/roboto-v27-latin-regular.woff2";
-import "./fonts/roboto/roboto-v27-latin-regular.woff";
-import "./fonts/roboto/roboto-v27-latin-700.woff2";
-import "./fonts/roboto/roboto-v27-latin-700.woff";
+import "./assets/fonts/roboto/roboto-v27-latin-regular.woff2";
+import "./assets/fonts/roboto/roboto-v27-latin-regular.woff";
+import "./assets/fonts/roboto/roboto-v27-latin-700.woff2";
+import "./assets/fonts/roboto/roboto-v27-latin-700.woff";
 
 ReactDOM.render(
   <React.StrictMode>

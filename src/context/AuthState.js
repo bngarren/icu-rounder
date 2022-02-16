@@ -1,8 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import {
-  UNAUTHENTICATED,
-  AUTHENTICATED_ANONYMOUSLY,
-} from "../components/Firebase/Firebase";
+import { UNAUTHENTICATED, AUTHENTICATED_ANONYMOUSLY } from "../api/Firebase";
 
 const AuthStateContext = createContext({
   state: UNAUTHENTICATED,
