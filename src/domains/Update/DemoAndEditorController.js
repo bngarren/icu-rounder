@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Grid,
   Box,
-  Button,
   Toolbar,
   Typography,
   Switch,
@@ -21,6 +20,7 @@ import { uniqueId } from "lodash";
 // Components
 import DemoBox from "./DemoBox";
 import BedspaceEditor from "./BedspaceEditor";
+import { ButtonStandard } from "../../components";
 
 // Context
 import { useDebouncedContext } from "./DebouncedContext";
@@ -35,28 +35,6 @@ const StyledNavigateIconButton = styled(IconButton)(({ theme }) => ({
     cursor: "pointer",
     backgroundColor: "transparent",
   },
-}));
-
-// for Save and Reset
-const StyledButton = styled(Button, {
-  shouldForwardProp: (prop) => prop !== "save",
-})(({ save, theme }) => ({
-  fontSize: "0.85rem",
-  backgroundColor: theme.palette.primary.light,
-  color: theme.palette.primary.contrastText,
-  ...(save && {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.secondary.light,
-  }),
-  "&.Mui-disabled": {
-    backgroundColor: theme.palette.grey[50],
-    color: theme.palette.grey[500],
-  },
-  "&:hover": {
-    backgroundColor: theme.palette.secondary.light,
-    color: theme.palette.secondary.contrastText,
-  },
-  marginRight: "3px",
 }));
 
 const DemoAndEditorController = ({
@@ -187,21 +165,19 @@ const DemoAndEditorController = ({
           <NavigateNextIcon sx={{ fontSize: "4rem" }} />
         </StyledNavigateIconButton>
       </Box>
-      <StyledButton
-        size="small"
+      <ButtonStandard
         disabled={!needsSave}
         onClick={() => onSave(bedspaceEditorData)}
-        save
       >
         Save
-      </StyledButton>
-      <StyledButton
-        size="small"
+      </ButtonStandard>
+      <ButtonStandard
         disabled={!needsSave}
+        secondary
         onClick={(e) => handleOnReset(e)}
       >
         Reset
-      </StyledButton>
+      </ButtonStandard>
     </Toolbar>
   );
 
