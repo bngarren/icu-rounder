@@ -9,9 +9,12 @@ import TableBedList from "./TableBedList";
 import DemoAndEditorController from "./DemoAndEditorController";
 import { useDialog } from "../../components";
 
-// context
+// Context
 import { DebouncedContextProvider } from "./DebouncedContext";
 import BedActionsContext from "./BedActionsContext";
+
+// Util
+import { DEFAULT_BED_DATA } from "../../utils";
 
 // Firebase
 import { useGridStateContext } from "../../context/GridState";
@@ -30,23 +33,9 @@ const UpdatePage = () => {
 
   const [defaultBedData, setDefaultBedData] = useState();
 
-  /* Default bed data */
-  const defaults = useRef({
-    bed: "",
-    lastName: "",
-    firstName: "",
-    teamNumber: "",
-    oneLiner: "",
-    contingencies: [],
-    contentType: "simple",
-    simpleContent: "",
-    nestedContent: [],
-    bottomText: "",
-  });
-
   useEffect(() => {
     setDefaultBedData({
-      ...defaults.current,
+      ...DEFAULT_BED_DATA,
       ...gridData[selectedKey],
     });
   }, [selectedKey, gridData]);
