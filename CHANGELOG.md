@@ -1,8 +1,10 @@
 # Changelog
 
-## Unreleased (yyyy-mm-dd)
+## 3.0.0 (yyyy-mm-dd)
 
 ### Added
+
+- New import functionality. Can select specific bedspaces for import [c1e7db2](https://github.com/bngarren/icu-rounder/commit/c1e7db223223c510e2ddee9272b62d262fa685e1)
 
 ### Changed
 

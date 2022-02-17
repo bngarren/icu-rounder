@@ -3,9 +3,10 @@ import { saveAs } from "file-saver";
 
 // Context
 import { useGridStateContext } from "../../context/GridState";
+import { useAuthStateContext } from "../../context/AuthState";
 
 // Utility
-import { getJsonObjectFromArray } from "../../utils";
+import { getJsonForExport } from "../../utils";
 
 /* Saves the .json file */
 const exportDataWithFilename = (data, filename) => {
@@ -25,14 +26,23 @@ const Exporter = ({
   filename = "grid",
   onExported = (f) => f,
 }) => {
+  /* Get the currently logged in user */
+  const { authState } = useAuthStateContext();
+
   /* Either use the selected grid data passed in as a prop,
   or default to the full gridData from GridStateContext */
   const { gridData } = useGridStateContext();
-  const gridDataJson = getJsonObjectFromArray(gridDataToExport || gridData);
+  const dataToExport = { gridData: gridDataToExport || gridData };
+
+  if (authState?.user) {
+    dataToExport.user = authState.user?.email || "";
+  }
+
+  const jsonToExport = getJsonForExport(dataToExport);
 
   const handleExport = () => {
     try {
-      exportDataWithFilename(gridDataJson, filename);
+      exportDataWithFilename(jsonToExport, filename);
     } catch (err) {
       console.error(`Error in Exporter: ${err}`);
     } finally {

@@ -13,8 +13,9 @@ import { useDialog } from "../../components";
 import { DebouncedContextProvider } from "./DebouncedContext";
 import BedActionsContext from "./BedActionsContext";
 
-// Util
+// Utils/helpers
 import { DEFAULT_BED_DATA } from "../../utils";
+import { doesBedExistInGridData } from "./updateHelpers";
 
 // Firebase
 import { useGridStateContext } from "../../context/GridState";
@@ -164,7 +165,7 @@ const UpdatePage = () => {
           //should clear callback
           let updatedData = [...gridData];
           updatedData[key] = { bed: updatedData[key].bed }; // only keep the bed
-          updateGridData(updatedData); //send new data to GridStateContext (handles truth data)
+          updateGridData(updatedData); //send new data to GridState context (handles truth data)
           setNeedsSave(false);
         },
         () => {
@@ -226,25 +227,23 @@ const UpdatePage = () => {
     (bedspaceEditorData) => {
       const updatedData = [...gridData]; // copy the current gridData
 
-      /*
-         //* The actual save action
-         that merges this new bedspaceEditorData with the truth data in GridDataContext */
-      const saveBedspaceEditorData = (dataToSave) => {
-        /* Find out if there is already a bed number in our grid
-            that matches the bed that has just been edited (bedspaceEditorData). */
-        const objIndex = dataToSave.findIndex((obj) => {
-          const bed = obj.bed + ""; // cast bed to string before comparison
-          return bed === bedspaceEditorData.bed + "";
-        });
+      /* The actual save action that merges this new bedspaceEditorData
+      with the truth data in GridDataContext */
+      const saveBedspaceEditorData = (gridDataToSave) => {
+        // See if this bed already exists in gridData
+        const { objIndex, bedAlreadyExists } = doesBedExistInGridData(
+          bedspaceEditorData,
+          gridDataToSave
+        );
         /* If bed already exists, overwrite with new data */
-        if (objIndex >= 0) {
-          dataToSave[objIndex] = bedspaceEditorData;
+        if (bedAlreadyExists) {
+          gridDataToSave[objIndex] = bedspaceEditorData;
         } else {
           // If bed doesn't exist, add new one
-          dataToSave.push(bedspaceEditorData);
+          gridDataToSave.push(bedspaceEditorData);
         }
         // send updated data to GridStateContext
-        updateGridData(dataToSave).then((res) => {
+        updateGridData(gridDataToSave).then((res) => {
           if (res) {
             const newKey = getKeyForBed(res, bedspaceEditorData.bed);
             setSelectedKey(newKey);
@@ -287,7 +286,7 @@ const UpdatePage = () => {
           () => {
             //should change bed
 
-            //* clear the previous bed, but keep it (don't delete)
+            //* clear the previous bed's data, but keep the bed present (don't delete)
             updatedData[selectedKey] = {
               bed: updatedData[selectedKey].bed, // only keep the bed
             };
