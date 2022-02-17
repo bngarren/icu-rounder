@@ -16,7 +16,7 @@ import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
 // Lodash
-import { uniqueId } from "lodash";
+import { uniqueId } from "lodash-es";
 
 // Components
 import DemoBox from "./DemoBox";

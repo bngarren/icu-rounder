@@ -26,7 +26,7 @@ import ContentInputForm from "./ContentInputForm";
 import ContentInputToolbar from "./ContentInputToolbar";
 
 // lodash
-import { uniqueId } from "lodash";
+import { uniqueId } from "lodash-es";
 
 /* Styling - ContentInput */
 

@@ -18,7 +18,7 @@ import { useSettings } from "../../context/Settings";
 import { useDebouncedContext } from "./DebouncedContext";
 
 // lodash
-import { uniqueId, debounce } from "lodash";
+import { uniqueId, debounce } from "lodash-es";
 
 // Util
 import { getCursorPos, setCursorPos } from "../../utils/CursorPos";

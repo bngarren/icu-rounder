@@ -27,7 +27,7 @@ import { List as MovableList, arrayMove } from "react-movable";
 import { useDebouncedContext } from "../../domains/Update/DebouncedContext";
 
 //lodash
-import { uniqueId, debounce } from "lodash";
+import { uniqueId, debounce } from "lodash-es";
 
 /* Styling */
 const StyledRootBox = styled(Box, {

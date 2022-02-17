@@ -28,7 +28,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { ReactComponent as Logo } from "../../assets/logo_color.svg";
 
 // lodash
-import { uniqueId } from "lodash";
+import { uniqueId } from "lodash-es";
 
 // React Router
 import { useMatch, useNavigate } from "react-router-dom";
