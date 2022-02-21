@@ -67,14 +67,18 @@ export class Firebase {
           token,
         });
       } else {
-        await this.signInAnonymously(setAuthState);
+        await this.signInAnonymously(setAuthState).catch((err) => {
+          console.error(err);
+        });
       }
     });
 
   signInWithGoogle = async (setAuthState, callback) => {
     try {
       setAuthState({ status: AUTHENTICATION_LOADING });
-      await this.auth.signInWithPopup(this.googleLoginProvider);
+      await this.auth.signInWithPopup(this.googleLoginProvider).catch((err) => {
+        console.error(err);
+      });
       const user = this.auth.currentUser;
       callback(user);
     } catch (error) {
@@ -94,13 +98,17 @@ export class Firebase {
   userHasOnlyEmailProvider = async (email) => {
     let providers;
     if (email) {
-      providers = await this.providersForEmail(email);
+      providers = await this.providersForEmail(email).catch((err) => {
+        console.error(err);
+      });
     } else {
       const user = this.auth.currentUser;
       if (!user) {
         return false;
       }
-      providers = await this.providersForEmail(user.email);
+      providers = await this.providersForEmail(user.email).catch((err) => {
+        console.error(err);
+      });
     }
     return (
       providers.length === 1 &&
@@ -113,7 +121,11 @@ export class Firebase {
    * facebook for example.
    */
   linkProviders = async (email, credential) => {
-    const providers = await this.auth.fetchSignInMethodsForEmail(email);
+    const providers = await this.auth
+      .fetchSignInMethodsForEmail(email)
+      .catch((err) => {
+        console.error(err);
+      });
     const firstPopupProviderMethod = providers.find((p) =>
       supportedPopupSignInMethods.includes(p)
     );

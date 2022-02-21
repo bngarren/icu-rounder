@@ -63,11 +63,12 @@ export default function GridStateProvider({ children }) {
    * bedLayout -- Array of bed names, e.g. ["1", "2", "2B",] etc.
    */
   const updateGridData = useCallback(async (incomingDataArray, bedLayout) => {
-    /* If bedLayout parameter is null, just conform bedLayout to the data.
-    If bedLayout is non-null but empty, we will use it as such, as this may have
-    been intended by setting the bedLayout to no beds. */
+    /* If bedLayout parameter is null, just conform bedLayout to the incoming data.
+    However, if bedLayout is non-null but empty, ie. [], we will use it as such,
+    as this may have been intended by setting the bedLayout to no beds in order
+    to clear the data. */
     let bl = [];
-    if (bedLayout == null) {
+    if (bedLayout == null && incomingDataArray !== null) {
       incomingDataArray.forEach((element) => {
         bl.push(element.bed);
       });

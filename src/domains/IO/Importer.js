@@ -15,7 +15,9 @@ const Importer = ({ onNewDataSelected = (f) => f }) => {
     const getDataFromFile = () => {
       const fr = new FileReader();
       fr.onload = async (e) => {
-        const result = await JSON.parse(e.target.result);
+        const result = await JSON.parse(e.target.result).catch((err) => {
+          console.error(err);
+        });
 
         try {
           const modifiedResult = getModifiedJSON(result);
