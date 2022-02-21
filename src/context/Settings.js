@@ -1,24 +1,8 @@
 import { createContext, useReducer, useContext, useEffect } from "react";
 
-const SettingsContext = createContext();
+import { DEFAULT_SETTINGS } from "../utils";
 
-const INITIAL_STATE = {
-  document_cols_per_page: 4,
-  document_title: "",
-  export_filename: "grid",
-  contingencyOptions: [
-    "Critical Airway",
-    "Critical Brain",
-    "Difficult Airway",
-    "ORL STAT",
-    "Anesthesia STAT",
-    "No ECMO",
-    "DNR/DNI",
-    "Modified DNR",
-    "Comfort measures only",
-    "Pulm HTN",
-  ],
-};
+const SettingsContext = createContext();
 
 const settingsReducer = (state, action) => {
   switch (action.type) {
@@ -31,27 +15,24 @@ const settingsReducer = (state, action) => {
 };
 
 const SettingsProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(settingsReducer, INITIAL_STATE);
+  const [state, dispatch] = useReducer(settingsReducer, DEFAULT_SETTINGS);
 
+  /* Load settings from local storage */
   useEffect(() => {
-    const loadData = () => {
-      const data = localStorage.getItem("settings");
+    const data = localStorage.getItem("settings");
 
-      dispatch({
-        type: "UPDATE",
-        payload: JSON.parse(data),
-      });
-    };
-    loadData();
+    dispatch({
+      type: "UPDATE",
+      payload: JSON.parse(data),
+    });
   }, []);
 
+  /* When state changes, save to local storage */
   useEffect(() => {
-    const saveData = () => {
+    if (state != null) {
       const dataToSave = JSON.stringify(state);
       localStorage.setItem("settings", dataToSave);
-      console.log(`Saved settings to localStorage: ${dataToSave}`);
-    };
-    if (state != null) saveData();
+    }
   }, [state]);
 
   const value = { settings: state, dispatchSettings: dispatch };

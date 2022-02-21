@@ -25,6 +25,7 @@ import { ButtonStandard } from "../../components";
 
 // Context
 import { useDebouncedContext } from "./DebouncedContext";
+import { useSettings } from "../../context/Settings";
 
 /* Styling */
 
@@ -45,6 +46,7 @@ const DemoAndEditorController = ({
   onNextBedspace = (f) => f,
   onSave = (f) => f,
 }) => {
+  const { settings, dispatchSettings } = useSettings();
   /* Holds the Editor's own version of this bedspace's data
    */
   const [bedspaceEditorData, _setBedspaceEditorData] = useState(); // i.e. "Working" data
@@ -84,7 +86,21 @@ const DemoAndEditorController = ({
   /* Track the toggle state of DemoBox collapsed status,
   helpful for setting debounce interval in BedspaceEditor 
   i.e., if demobox is not visible, the debounce interval can be higher */
-  const [demoBoxCollapsed, setDemoBoxCollapsed] = useState(true);
+  const [demoBoxCollapsed, setDemoBoxCollapsed] = useState(
+    !settings.show_demoBox
+  );
+
+  const handleToggleDemoBox = () => {
+    setDemoBoxCollapsed((prevValue) => {
+      dispatchSettings({
+        type: "UPDATE",
+        payload: {
+          show_demoBox: prevValue,
+        },
+      });
+      return !prevValue;
+    });
+  };
 
   /* Grab the flushAll() function so that we can flush all the debounced functions 
   before quick saving with CTRL+S */
@@ -194,7 +210,7 @@ const DemoAndEditorController = ({
           >
             <Switch
               checked={!demoBoxCollapsed}
-              onChange={() => setDemoBoxCollapsed((prevValue) => !prevValue)}
+              onChange={handleToggleDemoBox}
             />
           </Tooltip>
           <DemoBox data={bedspaceEditorData} collapsed={demoBoxCollapsed} />
