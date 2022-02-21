@@ -20,14 +20,22 @@ const mergeWithBedLayout = (arr, bedLayout) => {
     bedLayout = "";
   }
 
+  /* resultArray will begin the formation of our new gridData */
   let resultArray = [];
   if (Array.isArray(bedLayout)) {
     bedLayout.forEach((value, index) => {
-      resultArray[index] = { bed: value }; // create each bedspace with just a bed number
+      /* For each item declared in bedLayout, at least make an
+      object with a "bed" property */
+      resultArray[index] = { bed: value };
+
+      /* If there is also gridData (not just a bedLayout),
+      let's check to see if there is data for this bed number
+      that we need to put down */
       if (arr) {
         arr.forEach((a) => {
+          /* If there is data within gridData pertaining to the current bedspace
+          within bedLayout, let's add this data */
           if (a.bed === value) {
-            // if there is bed data put it in to that bedspace
             resultArray[index] = a;
           }
         });
@@ -51,26 +59,16 @@ export default function GridStateProvider({ children }) {
   to cause a change to gridData, i.e. dropping/adding beds. */
 
   /**
-   * @param {object} data Grid data in the form of JSON object (not array)
-   * @param {array} bedLayout Array of bed names, e.g. ["1", "2", "2B",] etc.
+   * incomingDataArray -- Grid data in the form of an array
+   * bedLayout -- Array of bed names, e.g. ["1", "2", "2B",] etc.
    */
-  const updateGridData = useCallback(async (data, bedLayout) => {
-    // ..verify input data
-    const verifiedData = data;
-
-    // Put each bedspace data object into an array
-    let arr = [];
-    if (verifiedData) {
-      for (let i in verifiedData) {
-        arr.push(verifiedData[i]);
-      }
-    }
+  const updateGridData = useCallback(async (incomingDataArray, bedLayout) => {
     /* If bedLayout parameter is null, just conform bedLayout to the data.
     If bedLayout is non-null but empty, we will use it as such, as this may have
     been intended by setting the bedLayout to no beds. */
     let bl = [];
     if (bedLayout == null) {
-      arr.forEach((element) => {
+      incomingDataArray.forEach((element) => {
         bl.push(element.bed);
       });
     } else {
@@ -79,7 +77,7 @@ export default function GridStateProvider({ children }) {
 
     /* Merge the data with bedLayout array and then sort the data array by bed*/
     try {
-      const mergedData = mergeWithBedLayout(arr, bl);
+      const mergedData = mergeWithBedLayout(incomingDataArray, bl);
       const sortedArrayData = sortByBed(mergedData);
       setGridData(sortedArrayData);
       setBedLayout(bl);

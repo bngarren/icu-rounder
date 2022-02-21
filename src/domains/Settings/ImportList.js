@@ -21,15 +21,12 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { styled } from "@mui/system";
 
-// Context
-import { useGridStateContext } from "../../context/GridState";
-
 // Utility
 import { isBedEmpty } from "../../utils";
 
 /* Styling */
 const StyledButton = styled(ButtonUnstyled, {
-  name: "ExportList",
+  name: "ImportList",
   slot: "button",
 })(({ theme, disabled }) => ({
   border: 0,
@@ -48,7 +45,7 @@ const StyledButton = styled(ButtonUnstyled, {
 }));
 
 /* This component renders the Checkbox for each bedspace */
-const ExportItem = ({ value, selected, toggleSelected }) => {
+const ImportItem = ({ value, selected, toggleSelected }) => {
   if (value != null) {
     /* Check if properties exist and are non-empty */
     const bed = typeof value.bed === "string" && value.bed.length && value.bed;
@@ -99,37 +96,35 @@ const ExportItem = ({ value, selected, toggleSelected }) => {
   }
 };
 
-/* A component that allows choosing a portion of the gridData to
-be selected for export. Each time a new selection is made, a callback
-is fired on the parent (ExportSection) to let it update it's object for export. 
-*Remember to check ImportList component as well with any changes,
+/* A component that allows choosing a portion of the data to
+be selected for import. Each time a new selection is made, a callback
+is fired on the parent (ImportSection) to let it update it's object for import. 
+*Remember to check ExportList component as well with any changes,
 *as they share similar code but currently not DRY
 */
-const ExportList = ({ onChangeSelected = (f) => f }) => {
-  const { gridData } = useGridStateContext();
-
+const ImportList = ({ data, onChangeSelected = (f) => f }) => {
   const [expanded, setExpanded] = React.useState(false);
   const [selected, setSelected] = React.useState([]);
 
-  /* If new gridData comes in, reset the list so that all of them
+  /* If new data comes in, reset the list so that all of them
   start off selected */
   React.useEffect(() => {
-    setSelected([...gridData]);
-  }, [gridData]);
+    setSelected([...data]);
+  }, [data]);
 
   /* Each time a new selection is made, send this back to parent so
-  that this new group can be exported */
+  that this new group can be imported */
   React.useEffect(() => {
     onChangeSelected(selected);
   }, [selected, onChangeSelected]);
 
-  const errorNoBeds = gridData.length < 1;
+  const errorNoBeds = data.length < 1;
   const errorNoneSelected = selected.length < 1;
   const errorMessage = () => {
     if (errorNoneSelected) {
       return errorNoBeds
-        ? "There are no beds to export. Add beds to your grid."
-        : "Please select at least 1 item to export.";
+        ? "There are no beds to import. Add valid JSON."
+        : "Please select at least 1 item to import.";
     }
   };
 
@@ -154,7 +149,7 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
   TODO Consider adding an Autocomplete field that allows user to choose certain filters
    */
   const handleSelectAll = () => {
-    setSelected([...gridData]);
+    setSelected([...data]);
   };
 
   const handleClearAll = () => {
@@ -169,14 +164,14 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
   /* Generates the list of items. Divides list into 2 columns if 
   longer than threshold */
   const THRESHOLD = 15;
-  const listOfExportItems = () => {
+  const listOfImportItems = () => {
     /* Single column, if less than this size */
-    if (gridData.length <= THRESHOLD) {
+    if (data.length <= THRESHOLD) {
       return (
         <Stack sx={{ pl: 4 }}>
-          {gridData.map((value, key) => {
+          {data.map((value, key) => {
             return (
-              <ExportItem
+              <ImportItem
                 key={`${value.bed}-${key}`}
                 value={value}
                 selected={selected.indexOf(value) !== -1}
@@ -188,9 +183,9 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
       );
     } else {
       /* Split into 2 columns */
-      const halfwayIndex = Math.floor(gridData.length / 2);
-      const firstHalf = gridData.slice(0, halfwayIndex);
-      const secondHalf = gridData.slice(halfwayIndex, gridData.length);
+      const halfwayIndex = Math.floor(data.length / 2);
+      const firstHalf = data.slice(0, halfwayIndex);
+      const secondHalf = data.slice(halfwayIndex, data.length);
 
       return (
         <Grid
@@ -208,7 +203,7 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
                 <Stack>
                   {data.map((value, key) => {
                     return (
-                      <ExportItem
+                      <ImportItem
                         key={`${value.bed}-${key}`}
                         value={value}
                         selected={selected.indexOf(value) !== -1}
@@ -247,7 +242,7 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
               color: errorNoneSelected && "error.main",
             }}
           >
-            <b>{selected.length}</b> of {gridData.length} beds selected
+            <b>{selected.length}</b> of {data.length} beds selected
           </Typography>
 
           <IconButton
@@ -282,11 +277,11 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
           {errorMessage()}
         </FormHelperText>
         <Collapse in={expanded} sx={{ ...(expanded && { pt: "8px" }) }}>
-          {listOfExportItems()}
+          {listOfImportItems()}
         </Collapse>
       </Paper>
     </FormControl>
   );
 };
 
-export default ExportList;
+export default ImportList;
