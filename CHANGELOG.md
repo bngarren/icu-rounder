@@ -5,6 +5,7 @@
 ### Added
 
 - New import functionality. Can select specific bedspaces for import [c1e7db2](https://github.com/bngarren/icu-rounder/commit/c1e7db223223c510e2ddee9272b62d262fa685e1)
+- App now includes react testing library and starting to integrate testing. The import functionality is now well-tested.
 
 ### Changed
 
