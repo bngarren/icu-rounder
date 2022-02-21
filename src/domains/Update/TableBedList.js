@@ -13,8 +13,10 @@ import {
   Typography,
   Paper,
   Radio,
+  Tooltip,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import GroupIcon from "@mui/icons-material/Group";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import { styled } from "@mui/system";
 
@@ -41,8 +43,9 @@ const StyledTableCellHeader = styled(TableCell, {
 })(({ theme }) => ({
   backgroundColor: theme.palette.primary.dark,
   color: theme.palette.primary.contrastText,
-  padding: "4px 2px 4px 10px",
+  padding: "4px",
   borderBottom: "none",
+  textAlign: "center",
 }));
 
 const StyledTableCell = styled(TableCell, {
@@ -52,12 +55,10 @@ const StyledTableCell = styled(TableCell, {
     prop !== "shouldHighlight" && prop !== "isSelected",
 })(({ shouldHighlight, isSelected, component, theme }) => ({
   [theme.breakpoints.up("lg")]: {
-    padding: "3px 8px 3px 8px",
-    fontSize: "1rem",
+    padding: "3px 6px 3px 6px",
   },
   [theme.breakpoints.down("lg")]: {
-    padding: "2px 2px 2px 2px",
-    fontSize: "0.85rem",
+    padding: "2px 4px 2px 4px",
   },
   // Targets the Bed number table cell, when selected
   ...(isSelected &&
@@ -86,6 +87,18 @@ const StyledTypographyBedNumber = styled(Typography, {
     transition: "color 0.2s ease-in",
     color: theme.palette.primary.main,
   }),
+}));
+
+const StyledTypographyPatientName = styled(Typography, {
+  name: "TableBedList",
+  slot: "patientName",
+})(({ theme }) => ({
+  [theme.breakpoints.up("lg")]: {
+    fontSize: "0.95rem",
+  },
+  [theme.breakpoints.down("lg")]: {
+    fontSize: "0.90rem",
+  },
 }));
 
 const StyledTablePagination = styled(TablePagination, {
@@ -179,19 +192,32 @@ const TableBedList = ({ data, selectedKey }) => {
     setPage(newPage);
   }, [selectedKey, data.length, rowsPerPage]);
 
-  //
+  const columnSizes = {
+    bed: getBedCharSize(data),
+    team: getTeamCharSize(data),
+  };
 
   return (
     <TableContainer component={Paper}>
-      <Table aria-label="simple table">
+      <Table aria-label="simple table" sx={{ tableLayout: "fixed" }}>
         <TableHead>
           <TableRow>
-            <StyledTableCellHeader>Bed</StyledTableCellHeader>
-            <StyledTableCellHeader sx={{ width: "100%" }}>
-              Patient
+            <StyledTableCellHeader
+              sx={{
+                width: `${columnSizes.bed * 1.7}ch`,
+              }}
+            >
+              Bed
             </StyledTableCellHeader>
-            <StyledTableCellHeader>Team</StyledTableCellHeader>
-            <StyledTableCellHeader sx={{}} />
+            <StyledTableCellHeader>{/* Name */}</StyledTableCellHeader>
+            <StyledTableCellHeader
+              sx={{ width: `${columnSizes.team * 1.5}ch` }}
+            >
+              <Tooltip title="Team" placement="top">
+                <GroupIcon sx={{ verticalAlign: "middle" }} />
+              </Tooltip>
+            </StyledTableCellHeader>
+            <StyledTableCellHeader sx={{ width: "80px" }} />
           </TableRow>
         </TableHead>
         <MyTableBody
@@ -199,6 +225,7 @@ const TableBedList = ({ data, selectedKey }) => {
           page={page}
           rowsPerPage={rowsPerPage}
           selectedKey={selectedKey}
+          columnSizes={columnSizes}
         />
       </Table>
       <StyledTablePagination
@@ -215,7 +242,7 @@ const TableBedList = ({ data, selectedKey }) => {
   );
 };
 
-const MyTableBody = ({ data, page, rowsPerPage, selectedKey }) => {
+const MyTableBody = ({ data, page, rowsPerPage, selectedKey, columnSizes }) => {
   const [highlightedKey, setHighlightedKey] = useState(false);
 
   const handleNewBedspaceSubmitted = (key) => {
@@ -249,6 +276,7 @@ const MyTableBody = ({ data, page, rowsPerPage, selectedKey }) => {
                 isSelected={isSelected}
                 key={`MyTableRow-${value.bed}-${key}`}
                 value={value}
+                columnSizes={columnSizes}
               />
             );
           })}
@@ -263,8 +291,16 @@ const MyTableRow = memo(function MyTableRow({
   adjustedKey,
   isSelected,
   value,
+  columnSizes,
 }) {
   const emptyBed = isBedEmpty(value);
+
+  const getPatientName = () => {
+    if (value == null) return "";
+    const lastName = value.lastName || "";
+    const firstName = value.firstName || "";
+    return `${lastName}${lastName && firstName && ", "}${firstName}`;
+  };
 
   return (
     <TableRow key={value.bed} hover selected={isSelected}>
@@ -276,28 +312,44 @@ const MyTableRow = memo(function MyTableRow({
         isSelected={isSelected}
       >
         <StyledTypographyBedNumber
-          variant="h5"
+          variant="h6"
           shouldHighlight={shouldHighlight}
           isSelected={isSelected}
+          sx={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            fontSize: columnSizes.bed > 3 ? "0.90rem" : "1rem",
+          }}
         >
           {value.bed}
         </StyledTypographyBedNumber>
       </StyledTableCell>
       <StyledTableCell align="left" isSelected={isSelected}>
+        <StyledTypographyPatientName
+          variant="body1"
+          sx={{
+            fontWeight: isSelected ? "fontWeightBold" : "fontWeightRegular",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {getPatientName()}
+        </StyledTypographyPatientName>
+      </StyledTableCell>
+      <StyledTableCell align="center">
         <Typography
           variant="body1"
           sx={{
-            pl: 1.5,
-            fontWeight: isSelected ? "fontWeightBold" : "fontWeightRegular",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            fontSize: columnSizes.team > 4 && "0.85rem",
           }}
         >
-          {value["lastName"]}
-          {value["lastName"] && value["firstName"] && ", "}
-          {value["firstName"]}
+          {value["teamNumber"]}
         </Typography>
-      </StyledTableCell>
-      <StyledTableCell align="center">
-        <Typography>{value["teamNumber"]}</Typography>
       </StyledTableCell>
       <StyledTableCell>
         <BedActions
@@ -360,5 +412,30 @@ const BedActions = memo(function BedActions({ isSelected, bedKey, emptyBed }) {
     </StyledBedActionsDiv>
   );
 });
+
+/* Helper functions to calculate the number of characters in the
+longest string so that the column and font can be resized appropriately */
+
+function getBedCharSize(data) {
+  return (() => {
+    let min = 3;
+    let max = 6;
+    data?.forEach((i) => {
+      min = Math.max(min, i.bed?.length || 0);
+    });
+    return Math.min(min, max);
+  })();
+}
+
+function getTeamCharSize(data) {
+  return (() => {
+    let min = 4;
+    let max = 6;
+    data?.forEach((i) => {
+      min = Math.max(min, i.teamNumber?.length || 0);
+    });
+    return Math.min(min, max);
+  })();
+}
 
 export default TableBedList;
