@@ -9,4 +9,4 @@ export { default as isBedEmpty } from "./isBedEmpty";
 export { default as readFileAsync } from "./readFileAsync";
 export { setCursorPos, getCursorPos } from "./CursorPos";
 
-export { DEFAULT_BED_DATA } from "./constants";
+export { DEFAULT_BED_DATA, DEFAULT_SETTINGS } from "./constants";
