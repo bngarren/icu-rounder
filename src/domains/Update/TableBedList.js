@@ -20,6 +20,9 @@ import GroupIcon from "@mui/icons-material/Group";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import { styled } from "@mui/system";
 
+// Router
+import { Link } from "react-router-dom";
+
 // Utility
 import { isBedEmpty } from "../../utils";
 
@@ -201,24 +204,30 @@ const TableBedList = ({ data, selectedKey }) => {
     <TableContainer component={Paper}>
       <Table aria-label="table of beds" sx={{ tableLayout: "fixed" }}>
         <TableHead>
-          <TableRow>
-            <StyledTableCellHeader
-              sx={{
-                width: `${columnSizes.bed * 1.7}ch`,
-              }}
-            >
-              Bed
-            </StyledTableCellHeader>
-            <StyledTableCellHeader>{/* Name */}</StyledTableCellHeader>
-            <StyledTableCellHeader
-              sx={{ width: `${columnSizes.team * 1.5}ch` }}
-            >
-              <Tooltip title="Team" placement="top">
-                <GroupIcon sx={{ verticalAlign: "middle" }} />
-              </Tooltip>
-            </StyledTableCellHeader>
-            <StyledTableCellHeader sx={{ width: "80px" }} />
-          </TableRow>
+          {data?.length !== 0 ? (
+            <TableRow data-testid="header row with info">
+              <StyledTableCellHeader
+                sx={{
+                  width: `${columnSizes.bed * 1.7}ch`,
+                }}
+              >
+                Bed
+              </StyledTableCellHeader>
+              <StyledTableCellHeader>{/* Name */}</StyledTableCellHeader>
+              <StyledTableCellHeader
+                sx={{ width: `${columnSizes.team * 1.5}ch` }}
+              >
+                <Tooltip title="Team" placement="top">
+                  <GroupIcon sx={{ verticalAlign: "middle" }} />
+                </Tooltip>
+              </StyledTableCellHeader>
+              <StyledTableCellHeader sx={{ width: "80px" }} />
+            </TableRow>
+          ) : (
+            <TableRow data-testid="header row without info">
+              <StyledTableCellHeader colSpan={4} />
+            </TableRow>
+          )}
         </TableHead>
         <MyTableBody
           data={data}
@@ -263,23 +272,32 @@ const MyTableBody = ({ data, page, rowsPerPage, selectedKey, columnSizes }) => {
   return (
     <>
       <TableBody>
-        {data
-          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-          .map((value, key) => {
-            let adjustedKey = key + page * rowsPerPage; // the key resets to index 0 for every pagination page
-            const isSelected = adjustedKey === selectedKey;
+        {data?.length !== 0 ? (
+          data
+            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            .map((value, key) => {
+              let adjustedKey = key + page * rowsPerPage; // the key resets to index 0 for every pagination page
+              const isSelected = adjustedKey === selectedKey;
 
-            return (
-              <MyTableRow
-                shouldHighlight={highlightedKey === adjustedKey}
-                adjustedKey={adjustedKey}
-                isSelected={isSelected}
-                key={`MyTableRow-${value.bed}-${key}`}
-                value={value}
-                columnSizes={columnSizes}
-              />
-            );
-          })}
+              return (
+                <MyTableRow
+                  shouldHighlight={highlightedKey === adjustedKey}
+                  adjustedKey={adjustedKey}
+                  isSelected={isSelected}
+                  key={`MyTableRow-${value.bed}-${key}`}
+                  value={value}
+                  columnSizes={columnSizes}
+                />
+              );
+            })
+        ) : (
+          <TableRow>
+            <TableCell scope="row" colSpan={4}>
+              Add your first bed below or{" "}
+              <Link to="/settings">create a layout</Link>
+            </TableCell>
+          </TableRow>
+        )}
         {MyInputTableRow}
       </TableBody>
     </>

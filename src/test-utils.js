@@ -4,6 +4,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import theme from "./context/Theme";
 import { SettingsProvider } from "./context/Settings";
 import GridStateProvider from "./context/GridState";
+import { BrowserRouter } from "react-router-dom";
 import { Firebase } from "./api/Firebase";
 import { config } from "./api/credentials";
 
@@ -13,7 +14,9 @@ const AllTheProviders = ({ children }) => {
   return (
     <SettingsProvider>
       <ThemeProvider theme={theme}>
-        <GridStateProvider>{children}</GridStateProvider>
+        <GridStateProvider>
+          <BrowserRouter>{children}</BrowserRouter>
+        </GridStateProvider>
       </ThemeProvider>
     </SettingsProvider>
   );
