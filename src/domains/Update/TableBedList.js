@@ -199,7 +199,7 @@ const TableBedList = ({ data, selectedKey }) => {
 
   return (
     <TableContainer component={Paper}>
-      <Table aria-label="simple table" sx={{ tableLayout: "fixed" }}>
+      <Table aria-label="table of beds" sx={{ tableLayout: "fixed" }}>
         <TableHead>
           <TableRow>
             <StyledTableCellHeader

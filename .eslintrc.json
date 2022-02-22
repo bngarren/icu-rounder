@@ -1,32 +1,29 @@
 {
-    "env": {
-        "browser": true,
-        "es2021": true
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": [
+    "react-app",
+    "react-app/jest",
+    "eslint:recommended",
+    //"plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:import/errors"
+  ],
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "requireConfigFile": false,
+    "babelOptions": {
+      "presets": ["@babel/preset-react"]
     },
-    "extends": [
-        "react-app",
-        "eslint:recommended",
-        //"plugin:react/recommended",
-        "plugin:react-hooks/recommended",
-        "plugin:import/errors"
-    ],
-    "parser": "@babel/eslint-parser",
-    "parserOptions": {
-        "requireConfigFile": false,
-        "babelOptions": {
-            "presets": [
-                "@babel/preset-react"
-            ]
-        },
-        "ecmaFeatures": {
-            "jsx": true
-        },
-        "sourceType": "module"
+    "ecmaFeatures": {
+      "jsx": true
     },
-    "plugins": [
-        "react", "prettier", "import", "react-hooks"
-    ],
-    "rules": {
+    "sourceType": "module"
+  },
+  "plugins": ["react", "prettier", "import", "react-hooks"],
+  "rules": {
     // Include .prettierrc.js rules
     "prettier/prettier": ["error", {}, { "usePrettierrc": true }],
     // suppress errors for missing 'import React' in files
@@ -34,10 +31,10 @@
     /* eslint-disable react/prop-types */
     "react/prop-types": "off",
     "no-unused-vars": "warn"
-    },
-    "settings": {
-        "react": {
-            "version": "detect"
-        }
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
     }
+  }
 }
