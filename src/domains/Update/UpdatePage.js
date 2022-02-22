@@ -34,10 +34,14 @@ const UpdatePage = () => {
 
   const [defaultBedData, setDefaultBedData] = useState();
 
+  /* UpdatePage keeps this default bed data in its state in order to pass
+  to DemoAndEditorController when a bed is selected. It combines any of
+  the selected bed's data with default data so that DemoAndEditorController
+  has at least some appropriate value for every property of bedspace */
   useEffect(() => {
     setDefaultBedData({
       ...DEFAULT_BED_DATA,
-      ...gridData[selectedKey],
+      ...(gridData?.length !== 0 && selectedKey && gridData[selectedKey]),
     });
   }, [selectedKey, gridData]);
 
