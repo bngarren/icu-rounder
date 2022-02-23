@@ -53,7 +53,7 @@ const UpdatePage = () => {
   useEffect(() => {
     const selectedData = {
       ...(gridData?.length !== 0 &&
-        selectedKey !== null &&
+        selectedKey != null &&
         gridData[selectedKey]),
     };
     setDefaultGridDataElementData({
@@ -100,7 +100,7 @@ const UpdatePage = () => {
 
           if (refToGridDataElementEditorDiv && !media_atleast_md) {
             setTimeout(() => {
-              refToGridDataElementEditorDiv.current.scrollIntoView(false);
+              refToGridDataElementEditorDiv?.current?.scrollIntoView(false);
             }, 200);
           }
         }
