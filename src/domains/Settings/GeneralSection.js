@@ -9,21 +9,21 @@ import CustomFormControlSetting from "./CustomFormControlSetting";
 import { useGridStateContext } from "../../context/GridState";
 
 // Util
-import { getPrettyBedLayout } from "../../utils";
+import { getPrettyLocationLayout } from "../../utils";
 
 const GeneralSection = ({ onSave = (f) => f }) => {
-  /* Get GridData and BedLayout from context */
-  const { bedLayout } = useGridStateContext();
+  /* Get GridData and locationLayout from context */
+  const { locationLayout } = useGridStateContext();
 
   return (
     <Box>
       <CustomFormControlSetting
-        label="Bed Layout"
-        id="bedLayout"
-        initialValue={getPrettyBedLayout(bedLayout)}
+        label="Layout"
+        id="locationLayout"
+        initialValue={getPrettyLocationLayout(locationLayout)}
         onSave={onSave}
       >
-        <CustomTextField id="bedLayoutTextField" fullWidth multiline />
+        <CustomTextField id="locationLayoutTextField" fullWidth multiline />
       </CustomFormControlSetting>
     </Box>
   );

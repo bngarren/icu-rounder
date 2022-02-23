@@ -3,21 +3,13 @@ import user from "@testing-library/user-event";
 import { render, screen, waitFor } from "../../test-utils";
 import { useImporter } from "./useImporter";
 import ImportSection from "../Settings/ImportSection";
+import { TEST_GRID_DATA } from "../../utils";
 
 const testData = {
   pass: {
     gridData: [
       {
-        bed: "1",
-        lastName: "Doe",
-        firstName: "John",
-        teamNumber: "2",
-        oneLiner: "3yoM with asthma",
-        contingencies: ["Pulm HTN"],
-        contentType: "simple",
-        simpleContent: "Make him better",
-        nestedContent: [],
-        bottomText: "Floor",
+        ...TEST_GRID_DATA,
       },
     ],
   },
@@ -25,7 +17,7 @@ const testData = {
 };
 
 describe("useImporter", () => {
-  it("has correct initial state", () => {
+  it("should have correct initial state", () => {
     const { result: hook } = renderHook(() => useImporter());
     expect(hook.current.file).toBe(null);
     expect(hook.current.importedData).not.toBe(true);
@@ -33,7 +25,7 @@ describe("useImporter", () => {
     expect(hook.current.error).not.toBe(true);
   });
 
-  it("uploads file and adds file to state", async () => {
+  it("should upload a file and add file to state", async () => {
     const { result: hook } = renderHook(() => useImporter());
     render(<ImportSection />);
     const _data = JSON.stringify(testData.pass);
@@ -56,7 +48,7 @@ describe("useImporter", () => {
     await waitFor(() => expect(hook.current.file).not.toBe(null));
   });
 
-  it("shows error message on invalid files and show disabled accept button and enabled cancel button", async () => {
+  it("should show an error message on invalid files and show disabled accept button and enabled cancel button", async () => {
     const { result: hook } = renderHook(() => useImporter());
     render(<ImportSection />);
     const _data = JSON.stringify(testData.empty);

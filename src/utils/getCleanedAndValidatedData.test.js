@@ -1,21 +1,9 @@
 import { getCleanedAndValidatedData } from ".";
+import { TEST_GRID_DATA } from "../utils";
 
 const testData = {
   pass: {
-    gridData: [
-      {
-        bed: "1",
-        lastName: "Doe",
-        firstName: "John",
-        teamNumber: "2",
-        oneLiner: "3yoM with asthma",
-        contingencies: ["Pulm HTN"],
-        contentType: "simple",
-        simpleContent: "Make him better",
-        nestedContent: [],
-        bottomText: "Floor",
-      },
-    ],
+    gridData: [...TEST_GRID_DATA],
   },
   empty: {},
   missingGridData: {
@@ -27,14 +15,17 @@ const testData = {
   invalidGridData_emptyArray: {
     gridData: [],
   },
+  hasIdValue: {
+    gridData: [{ ...TEST_GRID_DATA[0], id: "string" }],
+  },
   incorrectTypes: {
     gridData: [
       {
-        bed: 1,
+        location: 1,
         lastName: true,
         firstName: true,
-        teamNumber: 2,
-        oneLiner: true,
+        team: 2,
+        summary: true,
         contingencies: 1,
         contentType: 1,
         simpleContent: 1,
@@ -42,6 +33,9 @@ const testData = {
         bottomText: {},
       },
     ],
+  },
+  extraGridDataKeys: {
+    gridData: [{ ...TEST_GRID_DATA[0], extraKey: "bad" }],
   },
 };
 
@@ -71,17 +65,29 @@ describe("getCleanedAndValidatedData function", () => {
     ).not.toThrow();
   });
 
-  it("will return cleaned data that has correct types", () => {
+  it("should remove any 'id' value, if present", () => {
+    let { cleanedData } = getCleanedAndValidatedData(testData.hasIdValue);
+    expect(cleanedData.gridData[0].id).toBeFalsy();
+  });
+
+  it("should return cleaned data that has correct types", () => {
     let { cleanedData } = getCleanedAndValidatedData(testData.incorrectTypes);
-    expect(typeof cleanedData.gridData[0].bed).toBe("string");
+    expect(typeof cleanedData.gridData[0].location).toBe("string");
     expect(typeof cleanedData.gridData[0].lastName).toBe("string");
     expect(typeof cleanedData.gridData[0].firstName).toBe("string");
-    expect(typeof cleanedData.gridData[0].teamNumber).toBe("string");
-    expect(typeof cleanedData.gridData[0].oneLiner).toBe("string");
+    expect(typeof cleanedData.gridData[0].team).toBe("string");
+    expect(typeof cleanedData.gridData[0].summary).toBe("string");
     expect(Array.isArray(cleanedData.gridData[0].contingencies)).toBeTruthy();
     expect(typeof cleanedData.gridData[0].contentType).toBe("string");
     expect(typeof cleanedData.gridData[0].simpleContent).toBe("string");
     expect(Array.isArray(cleanedData.gridData[0].nestedContent)).toBeTruthy();
     expect(typeof cleanedData.gridData[0].bottomText).toBe("string");
+  });
+
+  it("should remove gridData keys that are not expected", () => {
+    let { cleanedData } = getCleanedAndValidatedData(
+      testData.extraGridDataKeys
+    );
+    expect("extraKey" in cleanedData.gridData[0]).toBeFalsy();
   });
 });

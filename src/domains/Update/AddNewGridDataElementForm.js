@@ -14,18 +14,22 @@ import AddIcon from "@mui/icons-material/Add";
 // Context
 import { useGridStateContext } from "../../context/GridState";
 
+// Util
+import { APP_TEXT } from "../../utils";
+
 /* Styling */
 
 const StyledOutlinedInput = styled(OutlinedInput, {
-  name: "AddNewBedspaceForm",
+  name: "AddNewGridDataElementForm",
   slot: "input",
 })(() => ({}));
 
-const AddNewBedspaceForm = ({ onSubmit = (f) => f }) => {
-  const { bedLayout, gridData, updateGridData } = useGridStateContext();
+const AddNewGridDataElementForm = ({ onSubmit = (f) => f }) => {
+  const { locationLayout, gridData, updateGridData } = useGridStateContext();
   const [value, setValue] = useState("");
 
-  const newBedAlreadyExists = (bed) => bedLayout.includes(bed);
+  const newLocationAlreadyExists = (location) =>
+    locationLayout?.includes(location);
 
   const handleOnChange = (val) => {
     setValue(val);
@@ -37,32 +41,32 @@ const AddNewBedspaceForm = ({ onSubmit = (f) => f }) => {
     }
   };
 
-  /* Handles to submission of a new bedspace.
+  /* Handles the submission of a new gridDataElement.
   **
-  If this bed already exists, it just finds the corresponding key in
+  If this location already exists, it just finds the corresponding key in
   the gridData array and sends it back to the parent through onSubmit
   so that that row can be highlighted.
-  If this bed doesn't exist, it is added to bedLayout and the gridData
+  If this location doesn't exist, it is added to locationLayout and the gridData
   is updated through updateGridData, and when this is complete, the parent
   is notified through the callback onSubmit and that new row is highlighted.
   **
    */
   const handleOnSubmit = () => {
     const valToSubmit = value.trim();
-    if (newBedAlreadyExists(valToSubmit)) {
+    if (newLocationAlreadyExists(valToSubmit)) {
       console.log(`${valToSubmit} already exists!`);
-      const bedKeyExists = gridData.findIndex(
-        (element) => element.bed === valToSubmit
+      const keyOfExistingLocation = gridData.findIndex(
+        (element) => element.location === valToSubmit
       );
-      onSubmit(bedKeyExists);
+      onSubmit(keyOfExistingLocation);
     } else {
-      const newBedLayout = [...bedLayout, valToSubmit];
-      updateGridData(gridData, newBedLayout).then((res) => {
+      const newLocationLayout = [...locationLayout, valToSubmit];
+      updateGridData(gridData, newLocationLayout).then((res) => {
         if (res) {
-          const bedKeyNew = res.findIndex(
-            (element) => element.bed === valToSubmit
+          const keyOfNewLocation = res.findIndex(
+            (element) => element.location === valToSubmit
           );
-          onSubmit(bedKeyNew);
+          onSubmit(keyOfNewLocation);
         }
       });
     }
@@ -72,7 +76,7 @@ const AddNewBedspaceForm = ({ onSubmit = (f) => f }) => {
   return (
     <Box>
       <StyledOutlinedInput
-        placeholder="Add bed"
+        placeholder={APP_TEXT.addGridDataElement}
         size="small"
         value={value}
         onChange={(e) => handleOnChange(e.target.value)}
@@ -100,4 +104,4 @@ const AddNewBedspaceForm = ({ onSubmit = (f) => f }) => {
   );
 };
 
-export default AddNewBedspaceForm;
+export default AddNewGridDataElementForm;

@@ -24,24 +24,24 @@ import { styled } from "@mui/system";
 import { Link } from "react-router-dom";
 
 // Utility
-import { isBedEmpty } from "../../utils";
+import { isGridDataElementEmpty, APP_TEXT } from "../../utils";
 
 // Popover
 import { usePopupState } from "material-ui-popup-state/hooks";
-import TableBedListPopover from "./TableBedListPopover";
+import ActionsPopover from "./ActionsPopover";
 
 // Components
-import AddNewBedspaceForm from "./AddNewBedspaceForm";
+import AddNewGridDataElementForm from "./AddNewGridDataElementForm";
 
 // Context
-import BedActionsContext from "./BedActionsContext";
+import GridDataElementActionsContext from "./GridDataElementActionsContext";
 
 // Defaults //TODO Need to put this in Settings
 const ROWS_PER_PAGE = 15;
 
 /* Styling */
 const StyledTableCellHeader = styled(TableCell, {
-  name: "TableBedList",
+  name: "TableGridDataElements",
   slot: "header",
 })(({ theme }) => ({
   backgroundColor: theme.palette.primary.dark,
@@ -52,7 +52,7 @@ const StyledTableCellHeader = styled(TableCell, {
 }));
 
 const StyledTableCell = styled(TableCell, {
-  name: "TableBedList",
+  name: "TableGridDataElements",
   slot: "tableCell",
   shouldForwardProp: (prop) =>
     prop !== "shouldHighlight" && prop !== "isSelected",
@@ -63,7 +63,7 @@ const StyledTableCell = styled(TableCell, {
   [theme.breakpoints.down("lg")]: {
     padding: "2px 4px 2px 4px",
   },
-  // Targets the Bed number table cell, when selected
+  // Targets the Location table cell, when selected
   ...(isSelected &&
     component === "th" && {
       transition: "color 0.1s linear",
@@ -75,9 +75,9 @@ const StyledTableCell = styled(TableCell, {
   }),
 }));
 
-const StyledTypographyBedNumber = styled(Typography, {
-  name: "TableBedList",
-  slot: "bedNumber",
+const StyledTypographyLocation = styled(Typography, {
+  name: "TableGridDataElements",
+  slot: "location",
   shouldForwardProp: (prop) =>
     prop !== "shouldHighlight" && prop !== "isSelected",
 })(({ shouldHighlight, isSelected, theme }) => ({
@@ -93,7 +93,7 @@ const StyledTypographyBedNumber = styled(Typography, {
 }));
 
 const StyledTypographyPatientName = styled(Typography, {
-  name: "TableBedList",
+  name: "TableGridDataElements",
   slot: "patientName",
 })(({ theme }) => ({
   [theme.breakpoints.up("lg")]: {
@@ -105,7 +105,7 @@ const StyledTypographyPatientName = styled(Typography, {
 }));
 
 const StyledTablePagination = styled(TablePagination, {
-  name: "TableBedList",
+  name: "TableGridDataElements",
   slot: "pagination",
 })(({ theme }) => ({
   "& .MuiTablePagination-root": {
@@ -129,9 +129,9 @@ const StyledTablePagination = styled(TablePagination, {
   },
 }));
 
-const StyledBedActionsDiv = styled("div", {
-  name: "TableBedList",
-  slot: "bedActions",
+const StyledActionsDiv = styled("div", {
+  name: "TableGridDataElements",
+  slot: "actions",
 })(() => ({
   display: "flex",
   alignItems: "center",
@@ -162,7 +162,7 @@ const StyledMenuOpenIcon = styled(MenuOpenIcon)(({ theme }) => ({
   color: theme.palette.primary.light,
 }));
 
-const TableBedList = ({ data, selectedKey }) => {
+const TableGridDataElements = ({ data, selectedKey }) => {
   // table pagination
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(ROWS_PER_PAGE);
@@ -176,7 +176,7 @@ const TableBedList = ({ data, selectedKey }) => {
   };
 
   /* Watches for changes in selectedKey and picks the correct paginated page that contains
-  that bed space. E.g. when using the navigation arrows and you move to a bedspace that is on
+  that gridDataElement. E.g. when using the navigation arrows and you move to a gridDataElement that is on
   a different paginated page */
   useEffect(() => {
     // Page should be set so that selectedKey is within range of [page*rowsPerPage, rowsPerPage + rowsPerPage - 1]
@@ -196,22 +196,22 @@ const TableBedList = ({ data, selectedKey }) => {
   }, [selectedKey, data.length, rowsPerPage]);
 
   const columnSizes = {
-    bed: getBedCharSize(data),
+    location: getLocationCharSize(data),
     team: getTeamCharSize(data),
   };
 
   return (
     <TableContainer component={Paper}>
-      <Table aria-label="table of beds" sx={{ tableLayout: "fixed" }}>
+      <Table aria-label="table of items" sx={{ tableLayout: "fixed" }}>
         <TableHead>
           {data?.length !== 0 ? (
             <TableRow data-testid="header row with info">
               <StyledTableCellHeader
                 sx={{
-                  width: `${columnSizes.bed * 1.7}ch`,
+                  width: `${columnSizes.location * 1.7}ch`,
                 }}
               >
-                Bed
+                Location
               </StyledTableCellHeader>
               <StyledTableCellHeader>{/* Name */}</StyledTableCellHeader>
               <StyledTableCellHeader
@@ -254,7 +254,7 @@ const TableBedList = ({ data, selectedKey }) => {
 const MyTableBody = ({ data, page, rowsPerPage, selectedKey, columnSizes }) => {
   const [highlightedKey, setHighlightedKey] = useState(false);
 
-  const handleNewBedspaceSubmitted = (key) => {
+  const handleNewGridDataElementSubmitted = (key) => {
     setHighlightedKey(key);
     setTimeout(() => {
       setHighlightedKey(null);
@@ -264,7 +264,9 @@ const MyTableBody = ({ data, page, rowsPerPage, selectedKey, columnSizes }) => {
   const MyInputTableRow = (
     <TableRow>
       <StyledTableCell component="th" scope="row" align="right" colSpan={4}>
-        <AddNewBedspaceForm onSubmit={handleNewBedspaceSubmitted} />
+        <AddNewGridDataElementForm
+          onSubmit={handleNewGridDataElementSubmitted}
+        />
       </StyledTableCell>
     </TableRow>
   );
@@ -284,7 +286,7 @@ const MyTableBody = ({ data, page, rowsPerPage, selectedKey, columnSizes }) => {
                   shouldHighlight={highlightedKey === adjustedKey}
                   adjustedKey={adjustedKey}
                   isSelected={isSelected}
-                  key={`MyTableRow-${value.bed}-${key}`}
+                  key={`MyTableRow-${value.id}`}
                   value={value}
                   columnSizes={columnSizes}
                 />
@@ -293,8 +295,8 @@ const MyTableBody = ({ data, page, rowsPerPage, selectedKey, columnSizes }) => {
         ) : (
           <TableRow>
             <TableCell scope="row" colSpan={4}>
-              Add your first bed below or{" "}
-              <Link to="/settings">create a layout</Link>
+              {APP_TEXT.addFirstGridDataElementPrompt}
+              <Link to="/settings">{APP_TEXT.createLayoutLink}</Link>
             </TableCell>
           </TableRow>
         )}
@@ -311,7 +313,7 @@ const MyTableRow = memo(function MyTableRow({
   value,
   columnSizes,
 }) {
-  const emptyBed = isBedEmpty(value);
+  const isEmptyGridDataElement = isGridDataElementEmpty(value);
 
   const getPatientName = () => {
     if (value == null) return "";
@@ -321,7 +323,7 @@ const MyTableRow = memo(function MyTableRow({
   };
 
   return (
-    <TableRow key={value.bed} hover selected={isSelected}>
+    <TableRow key={value.id} hover selected={isSelected}>
       <StyledTableCell
         component="th"
         scope="row"
@@ -329,7 +331,7 @@ const MyTableRow = memo(function MyTableRow({
         shouldHighlight={shouldHighlight}
         isSelected={isSelected}
       >
-        <StyledTypographyBedNumber
+        <StyledTypographyLocation
           variant="h6"
           shouldHighlight={shouldHighlight}
           isSelected={isSelected}
@@ -337,11 +339,11 @@ const MyTableRow = memo(function MyTableRow({
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            fontSize: columnSizes.bed > 3 ? "0.90rem" : "1rem",
+            fontSize: columnSizes.location > 3 ? "0.90rem" : "1rem",
           }}
         >
-          {value.bed}
-        </StyledTypographyBedNumber>
+          {value.location}
+        </StyledTypographyLocation>
       </StyledTableCell>
       <StyledTableCell align="left" isSelected={isSelected}>
         <StyledTypographyPatientName
@@ -366,23 +368,30 @@ const MyTableRow = memo(function MyTableRow({
             fontSize: columnSizes.team > 4 && "0.85rem",
           }}
         >
-          {value["teamNumber"]}
+          {value.team}
         </Typography>
       </StyledTableCell>
       <StyledTableCell>
-        <BedActions
+        <GridDataElementActions
           isSelected={isSelected}
-          bedKey={adjustedKey}
-          emptyBed={emptyBed}
+          gridDataElementKey={adjustedKey}
+          isEmptyGridDataElement={isEmptyGridDataElement}
         />
       </StyledTableCell>
     </TableRow>
   );
 });
 
-const BedActions = memo(function BedActions({ isSelected, bedKey, emptyBed }) {
-  const { bedActionEdit, bedActionClear, bedActionDelete } =
-    useContext(BedActionsContext);
+const GridDataElementActions = memo(function GridDataElementActions({
+  isSelected,
+  gridDataElementKey,
+  isEmptyGridDataElement,
+}) {
+  const {
+    gridDataElementActionEdit,
+    gridDataElementActionClear,
+    gridDataElementActionDelete,
+  } = useContext(GridDataElementActionsContext);
 
   // Popover - using a hook from material-ui-popup-state package
   const popupState = usePopupState({
@@ -395,19 +404,19 @@ const BedActions = memo(function BedActions({ isSelected, bedKey, emptyBed }) {
   };
 
   return (
-    <StyledBedActionsDiv>
+    <StyledActionsDiv>
       {
         <>
           <Radio
             checked={isSelected}
-            onClick={() => bedActionEdit(bedKey)}
+            onClick={() => gridDataElementActionEdit(gridDataElementKey)}
             sx={{ ...buttonPaddingSx }}
           />
         </>
       }
       {
         <StyledMenuIconButton
-          onClick={(e) => handleOnClickMenu(e, bedKey)}
+          onClick={(e) => handleOnClickMenu(e, gridDataElementKey)}
           size="large"
           sx={{
             ...buttonPaddingSx,
@@ -420,26 +429,26 @@ const BedActions = memo(function BedActions({ isSelected, bedKey, emptyBed }) {
           )}
         </StyledMenuIconButton>
       }
-      <TableBedListPopover
+      <ActionsPopover
         popupState={popupState}
-        key={bedKey}
-        emptyBed={emptyBed}
-        onSelectDelete={() => bedActionDelete(bedKey)}
-        onSelectClear={() => bedActionClear(bedKey)}
+        key={gridDataElementKey}
+        withEmptyGridDataElement={isEmptyGridDataElement}
+        onSelectDelete={() => gridDataElementActionDelete(gridDataElementKey)}
+        onSelectClear={() => gridDataElementActionClear(gridDataElementKey)}
       />
-    </StyledBedActionsDiv>
+    </StyledActionsDiv>
   );
 });
 
 /* Helper functions to calculate the number of characters in the
 longest string so that the column and font can be resized appropriately */
 
-function getBedCharSize(data) {
+function getLocationCharSize(data) {
   return (() => {
     let min = 3;
     let max = 6;
     data?.forEach((i) => {
-      min = Math.max(min, i.bed?.length || 0);
+      min = Math.max(min, i.location?.length || 0);
     });
     return Math.min(min, max);
   })();
@@ -450,10 +459,10 @@ function getTeamCharSize(data) {
     let min = 4;
     let max = 6;
     data?.forEach((i) => {
-      min = Math.max(min, i.teamNumber?.length || 0);
+      min = Math.max(min, i.team?.length || 0);
     });
     return Math.min(min, max);
   })();
 }
 
-export default TableBedList;
+export default TableGridDataElements;

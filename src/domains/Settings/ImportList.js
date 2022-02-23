@@ -22,7 +22,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { styled } from "@mui/system";
 
 // Utility
-import { isBedEmpty } from "../../utils";
+import { isGridDataElementEmpty } from "../../utils";
 
 /* Styling */
 const StyledButton = styled(ButtonUnstyled, {
@@ -44,17 +44,20 @@ const StyledButton = styled(ButtonUnstyled, {
   }),
 }));
 
-/* This component renders the Checkbox for each bedspace */
+/* This component renders the Checkbox for each item (gridDataElement) */
 const ImportItem = ({ value, selected, toggleSelected }) => {
   if (value != null) {
     /* Check if properties exist and are non-empty */
-    const bed = typeof value.bed === "string" && value.bed.length && value.bed;
+    const location =
+      typeof value.location === "string" &&
+      value.location.length &&
+      value.location;
     const lastName =
       typeof value.lastName === "string" &&
       value.lastName.length &&
       value.lastName;
 
-    const empty = isBedEmpty(value);
+    const empty = isGridDataElementEmpty(value);
 
     const label = (
       <>
@@ -63,7 +66,7 @@ const ImportItem = ({ value, selected, toggleSelected }) => {
           component="span"
           sx={{ color: empty && "grey.600" }}
         >
-          {bed}
+          {location}
         </Typography>
         <Typography variant="body2" component="span">
           {lastName && ` - ${lastName}`}
@@ -118,12 +121,12 @@ const ImportList = ({ data, onChangeSelected = (f) => f }) => {
     onChangeSelected(selected);
   }, [selected, onChangeSelected]);
 
-  const errorNoBeds = data.length < 1;
+  const errorNoGridDataElements = data.length < 1;
   const errorNoneSelected = selected.length < 1;
   const errorMessage = () => {
     if (errorNoneSelected) {
-      return errorNoBeds
-        ? "There are no beds to import. Add valid JSON."
+      return errorNoGridDataElements
+        ? "There are no items to import."
         : "Please select at least 1 item to import.";
     }
   };
@@ -157,7 +160,7 @@ const ImportList = ({ data, onChangeSelected = (f) => f }) => {
   };
 
   const handleFilterNonEmpty = () => {
-    const newSelected = selected.filter((el) => !isBedEmpty(el));
+    const newSelected = selected.filter((el) => !isGridDataElementEmpty(el));
     setSelected(newSelected);
   };
 
@@ -172,7 +175,7 @@ const ImportList = ({ data, onChangeSelected = (f) => f }) => {
           {data.map((value, key) => {
             return (
               <ImportItem
-                key={`${value.bed}-${key}`}
+                key={`${value.location}-${key}`}
                 value={value}
                 selected={selected.indexOf(value) !== -1}
                 toggleSelected={handleToggleSelection}
@@ -204,7 +207,7 @@ const ImportList = ({ data, onChangeSelected = (f) => f }) => {
                   {data.map((value, key) => {
                     return (
                       <ImportItem
-                        key={`${value.bed}-${key}`}
+                        key={`${value.location}-${key}`}
                         value={value}
                         selected={selected.indexOf(value) !== -1}
                         toggleSelected={handleToggleSelection}
@@ -242,31 +245,37 @@ const ImportList = ({ data, onChangeSelected = (f) => f }) => {
               color: errorNoneSelected && "error.main",
             }}
           >
-            <b>{selected.length}</b> of {data.length} beds selected
+            <b>{selected.length}</b> of {data.length} items selected
           </Typography>
 
           <IconButton
             size="small"
             onClick={handleToggleExpanded}
             sx={{ p: "1px 3px" }}
-            disabled={errorNoBeds}
+            disabled={errorNoGridDataElements}
           >
             {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>
         </Stack>
 
-        <StyledButton onClick={handleSelectAll} disabled={errorNoBeds}>
+        <StyledButton
+          onClick={handleSelectAll}
+          disabled={errorNoGridDataElements}
+        >
           Select All
         </StyledButton>
-        <StyledButton onClick={handleClearAll} disabled={errorNoBeds}>
+        <StyledButton
+          onClick={handleClearAll}
+          disabled={errorNoGridDataElements}
+        >
           Clear All
         </StyledButton>
-        <Tooltip title="Filter empty beds">
+        <Tooltip title="Filter empty items">
           <IconButton
             size="small"
             onClick={handleFilterNonEmpty}
             sx={{ p: "2px" }}
-            disabled={errorNoBeds}
+            disabled={errorNoGridDataElements}
           >
             <FilterAltIcon />
           </IconButton>

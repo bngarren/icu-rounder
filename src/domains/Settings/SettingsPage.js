@@ -17,7 +17,10 @@ import { useSettings } from "../../context/Settings";
 import { useGridStateContext } from "../../context/GridState";
 
 // Utility
-import { isBedEmpty, getDataForBed } from "../../utils";
+import {
+  isGridDataElementEmpty,
+  getGridDataElementByLocation,
+} from "../../utils";
 
 /* Styling */
 const StyledBodyStack = styled(Stack, {
@@ -29,21 +32,20 @@ const SettingsPage = () => {
   /* Get Settings context */
   const { dispatchSettings } = useSettings();
 
-  /* Get GridData and BedLayout from context */
-  const { bedLayout, gridData, updateGridData } = useGridStateContext();
+  /* Get GridData and locationLayout from context */
+  const { locationLayout, gridData, updateGridData } = useGridStateContext();
 
   /* Hook for our Dialog modal */
   const { dialogIsOpen, dialog, showYesNoDialog } = useDialog();
 
-  /* 
-  **
-  Handles the saving of the Settings data by passing
-  new data to SettingsContext via dispatchSettings, or 
-  updating bedLayout variable of GridStateContext
-  **
-  */
   /**
-   * @return {bool} Returns true if save action was successful, false if not */
+  * Handles the saving of the Settings data by passing
+  new data to SettingsContext via dispatchSettings, or 
+  updating locationLayout variable of GridStateContext
+  * @param {string} id of the property we are trying to save, e.g. 'locationLayout', 'firstName', etc.
+  * @param {Object} value of the property
+  * @returns {bool} Returns true if save action was successful, false if not
+  */
   const handleOnSave = (id, value) => {
     if (id == null || value == null) {
       throw new Error(
@@ -53,8 +55,8 @@ const SettingsPage = () => {
 
     let success = false;
 
-    if (id === "bedLayout") {
-      success = handleSaveBedLayout(value);
+    if (id === "locationLayout") {
+      success = handleSaveLocationLayout(value);
     } else {
       try {
         dispatchSettings({
@@ -71,45 +73,45 @@ const SettingsPage = () => {
     return success;
   };
 
-  /* 
-  **
-  Handles the saving of the bedLayout in GridStateContext. 
-  Importantly, this function checks new vs old bedlayout to alert user
-  if patient data might be overwritten.
-  **
- */
   /**
-   *
-   * @param {string} newBedLayout The "new" bedLayout string from user input
+   * Handles the saving of the locationLayout in GridStateContext.
+   * Importantly, this function checks new vs old locationLayout to alert user
+   * if patient data might be overwritten.
+   * @param {string} newLocationLayout The "new" locationLayout string from user input
    * @return {bool} Returns true if save was successful, false if not
    */
-  const handleSaveBedLayout = (newBedLayout) => {
-    /* Convert the input bedLayout string (CSV format) to an array */
-    const formattedBedLayout = getBedLayoutArrayFromCsv(newBedLayout);
+  const handleSaveLocationLayout = (newLocationLayout) => {
+    /* Convert the input locationLayout string (CSV format) to an array */
+    const formattedLocationLayout =
+      getLocationLayoutArrayFromCsv(newLocationLayout);
 
-    /* Find the beds that differ between the current and new bedLayouts */
-    let difference = bedLayout.filter((x) => !formattedBedLayout.includes(x));
-    /* Of these beds, if any, find which ones have patient data at risk of being deleted */
-    let riskBeds = [];
+    /* Find the locations that differ between the current and new locationLayouts */
+    let difference = locationLayout.filter(
+      (x) => !formattedLocationLayout.includes(x)
+    );
+    /* Of these locations, if any, find which ones have gridDataElement data at risk of being deleted */
+    let risklocations = [];
     if (difference.length > 0) {
       difference.forEach((i) => {
-        // Uses Utility function to get the bed's data and see if it's empty
-        if (!isBedEmpty(getDataForBed(gridData, i))) {
-          riskBeds.push(i);
+        // Uses Utility function to get the location's data and see if it's empty
+        if (
+          !isGridDataElementEmpty(getGridDataElementByLocation(gridData, i))
+        ) {
+          risklocations.push(i);
         }
       });
     }
-    // If there are bed(s) with data that are missing from new bedLayout
-    if (riskBeds.length > 0) {
+    // If there are location(s) with data that are missing from new locationLayout
+    if (risklocations.length > 0) {
       // Construct the message for the Dialog
       const content = (
         <div>
           <p>
-            This new bed layout will <b>NOT</b> include the following beds which
-            are non-empty:
+            This new layout will <b>NOT</b> include the following locations
+            which contain data:
           </p>
           <p>
-            {riskBeds.map((i) => {
+            {risklocations.map((i) => {
               return `| ${i} |     `;
             })}
           </p>
@@ -119,7 +121,7 @@ const SettingsPage = () => {
         content,
         () => {
           // chose to continue
-          updateGridData(gridData, formattedBedLayout);
+          updateGridData(gridData, formattedLocationLayout);
           return true;
         },
         () => {
@@ -129,7 +131,7 @@ const SettingsPage = () => {
         { yes: "Continue", no: "Cancel" }
       );
     } else {
-      updateGridData(gridData, formattedBedLayout);
+      updateGridData(gridData, formattedLocationLayout);
       return true;
     }
   };
@@ -189,15 +191,15 @@ const SettingsPage = () => {
   );
 };
 
-/* Helper function for taking the input bedLayout (CSV format) and 
-  converting it to a valid array. This is NOT where
-  validation happens. It does take accepted characters, i.e, commas,
-  and converts them to an appropriate format. */
 /**
+ * Helper function for taking the input locationLayout (CSV format) and
+ * converting it to a valid array. This is NOT where
+ * validation happens. It does take accepted characters, i.e, commas,
+ * and converts them to an appropriate format.
  * @param {string} csv String containing comma-separated values
- * @return {array} Array containing bedLayout, e.g. ["1", "2", "3"]
+ * @return {array} Array containing locationLayout, e.g. ["1", "2", "3"]
  */
-const getBedLayoutArrayFromCsv = (csv) => {
+const getLocationLayoutArrayFromCsv = (csv) => {
   let res = [];
   if (csv == null || csv === "") return res;
 

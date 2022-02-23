@@ -122,7 +122,7 @@ const ImportSection = () => {
               <CheckBoxIcon />
               <Typography variant="body2">
                 {`${selected} ${
-                  plural ? "beds" : "bed"
+                  plural ? "items" : "item"
                 } successfully imported.`}
               </Typography>
             </Stack>

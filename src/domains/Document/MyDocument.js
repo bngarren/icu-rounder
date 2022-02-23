@@ -85,7 +85,7 @@ const pdfStyles = StyleSheet.create({
     width: "100%",
     borderBottom: "1pt solid black",
   },
-  gridBoxHeaderBed: {
+  gridBoxHeaderLocation: {
     marginRight: "2pt",
     paddingLeft: "3pt",
     paddingRight: "3pt",
@@ -106,7 +106,7 @@ const pdfStyles = StyleSheet.create({
     alignSelf: "center",
     fontSize: "8.5pt",
   },
-  gridBoxBodyOneLiner: {
+  gridBoxBodySummary: {
     fontSize: "7pt",
     marginBottom: "1.5pt",
   },
@@ -184,8 +184,8 @@ export const getWidth = (colsPerPage, factor = 1) => {
   return res.toString() + "pt";
 };
 
-const MyDocument = ({ bedLayout, title, colsPerPage, data, census }) => {
-  const beds = bedLayout.length;
+const MyDocument = ({ locationLayout, title, colsPerPage, data, census }) => {
+  const locations = locationLayout.length;
 
   const getMatrix = (r, c) => {
     let matrix = [];
@@ -195,14 +195,14 @@ const MyDocument = ({ bedLayout, title, colsPerPage, data, census }) => {
       matrix[i] = [];
       for (let j = 0; j < c; j++) {
         // for each column
-        matrix[i][j] = bedLayout[counter];
+        matrix[i][j] = locationLayout[counter];
         counter++;
       }
     }
     return matrix;
   };
 
-  const matrix = getMatrix(Math.ceil(beds / colsPerPage), colsPerPage);
+  const matrix = getMatrix(Math.ceil(locations / colsPerPage), colsPerPage);
 
   return (
     <Document>
@@ -215,11 +215,7 @@ const MyDocument = ({ bedLayout, title, colsPerPage, data, census }) => {
           <View style={pdfStyles.censusRoot}>
             {census ? (
               <>
-                <Text>
-                  {`${census.filledTotal}/${census.total}`}{" "}
-                  {/* census.emptyBeds.length > 0 &&
-                    `[${census.emptyBeds.toString()}]` */}
-                </Text>
+                <Text>{`${census.filledTotal}/${census.total}`} </Text>
                 {census.teamTotals.map((t) => {
                   return (
                     <Text key={t.id}>
@@ -243,10 +239,14 @@ const MyDocument = ({ bedLayout, title, colsPerPage, data, census }) => {
                 key={`row-${rIndex}`}
               >
                 {row.map((box, cIndex) => {
-                  const objIndex = data.findIndex((obj) => obj.bed === box);
+                  const objIndex = data.findIndex(
+                    (obj) => obj.location === box
+                  );
                   return (
                     <GridBox
-                      bedspaceData={objIndex >= 0 ? data[objIndex] : null}
+                      gridDateElementData={
+                        objIndex >= 0 ? data[objIndex] : null
+                      }
                       width={getWidth(colsPerPage)}
                       removeLeftBorder={cIndex !== 0}
                       key={`grid-${cIndex}-${box}`}
@@ -262,8 +262,8 @@ const MyDocument = ({ bedLayout, title, colsPerPage, data, census }) => {
   );
 };
 
-const GridBox = ({ bedspaceData, width, removeLeftBorder }) => {
-  if (bedspaceData) {
+const GridBox = ({ gridDateElementData, width, removeLeftBorder }) => {
+  if (gridDateElementData) {
     return (
       <View
         style={[
@@ -276,27 +276,29 @@ const GridBox = ({ bedspaceData, width, removeLeftBorder }) => {
         ]}
       >
         <View style={pdfStyles.gridBoxHeader}>
-          <View style={pdfStyles.gridBoxHeaderBed}>
-            <Text>{bedspaceData.bed || " "}</Text>
+          <View style={pdfStyles.gridBoxHeaderLocation}>
+            <Text>{gridDateElementData.location || " "}</Text>
           </View>
           <View style={pdfStyles.gridBoxHeaderName}>
             <Text>
-              {bedspaceData.lastName || " "}
-              {bedspaceData.lastName && bedspaceData.firstName && ", "}
-              {bedspaceData.firstName || " "}
+              {gridDateElementData.lastName || " "}
+              {gridDateElementData.lastName &&
+                gridDateElementData.firstName &&
+                ", "}
+              {gridDateElementData.firstName || " "}
             </Text>
           </View>
           <View style={pdfStyles.gridBoxHeaderTeam}>
-            <Text>{bedspaceData.teamNumber || " "}</Text>
+            <Text>{gridDateElementData.team || " "}</Text>
           </View>
         </View>
         <View style={pdfStyles.gridBoxBody}>
-          <Text style={pdfStyles.gridBoxBodyOneLiner}>
-            {bedspaceData.oneLiner || " "}
+          <Text style={pdfStyles.gridBoxBodySummary}>
+            {gridDateElementData.summary || " "}
           </Text>
           <View style={pdfStyles.gridBoxBodyContingencies}>
-            {bedspaceData.contingencies &&
-              bedspaceData.contingencies.map((item, index) => {
+            {gridDateElementData.contingencies &&
+              gridDateElementData.contingencies.map((item, index) => {
                 if (item != null)
                   return (
                     <Text
@@ -309,13 +311,13 @@ const GridBox = ({ bedspaceData, width, removeLeftBorder }) => {
                 else return null;
               })}
           </View>
-          {bedspaceData.contentType === "simple" && (
-            <Text>{bedspaceData.simpleContent || " "}</Text>
+          {gridDateElementData.contentType === "simple" && (
+            <Text>{gridDateElementData.simpleContent || " "}</Text>
           )}
 
-          {bedspaceData.contentType === "nested" && (
+          {gridDateElementData.contentType === "nested" && (
             <View>
-              {bedspaceData.nestedContent?.map((sectionData) => {
+              {gridDateElementData.nestedContent?.map((sectionData) => {
                 return (
                   <View
                     key={sectionData.id}
@@ -356,7 +358,7 @@ const GridBox = ({ bedspaceData, width, removeLeftBorder }) => {
           )}
         </View>
         <View style={pdfStyles.gridBoxBottomText}>
-          <Text>{bedspaceData.bottomText || " "}</Text>
+          <Text>{gridDateElementData.bottomText || " "}</Text>
         </View>
       </View>
     );

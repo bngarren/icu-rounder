@@ -82,7 +82,7 @@ the "nestedContent" input--which is a more complex component that allows for str
 into sections and items, to make for a more compact layout in the actual grid.
 
 The data of this component is managed by its parent CustomFormControlEditor component (similar to the other
-inputs in BedspaceEditor). This component receives this data via props and also updates this
+inputs in Editor). This component receives this data via props and also updates this
 data via onChange callback in props as well. Therefore, in essence, both "simpleContent" and "nestedContent"
 are still 'controlled' inputs.
 
@@ -243,7 +243,7 @@ const ContentInput = ({
           Content
         </Typography>
         {
-          /* ToggleContentType component is passed here as child from BedspaceEditor */
+          /* ToggleContentType component is passed here as child from Editor */
           children
         }
         <ContentInputToolbar

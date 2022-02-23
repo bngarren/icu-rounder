@@ -2,6 +2,7 @@ import * as React from "react";
 
 // Util
 import { readFileAsync, getCleanedAndValidatedData } from "../../utils";
+import { v4 as uuidv4 } from "uuid";
 
 /* 
 Empty = waiting for user to click import button
@@ -17,7 +18,7 @@ const STATUS = Object.freeze({
 
 export const useImporter = () => {
   const [file, setFile] = React.useState(null);
-  const [importedData, setImportedData] = React.useState();
+  const [importedData, setImportedData] = React.useState(null);
   const [status, setStatus] = React.useState(STATUS.Empty);
   const [error, setError] = React.useState(false);
 
@@ -66,6 +67,11 @@ export const useImporter = () => {
           try {
             /* The getCleanedAndValidated function should return an object */
             res = getCleanedAndValidatedData(raw);
+
+            /* Add a unique id to each gridDataElement */
+            res.cleanedData?.gridData?.forEach((gde) => {
+              gde.id = uuidv4();
+            });
           } catch (err) {
             console.error(`Could not validate imported JSON. ${err}`);
             setError(true);
@@ -107,6 +113,8 @@ export const useImporter = () => {
 
   const handleConfirmAction = React.useCallback(() => {
     setStatus(STATUS.Confirmed);
+    setImportedData(null);
+    setError(false);
   }, []);
 
   const handleResetAction = React.useCallback(() => {

@@ -25,7 +25,7 @@ import { getCursorPos, setCursorPos } from "../../utils/CursorPos";
 
 /* Styling */
 
-const BedspaceEditor = ({
+const Editor = ({
   data,
   dataRef,
   defaultValues,
@@ -72,7 +72,7 @@ const BedspaceEditor = ({
     [setInputSavedStatus]
   );
 
-  /* Ref to last name input field, so we can focus() here when a bed is selected */
+  /* Ref to last name input field, so we can focus() here when a gridDataElement is selected */
   const lastNameInputRef = useRef();
 
   // Popover - using a hook from material-ui-popup-state package
@@ -83,7 +83,7 @@ const BedspaceEditor = ({
     element: null,
   });
 
-  /* When a new bedspace is selected...*/
+  /* When a new gridDataElement is selected...new default data is sent through as prop*/
   useEffect(() => {
     // Reset the unsavedData array because this new data shouldn't have any 'unsaved' status
     clearUnsavedData();
@@ -113,7 +113,7 @@ const BedspaceEditor = ({
   const debouncedOnEditorChangeFunction = useRef();
 
   // keeping the id helps us track this specific function in DebouncedContext
-  const debouncedFunctionId = useRef(uniqueId("BedspaceEditor"));
+  const debouncedFunctionId = useRef(uniqueId("Editor"));
 
   // the function we want to debounce
   debouncedOnEditorChangeFunction.current = (target, value) => {
@@ -151,7 +151,7 @@ const BedspaceEditor = ({
   passed through CustomFormControlEditor component which wraps the input */
   const handleInputChange = useCallback(
     (target, value) => {
-      /* Will eventually send the data back to parent component (UpdatePage), but
+      /* Will eventually send the data back to parent component (DemoAndEditorController), but
       we use debounced function so that it doesn't happen every keystroke */
       debouncedOnEditorChange(target, value);
     },
@@ -221,7 +221,7 @@ const BedspaceEditor = ({
 
       // this is the CTRL + SPACEBAR combination
       if (keyIsSpacebar && event.ctrlKey) {
-        if (elementId === "oneLiner" || elementId === "body") {
+        if (elementId === "summary" || elementId === "simpleContent") {
           console.log(`Popover event triggered from element = ${elementId}`);
 
           // Don't let the CTRL or SPACEBAR keydown do anything else
@@ -262,7 +262,7 @@ const BedspaceEditor = ({
         }}
       >
         <form autoComplete="off" spellCheck="false" key={resetKey}>
-          {/* Box containing Bed, Names, and Team */}
+          {/* Box containing Location, Names, and Team */}
           <Box
             sx={{
               display: "flex",
@@ -273,13 +273,13 @@ const BedspaceEditor = ({
             }}
           >
             <CustomFormControlEditor
-              id="bed"
-              initialValue={defaultValues.bed}
+              id="location"
+              initialValue={defaultValues.location}
               onInputChange={handleInputChange}
               onDiffChange={onDiffChange}
               onBlur={handleInputOnBlur}
             >
-              <EditorTextField label="Bed" size="small" inputSize={3} />
+              <EditorTextField label="Location" size="small" inputSize={4} />
             </CustomFormControlEditor>
             <CustomFormControlEditor
               id="lastName"
@@ -305,8 +305,8 @@ const BedspaceEditor = ({
               <EditorTextField label="First Name" size="small" />
             </CustomFormControlEditor>
             <CustomFormControlEditor
-              id="teamNumber"
-              initialValue={defaultValues.teamNumber}
+              id="team"
+              initialValue={defaultValues.team}
               onInputChange={handleInputChange}
               onDiffChange={onDiffChange}
               onBlur={handleInputOnBlur}
@@ -316,14 +316,14 @@ const BedspaceEditor = ({
           </Box>
           <Box>
             <CustomFormControlEditor
-              id="oneLiner"
-              initialValue={defaultValues.oneLiner}
+              id="summary"
+              initialValue={defaultValues.summary}
               onInputChange={handleInputChange}
               onDiffChange={onDiffChange}
               onBlur={handleInputOnBlur}
             >
               <EditorTextField
-                label="One Liner"
+                label="Summary"
                 multiline
                 minRows={2}
                 maxRows={4}
@@ -366,7 +366,7 @@ const BedspaceEditor = ({
                 onChangeArgument={data.contentType === "nested" ? 1 : 0}
               >
                 {/* Pass the initialValue prop here as well, so that ContentInput
-                  knows when to reset itself, i.e. after a bed change */}
+                  knows when to reset itself, i.e. after a gridDataElement change */}
                 <ContentInput
                   initialValue={
                     data.contentType === "nested"
@@ -413,4 +413,4 @@ const BedspaceEditor = ({
   }
 };
 
-export default BedspaceEditor;
+export default Editor;

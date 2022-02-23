@@ -10,12 +10,12 @@ import { useSettings } from "../../context/Settings";
 
 const usePdfMaker = () => {
   const { settings } = useSettings();
-  const { bedLayout, gridData, census } = useGridStateContext();
+  const { locationLayout, gridData, census } = useGridStateContext();
 
   const getMyDocument = () => {
     return (
       <MyDocument
-        bedLayout={bedLayout}
+        locationLayout={locationLayout}
         title={settings.document_title}
         colsPerPage={settings.document_cols_per_page}
         data={gridData}

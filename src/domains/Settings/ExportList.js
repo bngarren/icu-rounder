@@ -25,7 +25,7 @@ import { styled } from "@mui/system";
 import { useGridStateContext } from "../../context/GridState";
 
 // Utility
-import { isBedEmpty } from "../../utils";
+import { isGridDataElementEmpty } from "../../utils";
 
 /* Styling */
 const StyledButton = styled(ButtonUnstyled, {
@@ -47,17 +47,17 @@ const StyledButton = styled(ButtonUnstyled, {
   }),
 }));
 
-/* This component renders the Checkbox for each bedspace */
+/* This component renders the Checkbox for each gridDataElement */
 const ExportItem = ({ value, selected, toggleSelected }) => {
   if (value != null) {
     /* Check if properties exist and are non-empty */
-    const bed = typeof value.bed === "string" && value.bed.length && value.bed;
+    const location = typeof value.location === "string" && value.location;
     const lastName =
       typeof value.lastName === "string" &&
       value.lastName.length &&
       value.lastName;
 
-    const empty = isBedEmpty(value);
+    const empty = isGridDataElementEmpty(value);
 
     const label = (
       <>
@@ -66,7 +66,7 @@ const ExportItem = ({ value, selected, toggleSelected }) => {
           component="span"
           sx={{ color: empty && "grey.600" }}
         >
-          {bed}
+          {location}
         </Typography>
         <Typography variant="body2" component="span">
           {lastName && ` - ${lastName}`}
@@ -99,12 +99,15 @@ const ExportItem = ({ value, selected, toggleSelected }) => {
   }
 };
 
-/* A component that allows choosing a portion of the gridData to
-be selected for export. Each time a new selection is made, a callback
-is fired on the parent (ExportSection) to let it update it's object for export. 
-*Remember to check ImportList component as well with any changes,
-*as they share similar code but currently not DRY
-*/
+/**
+ * A component that allows choosing a portion of the gridData to
+ * be selected for export. Each time a new selection is made, a callback
+ * is fired on the parent (ExportSection) to let it update it's object for export.
+ * Remember to check ImportList component as well with any changes,
+ * as they share similar code but currently not DRY
+ * @param {function()} onChangeSelected - callback each time a new selection is made
+ * @returns React component
+ */
 const ExportList = ({ onChangeSelected = (f) => f }) => {
   const { gridData } = useGridStateContext();
 
@@ -123,12 +126,12 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
     onChangeSelected(selected);
   }, [selected, onChangeSelected]);
 
-  const errorNoBeds = gridData.length < 1;
+  const errorNoGridDataElements = gridData.length < 1;
   const errorNoneSelected = selected.length < 1;
   const errorMessage = () => {
     if (errorNoneSelected) {
-      return errorNoBeds
-        ? "There are no beds to export. Add beds to your grid."
+      return errorNoGridDataElements
+        ? "There are no items to export. Add items to your grid."
         : "Please select at least 1 item to export.";
     }
   };
@@ -162,7 +165,7 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
   };
 
   const handleFilterNonEmpty = () => {
-    const newSelected = selected.filter((el) => !isBedEmpty(el));
+    const newSelected = selected.filter((el) => !isGridDataElementEmpty(el));
     setSelected(newSelected);
   };
 
@@ -174,12 +177,12 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
     if (gridData.length <= THRESHOLD) {
       return (
         <Stack sx={{ pl: 4 }}>
-          {gridData.map((value, key) => {
+          {gridData.map((gde) => {
             return (
               <ExportItem
-                key={`${value.bed}-${key}`}
-                value={value}
-                selected={selected.indexOf(value) !== -1}
+                key={gde.id}
+                value={gde}
+                selected={selected.indexOf(gde) !== -1}
                 toggleSelected={handleToggleSelection}
               />
             );
@@ -206,10 +209,10 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
             return (
               <Grid item xs="auto" key={key}>
                 <Stack>
-                  {data.map((value, key) => {
+                  {data.map((value) => {
                     return (
                       <ExportItem
-                        key={`${value.bed}-${key}`}
+                        key={value.id}
                         value={value}
                         selected={selected.indexOf(value) !== -1}
                         toggleSelected={handleToggleSelection}
@@ -247,31 +250,37 @@ const ExportList = ({ onChangeSelected = (f) => f }) => {
               color: errorNoneSelected && "error.main",
             }}
           >
-            <b>{selected.length}</b> of {gridData.length} beds selected
+            <b>{selected.length}</b> of {gridData.length} items selected
           </Typography>
 
           <IconButton
             size="small"
             onClick={handleToggleExpanded}
             sx={{ p: "1px 3px" }}
-            disabled={errorNoBeds}
+            disabled={errorNoGridDataElements}
           >
             {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>
         </Stack>
 
-        <StyledButton onClick={handleSelectAll} disabled={errorNoBeds}>
+        <StyledButton
+          onClick={handleSelectAll}
+          disabled={errorNoGridDataElements}
+        >
           Select All
         </StyledButton>
-        <StyledButton onClick={handleClearAll} disabled={errorNoBeds}>
+        <StyledButton
+          onClick={handleClearAll}
+          disabled={errorNoGridDataElements}
+        >
           Clear All
         </StyledButton>
-        <Tooltip title="Filter empty beds">
+        <Tooltip title="Filter empty items">
           <IconButton
             size="small"
             onClick={handleFilterNonEmpty}
             sx={{ p: "2px" }}
-            disabled={errorNoBeds}
+            disabled={errorNoGridDataElements}
           >
             <FilterAltIcon />
           </IconButton>
