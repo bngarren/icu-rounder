@@ -9,9 +9,9 @@ const StyledMenuItem = styled(MenuItem)(() => ({
   fontSize: "1rem",
 }));
 
-const TableBedListPopover = ({
+const ActionsPopover = ({
   popupState,
-  emptyBed,
+  withEmptyGridDataElement,
   onSelectDelete = (f) => f,
   onSelectClear = (f) => f,
 }) => {
@@ -31,17 +31,17 @@ const TableBedListPopover = ({
         anchorOrigin={{ vertical: "center", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "left" }}
       >
-        {!emptyBed && (
+        {!withEmptyGridDataElement && (
           <StyledMenuItem onClick={handleSelectClear} key="clear">
-            Clear bed
+            Clear data
           </StyledMenuItem>
         )}
         <StyledMenuItem onClick={handleSelectDelete} key="delete">
-          Remove bed
+          Remove item
         </StyledMenuItem>
       </Menu>
     </>
   );
 };
 
-export default TableBedListPopover;
+export default ActionsPopover;

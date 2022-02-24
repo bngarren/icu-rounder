@@ -20,7 +20,7 @@ import { uniqueId } from "lodash-es";
 
 // Components
 import DemoBox from "./DemoBox";
-import BedspaceEditor from "./BedspaceEditor";
+import Editor from "./Editor";
 import { ButtonStandard } from "../../components";
 
 // Context
@@ -40,51 +40,52 @@ const StyledNavigateIconButton = styled(IconButton)(({ theme }) => ({
 }));
 
 const DemoAndEditorController = ({
-  defaultBedData,
+  defaultGridDataElementData,
   needsSave,
   setNeedsSave = (f) => f,
-  onNextBedspace = (f) => f,
+  onChangeGridDataElement = (f) => f,
   onSave = (f) => f,
 }) => {
   const { settings, dispatchSettings } = useSettings();
-  /* Holds the Editor's own version of this bedspace's data
-   */
-  const [bedspaceEditorData, _setBedspaceEditorData] = useState(); // i.e. "Working" data
+
+  /* Holds the Editor's own version of this gridDataElements's data*/
+  const [editorData, _setEditorData] = useState(); // i.e. "Working" data
 
   /* Also keep a ref (for instances where a stale closure is a problem) */
-  const bedspaceEditorDataRef = useRef(bedspaceEditorData);
-  const setBedspaceEditorData = useCallback((data) => {
-    _setBedspaceEditorData(data);
-    bedspaceEditorDataRef.current = data;
+  const editorDataRef = useRef(editorData);
+  const setEditorData = useCallback((data) => {
+    _setEditorData(data);
+    editorDataRef.current = data;
   }, []);
 
   const [resetKey, setResetKey] = useState(uniqueId()); // value not important, just using it to trigger re-render
 
-  /* Want to reset the data being used in the bedspaceEditor
+  /* Want to reset the data being used in the Editor
   to the saved "truth" data, e.g., reset changes back to the 
   last saved state */
   const handleOnReset = useCallback(() => {
-    setBedspaceEditorData(defaultBedData);
+    setEditorData(defaultGridDataElementData);
     setResetKey(uniqueId());
-  }, [defaultBedData, setBedspaceEditorData]);
+  }, [defaultGridDataElementData, setEditorData]);
 
-  /* Keep the editor's data up to date with the truth data */
+  /* Keep the Editor's data up to date with the truth data,
+  i.e. gridDataElement data from GridState */
   useEffect(() => {
-    handleOnReset(); // this will make BedspaceEditorData = defaultBedData
+    handleOnReset(); // this will make EditorData = defaultGridDataElementData
     setNeedsSave(false);
-  }, [defaultBedData, setNeedsSave, handleOnReset]);
+  }, [defaultGridDataElementData, setNeedsSave, handleOnReset]);
 
-  /* When a change in the BedspaceEditor's data occurs, it
-  sends the new bedspace JSON object here.  */
+  /* When a change in the Editor's data occurs, it
+  sends the new/modified/fresh gridDataElement data object here.  */
   const handleOnEditorDataChange = useCallback(
-    (newBedspaceData) => {
-      setBedspaceEditorData(newBedspaceData);
+    (freshGridDataElementData) => {
+      setEditorData(freshGridDataElementData);
     },
-    [setBedspaceEditorData]
+    [setEditorData]
   );
 
   /* Track the toggle state of DemoBox collapsed status,
-  helpful for setting debounce interval in BedspaceEditor 
+  helpful for setting debounce interval in Editor 
   i.e., if demobox is not visible, the debounce interval can be higher */
   const [demoBoxCollapsed, setDemoBoxCollapsed] = useState(
     !settings.show_demoBox
@@ -125,7 +126,7 @@ const DemoAndEditorController = ({
         /* If there is data that needsSave, do the save function */
         if (needsSave) {
           flushAll(); //ensure all debounced functions are finalized before saving
-          onSave(bedspaceEditorDataRef.current);
+          onSave(editorDataRef.current);
         }
       }
     },
@@ -148,7 +149,7 @@ const DemoAndEditorController = ({
   
   */
 
-  /* Renders the Toolbar associated with the BedspaceEditor, includes
+  /* Renders the Toolbar associated with the Editor, includes
   Navigation arrows, Save, and Reset buttons */
   const renderToolbar = () => (
     <Toolbar variant="dense">
@@ -163,7 +164,7 @@ const DemoAndEditorController = ({
         <StyledNavigateIconButton
           disabled={needsSave}
           disableRipple
-          onClick={() => onNextBedspace(true)}
+          onClick={() => onChangeGridDataElement(true)}
           size="large"
         >
           <NavigateBeforeIcon
@@ -171,12 +172,12 @@ const DemoAndEditorController = ({
           />
         </StyledNavigateIconButton>
         <Typography variant="h1" sx={{ color: "grey.300" }}>
-          {defaultBedData.bed || ""}
+          {defaultGridDataElementData.location || ""}
         </Typography>
         <StyledNavigateIconButton
           disabled={needsSave}
           disableRipple
-          onClick={() => onNextBedspace(false)}
+          onClick={() => onChangeGridDataElement(false)}
           size="large"
         >
           <NavigateNextIcon sx={{ fontSize: "4rem" }} />
@@ -185,7 +186,7 @@ const DemoAndEditorController = ({
       <Stack direction="row" spacing={1}>
         <ButtonStandard
           disabled={!needsSave}
-          onClick={() => onSave(bedspaceEditorData)}
+          onClick={() => onSave(editorData)}
         >
           Save
         </ButtonStandard>
@@ -200,7 +201,7 @@ const DemoAndEditorController = ({
     </Toolbar>
   );
 
-  if (bedspaceEditorData && defaultBedData) {
+  if (editorData && defaultGridDataElementData) {
     return (
       <Grid container>
         <Grid item xs={12}>
@@ -213,10 +214,10 @@ const DemoAndEditorController = ({
               onChange={handleToggleDemoBox}
             />
           </Tooltip>
-          <DemoBox data={bedspaceEditorData} collapsed={demoBoxCollapsed} />
+          <DemoBox data={editorData} collapsed={demoBoxCollapsed} />
         </Grid>
         <Grid item xs={12}>
-          {bedspaceEditorData && renderToolbar()}
+          {editorData && renderToolbar()}
         </Grid>
         <Grid
           item
@@ -225,18 +226,20 @@ const DemoAndEditorController = ({
             ...(needsSave ? {} : {}),
           }}
         >
-          <BedspaceEditor
-            data={bedspaceEditorData}
-            dataRef={bedspaceEditorDataRef}
-            defaultValues={defaultBedData}
-            onEditorDataChange={handleOnEditorDataChange}
-            setNeedsSave={setNeedsSave}
-            resetKey={resetKey}
-            debounceInterval={demoBoxCollapsed ? 600 : 400}
-          />
+          {
+            <Editor
+              data={editorData}
+              dataRef={editorDataRef}
+              defaultValues={defaultGridDataElementData}
+              onEditorDataChange={handleOnEditorDataChange}
+              setNeedsSave={setNeedsSave}
+              resetKey={resetKey}
+              debounceInterval={demoBoxCollapsed ? 600 : 400}
+            />
+          }
         </Grid>
         <Grid item xs={12}>
-          {bedspaceEditorData && renderToolbar()}
+          {editorData && renderToolbar()}
         </Grid>
       </Grid>
     );

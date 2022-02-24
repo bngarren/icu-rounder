@@ -13,9 +13,8 @@ import ExportList from "./ExportList";
 // Context
 import { useSettings } from "../../context/Settings";
 
-/* Section of SettingsPage that handles exporting the grid to JSON */
 /**
- *
+ * Section of SettingsPage that handles exporting the grid to JSON
  * @param {func} onSave Callback function when a setting is saved.
  */
 const ExportSection = ({ onSave = (f) => f }) => {

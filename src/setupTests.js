@@ -6,8 +6,9 @@ import "@testing-library/jest-dom";
 
 global.console = {
   log: jest.fn(),
+  warn: jest.fn(),
   debug: console.debug,
   trace: console.trace,
-  error: console.error,
+  error: console.debug,
   // map other methods that you want to use like console.table
 };

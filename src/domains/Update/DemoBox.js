@@ -55,13 +55,8 @@ const StyledNestedContentBox = styled(Box, {
 }));
 
 /* The demo grid box used for displaying what the grid box might look like */
-const DemoBox = ({ data: propsData, collapsed }) => {
-  const [data, setData] = useState({});
+const DemoBox = ({ data, collapsed }) => {
   const { settings } = useSettings();
-
-  useEffect(() => {
-    setData(propsData);
-  }, [propsData]);
 
   const renderNameComma = () => {
     if (data.lastName && data.firstName) {
@@ -98,7 +93,7 @@ const DemoBox = ({ data: propsData, collapsed }) => {
                   fontWeight: "bold",
                 }}
               >
-                {data.bed}
+                {data.location}
               </Box>
               <Box sx={{ flexGrow: "1" }}>
                 {data.lastName}
@@ -113,7 +108,7 @@ const DemoBox = ({ data: propsData, collapsed }) => {
                   borderLeft: "1px solid black",
                 }}
               >
-                {data.teamNumber}
+                {data.team}
               </Box>
             </StyledHeaderBox>
             <StyledBodyBox>
@@ -123,7 +118,7 @@ const DemoBox = ({ data: propsData, collapsed }) => {
                   marginBottom: "2px",
                 }}
               >
-                {data.oneLiner}
+                {data.summary}
               </Box>
               <Box
                 sx={{

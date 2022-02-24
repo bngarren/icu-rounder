@@ -1,15 +1,40 @@
-/** Find out if a specific "bed" is already in use
+/** Find out if a specific "location" is already in use
  * in our gridData.
  *
- * @param {Object} bedData The "new" bed data
+ * @param {Object} incomingGridDataElementData The "new" gridDataElement data
  * @param {array} gridData The array of current gridData
- * @returns {{objIndex: number, bedAlreadyExists: bool}} Object containing the objIndex (0 or greater if
- * this bed already exists, -1 if the bed does not exist)
+ * @returns {{objIndex: number, locationAlreadyExists: bool}} Object containing the objIndex (0 or greater if
+ * this location already exists, -1 if the location does not exist)
  */
-export const doesBedExistInGridData = (bedData, gridData) => {
+export const doesLocationExistInGridData = (
+  incomingGridDataElementData,
+  gridData
+) => {
   const objIndex = gridData.findIndex((obj) => {
-    const bed = obj.bed + ""; // cast bed to string before comparison
-    return bed === bedData.bed + "";
+    const location = obj.location + ""; // cast location to string before comparison
+    return location === incomingGridDataElementData.location + "";
   });
-  return { objIndex, bedAlreadyExists: objIndex >= 0 }; // will return -1 if not found
+  return { objIndex, locationAlreadyExists: objIndex >= 0 }; // will return -1 if not found
+};
+
+/** Helper function for finding next or previous index in given array, or 
+cycles to the end.
+ * @param {array} arr Array of grid data, e.g. each index is a gridDataElement
+ * @param {number} currentIndex Starting index, i.e. current gridDataElement in the editor
+ * @param {boolean} reverse  If true, will go back a GDE. If false, will go forward
+ * @returns {number} The new index
+ */
+export const getAdjacentGridDataElement = (
+  arr,
+  currentIndex,
+  reverse = false
+) => {
+  const newIndex = reverse ? currentIndex - 1 : currentIndex + 1;
+  if (newIndex < 0) {
+    return arr.length - 1;
+  }
+  if (newIndex > arr.length - 1) {
+    return 0;
+  }
+  return newIndex;
 };

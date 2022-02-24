@@ -1,4 +1,4 @@
-import sortByBed from "./sortByBed";
+import sortByLocation from "./sortByLocation";
 
 /**
  * Takes data and creates a JSON file for export
@@ -8,11 +8,15 @@ export default function getJsonForExport(data) {
   if (data == null || !data.gridData || !Array.isArray(data.gridData)) {
     throw new Error("Could not export data.");
   }
-  const result = { ...data };
+  let result = { ...data };
 
-  // Sort the gridData by bed
-  const sortedArray = sortByBed(data.gridData);
-  result.gridData = sortedArray;
+  // Remove 'id' from each gridDataElement
+  result.gridData?.forEach((gde) => {
+    gde.id && delete gde.id;
+  });
+
+  // Sort the gridData by location
+  result.gridData = sortByLocation(result.gridData);
 
   // Convert the map to JSON
   const json = JSON.stringify(result, null, 2);

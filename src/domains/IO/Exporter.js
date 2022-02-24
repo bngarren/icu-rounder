@@ -38,10 +38,9 @@ const Exporter = ({
     dataToExport.user = authState.user?.email || "";
   }
 
-  const jsonToExport = getJsonForExport(dataToExport);
-
   const handleExport = () => {
     try {
+      const jsonToExport = getJsonForExport(dataToExport);
       exportDataWithFilename(jsonToExport, filename);
     } catch (err) {
       console.error(`Error in Exporter: ${err}`);
