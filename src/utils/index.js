@@ -13,7 +13,8 @@ export { setCursorPos, getCursorPos } from "./CursorPos";
 
 export {
   DEFAULT_GRID_DATA_ELEMENT_DATA,
-  DEFAULT_SETTINGS,
   TEST_GRID_DATA,
+  EXAMPLE_SNIPPETS,
+  DEFAULT_SETTINGS,
   APP_TEXT,
 } from "./constants";

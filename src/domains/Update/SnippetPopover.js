@@ -13,6 +13,9 @@ import Popper from "@mui/material/Popper";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import { bindPopper } from "material-ui-popup-state/hooks";
 
+// Util
+import { EXAMPLE_SNIPPETS } from "../../utils";
+
 /* Styling */
 
 const StyledRootBox = styled(Box, {
@@ -58,7 +61,7 @@ const SnippetPopover = ({ popupState, onSelect = (f) => f }) => {
 
   useEffect(() => {
     //Load in snippets
-    snippets.current = SNIPPETS;
+    snippets.current = EXAMPLE_SNIPPETS;
   }, []);
 
   const handleSelect = (selection) => {
@@ -154,16 +157,4 @@ const SnippetPopover = ({ popupState, onSelect = (f) => f }) => {
     </StyledRootBox>
   );
 };
-
-const SNIPPETS = [
-  { key: "sedation", content: "Mo, Mz, Dex gtts" },
-  { key: "systems", content: "NEURO:\nRESP:\nCV:\nFEN:\nID:\nHEME:\nENDO:" },
-  { key: "crit airway", content: "*CRITICAL AIRWAY*" },
-  { key: "crit brain", content: "*CRITICAL BRAIN*" },
-  { key: "no ecmo", content: "*NO ECMO*" },
-  { key: "ORL STAT", content: "*ORL STAT*" },
-  { key: "GT feeds", content: "GT full feeds" },
-  { key: "SDS contingency", content: "would need SDS" },
-];
-
 export default SnippetPopover;

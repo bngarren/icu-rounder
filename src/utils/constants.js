@@ -11,6 +11,34 @@ export const DEFAULT_GRID_DATA_ELEMENT_DATA = {
   nestedContent: [],
   bottomText: "",
 };
+export const TEST_GRID_DATA = [
+  {
+    // id: "", Does not include 'id' for testing purposes
+    location: "4",
+    lastName: "Leffingwell",
+    firstName: "Keira",
+    team: "2",
+    summary:
+      "3yo ex 23 wk F with CLD, Pulm vein stenosis, SGS, Trach, nocturnal vent, here with hypoxemia, worse PVS, and pulm HTN and RV dysfunction",
+    contingencies: ["Pulm HTN"],
+    contentType: "simple",
+    simpleContent:
+      "R - baseline Trach collar 1-2 L, night time PSV 10/7\nCV - acute on chronic pulm HTN, sildenafil\n   [ ] Plan for cath intervention\nGI - Gtube feeds\nID - none\nH - home ASA\nSocial - parents moved to Boston, no housing",
+    nestedContent: [],
+    bottomText: "",
+  },
+];
+
+export const EXAMPLE_SNIPPETS = [
+  { key: "sedation", content: "Mo, Mz, Dex gtts" },
+  { key: "systems", content: "NEURO:\nRESP:\nCV:\nFEN:\nID:\nHEME:\nENDO:" },
+  { key: "crit airway", content: "*CRITICAL AIRWAY*" },
+  { key: "crit brain", content: "*CRITICAL BRAIN*" },
+  { key: "no ecmo", content: "*NO ECMO*" },
+  { key: "ORL STAT", content: "*ORL STAT*" },
+  { key: "GT feeds", content: "GT full feeds" },
+  { key: "SDS contingency", content: "would need SDS" },
+];
 
 export const DEFAULT_SETTINGS = {
   document_cols_per_page: 4,
@@ -30,24 +58,6 @@ export const DEFAULT_SETTINGS = {
   ],
   show_demoBox: false,
 };
-
-export const TEST_GRID_DATA = [
-  {
-    // id: "", Does not include 'id' for testing purposes
-    location: "4",
-    lastName: "Leffingwell",
-    firstName: "Keira",
-    team: "2",
-    summary:
-      "3yo ex 23 wk F with CLD, Pulm vein stenosis, SGS, Trach, nocturnal vent, here with hypoxemia, worse PVS, and pulm HTN and RV dysfunction",
-    contingencies: ["Pulm HTN"],
-    contentType: "simple",
-    simpleContent:
-      "R - baseline Trach collar 1-2 L, night time PSV 10/7\nCV - acute on chronic pulm HTN, sildenafil\n   [ ] Plan for cath intervention\nGI - Gtube feeds\nID - none\nH - home ASA\nSocial - parents moved to Boston, no housing",
-    nestedContent: [],
-    bottomText: "",
-  },
-];
 
 export const APP_TEXT = {
   addGridDataElement: "Add item",
