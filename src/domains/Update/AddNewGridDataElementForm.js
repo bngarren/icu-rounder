@@ -88,6 +88,7 @@ const AddNewGridDataElementForm = ({ onSubmit = (f) => f }) => {
           <Zoom in={value.trim() !== ""}>
             <InputAdornment position="end">
               <IconButton
+                aria-label="add item"
                 onClick={handleOnSubmit}
                 size="large"
                 sx={{

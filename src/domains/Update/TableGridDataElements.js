@@ -54,9 +54,8 @@ const StyledTableCellHeader = styled(TableCell, {
 const StyledTableCell = styled(TableCell, {
   name: "TableGridDataElements",
   slot: "tableCell",
-  shouldForwardProp: (prop) =>
-    prop !== "shouldHighlight" && prop !== "isSelected",
-})(({ shouldHighlight, isSelected, component, theme }) => ({
+  shouldForwardProp: (prop) => prop !== "isSelected",
+})(({ isSelected, component, theme }) => ({
   [theme.breakpoints.up("lg")]: {
     padding: "3px 6px 3px 6px",
   },
@@ -69,26 +68,17 @@ const StyledTableCell = styled(TableCell, {
       transition: "color 0.1s linear",
       backgroundColor: theme.palette.primary.main,
     }),
-  ...(shouldHighlight && {
-    transition: "color 0.2s ease-in",
-    backgroundColor: theme.palette.secondary.dark,
-  }),
 }));
 
 const StyledTypographyLocation = styled(Typography, {
   name: "TableGridDataElements",
   slot: "location",
-  shouldForwardProp: (prop) =>
-    prop !== "shouldHighlight" && prop !== "isSelected",
-})(({ shouldHighlight, isSelected, theme }) => ({
+  shouldForwardProp: (prop) => prop !== "isSelected",
+})(({ isSelected, theme }) => ({
   color: theme.palette.primary.main,
   fontWeight: "bold",
   ...(isSelected && {
     color: theme.palette.secondary.light,
-  }),
-  ...(shouldHighlight && {
-    transition: "color 0.2s ease-in",
-    color: theme.palette.primary.main,
   }),
 }));
 
@@ -252,21 +242,10 @@ const TableGridDataElements = ({ data, selectedKey }) => {
 };
 
 const MyTableBody = ({ data, page, rowsPerPage, selectedKey, columnSizes }) => {
-  const [highlightedKey, setHighlightedKey] = useState(false);
-
-  const handleNewGridDataElementSubmitted = (key) => {
-    setHighlightedKey(key);
-    setTimeout(() => {
-      setHighlightedKey(null);
-    }, 2000);
-  };
-
   const MyInputTableRow = (
     <TableRow>
       <StyledTableCell component="th" scope="row" align="right" colSpan={4}>
-        <AddNewGridDataElementForm
-          onSubmit={handleNewGridDataElementSubmitted}
-        />
+        <AddNewGridDataElementForm />
       </StyledTableCell>
     </TableRow>
   );
@@ -283,7 +262,6 @@ const MyTableBody = ({ data, page, rowsPerPage, selectedKey, columnSizes }) => {
 
               return (
                 <MyTableRow
-                  shouldHighlight={highlightedKey === adjustedKey}
                   adjustedKey={adjustedKey}
                   isSelected={isSelected}
                   key={`MyTableRow-${value.id}`}
@@ -307,7 +285,6 @@ const MyTableBody = ({ data, page, rowsPerPage, selectedKey, columnSizes }) => {
 };
 
 const MyTableRow = memo(function MyTableRow({
-  shouldHighlight,
   adjustedKey,
   isSelected,
   value,
@@ -328,12 +305,11 @@ const MyTableRow = memo(function MyTableRow({
         component="th"
         scope="row"
         align="center"
-        shouldHighlight={shouldHighlight}
         isSelected={isSelected}
       >
         <StyledTypographyLocation
+          aria-label="heading for location"
           variant="h6"
-          shouldHighlight={shouldHighlight}
           isSelected={isSelected}
           sx={{
             overflow: "hidden",
@@ -374,6 +350,7 @@ const MyTableRow = memo(function MyTableRow({
       <StyledTableCell>
         <GridDataElementActions
           isSelected={isSelected}
+          location={value.location}
           gridDataElementKey={adjustedKey}
           isEmptyGridDataElement={isEmptyGridDataElement}
         />
@@ -384,6 +361,7 @@ const MyTableRow = memo(function MyTableRow({
 
 const GridDataElementActions = memo(function GridDataElementActions({
   isSelected,
+  location,
   gridDataElementKey,
   isEmptyGridDataElement,
 }) {
@@ -411,6 +389,9 @@ const GridDataElementActions = memo(function GridDataElementActions({
             checked={isSelected}
             onClick={() => gridDataElementActionEdit(gridDataElementKey)}
             sx={{ ...buttonPaddingSx }}
+            inputProps={{
+              "aria-label": `toggle selection for ${location}`,
+            }}
           />
         </>
       }
