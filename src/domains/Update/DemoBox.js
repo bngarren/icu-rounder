@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
-
 // MUI
 import { Box, Paper, Collapse, Typography } from "@mui/material";
 import { styled } from "@mui/system";
 import StopIcon from "@mui/icons-material/Stop";
+
+// React hook form
+import { useWatch } from "react-hook-form";
 
 // Context and utility
 import { useSettings } from "../../context/Settings";
@@ -55,8 +56,21 @@ const StyledNestedContentBox = styled(Box, {
 }));
 
 /* The demo grid box used for displaying what the grid box might look like */
-const DemoBox = ({ data, collapsed }) => {
+const DemoBox = ({ collapsed }) => {
   const { settings } = useSettings();
+
+  /* react-hook-form */
+  const data = useWatch([
+    "location",
+    "lastName",
+    "firstName",
+    "team",
+    "summary",
+    "contentType",
+    "simpleContent",
+    "nestedContent",
+    "bottomText",
+  ]);
 
   const renderNameComma = () => {
     if (data.lastName && data.firstName) {
@@ -190,7 +204,7 @@ const DemoBox = ({ data, collapsed }) => {
                                 fontSize: "7.8pt",
                               }}
                             >
-                              {item.value}
+                              {item.content}
                             </Typography>
                           </Box>
                         );

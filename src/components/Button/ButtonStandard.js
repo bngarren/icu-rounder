@@ -1,3 +1,4 @@
+import * as React from "react";
 import Button from "@mui/material/Button";
 import { styled } from "@mui/system";
 
@@ -26,20 +27,21 @@ const StyledButton = styled(Button, {
  * @param {bool} secondary If true, button will have a "secondary" style which is less prominent
  * @returns A custom styled MUI Button
  */
-export default function ButtonStandard({
-  children,
-  secondary = false,
-  ...props
-}) {
-  return (
-    <StyledButton
-      variant="contained"
-      size="small"
-      disableElevation={secondary}
-      secondary={secondary}
-      {...props}
-    >
-      {children}
-    </StyledButton>
-  );
-}
+const ButtonStandard = React.forwardRef(
+  ({ children, secondary = false, ...props }, ref) => {
+    return (
+      <StyledButton
+        variant="contained"
+        size="small"
+        disableElevation={secondary}
+        secondary={secondary}
+        ref={ref}
+        {...props}
+      >
+        {children}
+      </StyledButton>
+    );
+  }
+);
+
+export default ButtonStandard;

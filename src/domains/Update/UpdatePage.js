@@ -6,11 +6,10 @@ import { useTheme } from "@mui/styles";
 
 // Components
 import TableGridDataElements from "./TableGridDataElements";
-import DemoAndEditorController from "./DemoAndEditorController";
+import EditorController from "./EditorController";
 import { useDialog } from "../../components";
 
 // Context
-import { DebouncedContextProvider } from "./DebouncedContext";
 import GridDataElementActionsContext from "./GridDataElementActionsContext";
 
 // Utils/helpers
@@ -37,30 +36,37 @@ const UpdatePage = () => {
   const { gridData, census, updateGridData } = useGridStateContext();
 
   /* Index of the gridDataElement selected and currently being "edited" */
-  const [selectedKey, setSelectedKey] = useState();
+  const [selectedKey, setSelectedKey] = useState(null);
 
-  /* true, if an unsaved changed has occurred in GridDataElementEditor */
-  const [needsSave, setNeedsSave] = useState(false);
+  /* true, if an unsaved changed has occurred in EditorController's react-hook-form */
+  const dirtyEditorController = useRef(false);
 
   /* An initial or "default" set of data for a gridDataElement */
-  const [defaultGridDataElementData, setDefaultGridDataElementData] =
-    useState();
+  const [defaultGridDataElementData, setDefaultGridDataElementData] = useState(
+    []
+  );
 
   /* UpdatePage keeps this default gridDataElement data in its state in order to pass
-  to DemoAndEditorController when a gridDataElement is selected. It combines any of
-  the selected GDE's data with default data so that DemoAndEditorController
+  to EditorController when a gridDataElement is selected. It combines any of
+  the selected GDE's data with default data so that EditorController
   has at least some appropriate value for every property of GDE */
   useEffect(() => {
-    const selectedData = {
-      ...(gridData?.length !== 0 &&
-        selectedKey != null &&
-        gridData[selectedKey]),
-    };
-    setDefaultGridDataElementData({
-      ...DEFAULT_GRID_DATA_ELEMENT_DATA,
-      ...selectedData,
-    });
+    if (selectedKey != null && gridData != null) {
+      const selectedData = {
+        ...(gridData?.length !== 0 &&
+          selectedKey != null &&
+          gridData[selectedKey]),
+      };
+      setDefaultGridDataElementData({
+        ...DEFAULT_GRID_DATA_ELEMENT_DATA,
+        ...selectedData,
+      });
+    }
   }, [selectedKey, gridData]);
+
+  const handleDirtyEditor = useCallback((isDirty, dirtyFields) => {
+    dirtyEditorController.current = isDirty;
+  }, []);
 
   /* Hook for our Dialog modal */
   const { dialogIsOpen, dialog, showYesNoDialog } = useDialog();
@@ -83,11 +89,14 @@ const UpdatePage = () => {
    *
    * @param {boolean} reverse If true, move backwards a gridDataElement. If false, move forwards.
    */
-  const navigateAdjacentGridDataElement = (reverse) => {
-    setCurrentGridDataElement(
-      getAdjacentGridDataElement(gridData, selectedKey, reverse)
-    );
-  };
+  const navigateAdjacentGridDataElement = useCallback(
+    (reverse) => {
+      setCurrentGridDataElement(
+        getAdjacentGridDataElement(gridData, selectedKey, reverse)
+      );
+    },
+    [gridData, selectedKey]
+  );
 
   const handleGridDataElementActionEdit = useCallback(
     (key) => {
@@ -106,7 +115,7 @@ const UpdatePage = () => {
         }
       };
 
-      if (needsSave) {
+      if (dirtyEditorController.current) {
         // Show a warning dialog if there is data that isn't saved
 
         // Construct the message for the Dialog
@@ -134,7 +143,6 @@ const UpdatePage = () => {
           () => {
             // chose to continue without saving
             doAction();
-            setNeedsSave(false);
           },
           () => {
             // chose to cancel
@@ -148,7 +156,7 @@ const UpdatePage = () => {
     [
       gridData,
       media_atleast_md,
-      needsSave,
+      dirtyEditorController,
       selectedKey,
       showYesNoDialog,
       theme.palette.warning.main,
@@ -193,7 +201,6 @@ const UpdatePage = () => {
             location: updatedData[key].location,
           };
           updateGridData(updatedData); //send new data to GridState context (handles truth data)
-          setNeedsSave(false);
         },
         () => {
           //should cancel callback
@@ -233,7 +240,7 @@ const UpdatePage = () => {
           let updatedData = [...gridData];
           updatedData.splice(key, 1); // will return the deleted items, but we don't use them for now
           updateGridData(updatedData); //send new data to GridStateContext (handles truth data)
-          setNeedsSave(false);
+
           setSelectedKey(null);
         },
         () => {
@@ -250,8 +257,8 @@ const UpdatePage = () => {
   we can run some checks, E.g., see if there has been a new location entered--because 
   we will warn the user that this may overwrite any data in that target location
   */
-  const handleOnSave = useCallback(
-    (gridDataElementEditorData) => {
+  const onEditorControllerSave = useCallback(
+    (editorData) => {
       const updatedData = [...gridData]; // copy the current gridData
 
       /* The actual save action that merges this modified gridDataElementEditorData
@@ -259,35 +266,31 @@ const UpdatePage = () => {
       const saveGridDataElementEditorData = (gridDataToSave) => {
         // See if this location already exists in gridData
         const { objIndex, locationAlreadyExists } = doesLocationExistInGridData(
-          gridDataElementEditorData,
+          editorData,
           gridDataToSave
         );
         /* If location already exists, overwrite with new data */
         if (locationAlreadyExists) {
-          gridDataToSave[objIndex] = gridDataElementEditorData;
+          gridDataToSave[objIndex] = editorData;
         } else {
           // If location doesn't exist, add new one
-          gridDataToSave.push(gridDataElementEditorData);
+          gridDataToSave.push(editorData);
         }
         // send updated data to GridStateContext
         updateGridData(gridDataToSave).then((res) => {
           if (res) {
-            const newKey = getKeyForGridDataElementID(
-              res,
-              gridDataElementEditorData.id
-            );
+            const newKey = getKeyForGridDataElementID(res, editorData.id);
             setSelectedKey(newKey);
+            return res;
           } else {
             setSelectedKey(null);
+            return false;
           }
         });
-        setNeedsSave(false);
       };
 
       //! See if gridDataElementEditor's data has changed the location for this gridDataElement
-      if (
-        gridDataElementEditorData.location !== gridData[selectedKey].location
-      ) {
+      if (editorData.location !== gridData[selectedKey].location) {
         // create the warning message
         const content = (
           <>
@@ -307,7 +310,7 @@ const UpdatePage = () => {
             <div>
               Current Location: {gridData[selectedKey].location}
               <br />
-              New Location: {gridDataElementEditorData.location}
+              New Location: {editorData.location}
             </div>
           </>
         );
@@ -405,17 +408,15 @@ const UpdatePage = () => {
             )}
           </Grid>
           <Grid item lg md sm={0} xs ref={refToGridDataElementEditorDiv}>
-            {selectedKey != null && (
-              <DebouncedContextProvider>
-                <DemoAndEditorController
-                  defaultGridDataElementData={defaultGridDataElementData}
-                  needsSave={needsSave}
-                  setNeedsSave={setNeedsSave}
+            {selectedKey != null &&
+              defaultGridDataElementData?.length !== 0 && (
+                <EditorController
+                  initialGridDataElementData={defaultGridDataElementData}
+                  dirtyFormCallback={handleDirtyEditor}
                   onChangeGridDataElement={navigateAdjacentGridDataElement}
-                  onSave={handleOnSave}
+                  onSave={onEditorControllerSave}
                 />
-              </DebouncedContextProvider>
-            )}
+              )}
           </Grid>
         </Grid>
         {dialogIsOpen && dialog}

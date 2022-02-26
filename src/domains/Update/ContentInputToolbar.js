@@ -1,11 +1,22 @@
 import { useState } from "react";
 
 // MUI
-import { AppBar, Toolbar, Divider, MenuItem, TextField } from "@mui/material";
+import {
+  AppBar,
+  Toolbar,
+  Stack,
+  Divider,
+  MenuItem,
+  TextField,
+} from "@mui/material";
 import { styled } from "@mui/system";
+
+// React-hook-form
+import { Controller } from "react-hook-form";
 
 // Components
 import QuickAddInput from "./QuickAddInput";
+import ToggleContentType from "./ToggleContentType";
 
 /* Styling */
 const StyledAppBar = styled(AppBar, {
@@ -22,29 +33,37 @@ const StyledToolBar = styled(Toolbar, {
   slot: "toolbar",
 })(() => ({
   padding: "0px 6px 0px 6px",
-  marginLeft: 1,
   minHeight: "auto",
 }));
 
-const dividerSx = {
+const divider_sx = {
   margin: "0 6px",
 };
 
 const ContentInputToolbar = ({
+  control,
   contentType,
   onAddSection = (f) => f,
   onSelectTemplate = (f) => f,
 }) => {
   return (
     <StyledAppBar position="static" square={true} elevation={0}>
-      <StyledToolBar disableGutters variant="dense" sx={{}}>
-        {contentType === "nestedContent" && (
-          <>
-            <QuickAddInput label="Add Section" onSubmit={onAddSection} />
-            <Divider orientation="vertical" flexItem sx={{ ...dividerSx }} />
-            <SelectTemplate onSelect={onSelectTemplate} />
-          </>
-        )}
+      <StyledToolBar disableGutters variant="dense">
+        <Stack direction="row" spacing={2}>
+          {/* Registers ToggleContentType as an input field of the form declared in EditorController */}
+          <Controller
+            name="contentType"
+            control={control}
+            render={({ field }) => <ToggleContentType field={field} />}
+          />
+          {contentType === "nested" && (
+            <>
+              <QuickAddInput label="Add Section" onSubmit={onAddSection} />
+              <Divider orientation="vertical" flexItem sx={{ ...divider_sx }} />
+              <SelectTemplate onSelect={onSelectTemplate} />
+            </>
+          )}
+        </Stack>
       </StyledToolBar>
     </StyledAppBar>
   );
