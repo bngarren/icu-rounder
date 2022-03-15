@@ -1,3 +1,5 @@
+import * as React from "react";
+
 // MUI
 import { styled } from "@mui/system";
 import { Autocomplete, Checkbox } from "@mui/material";
@@ -40,52 +42,57 @@ const StyledAutocomplete = styled(Autocomplete)(({ theme }) => ({
   },
 }));
 
-const ContingencyInput = ({ options, value, diff, ...props }) => {
-  return (
-    <StyledAutocomplete
-      limitTags={5}
-      fullWidth
-      multiple
-      freeSolo
-      clearOnBlur
-      filterSelectedOptions
-      options={options}
-      renderInput={(params) => {
-        return (
-          <EditorTextField
-            {...params}
-            diff={diff}
-            InputLabelProps={{
-              shrink: true,
-            }}
-            label="Contingencies"
-            placeholder="Add contingency"
-          />
-        );
-      }}
-      renderOption={(props, option, { selected }) => (
-        <li {...props}>
-          <Checkbox
-            sx={{
-              mr: 1,
-              padding: "3px",
-              color: "primary.light",
-              "&:hover": {
-                color: "primary.main",
-              },
-            }}
-            icon={icon}
-            checkedIcon={checkedIcon}
-            style={{ marginRight: 8 }}
-            checked={selected}
-          />
-          {option}
-        </li>
-      )}
-      {...props}
-      value={value ? value : []}
-    />
-  );
-};
+/* Should be wrapped by a Controller component from react-hook-form which renders
+this ContingencyInput component and passes in the field prop */
+const ContingencyInput = React.forwardRef(
+  ({ options, label, field, ...props }, ref) => {
+    return (
+      <StyledAutocomplete
+        {...props}
+        ref={field.ref}
+        limitTags={5}
+        fullWidth
+        multiple
+        freeSolo
+        clearOnBlur
+        filterSelectedOptions
+        options={options}
+        onChange={(_, data) => field.onChange(data)}
+        value={field.value}
+        renderInput={(params) => {
+          return (
+            <EditorTextField
+              {...params}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              label={label}
+              placeholder="Add contingency"
+            />
+          );
+        }}
+        renderOption={(props, option, { selected }) => (
+          <li {...props}>
+            <Checkbox
+              sx={{
+                mr: 1,
+                padding: "3px",
+                color: "primary.light",
+                "&:hover": {
+                  color: "primary.main",
+                },
+              }}
+              icon={icon}
+              checkedIcon={checkedIcon}
+              style={{ marginRight: 8 }}
+              checked={selected}
+            />
+            {option}
+          </li>
+        )}
+      />
+    );
+  }
+);
 
 export default ContingencyInput;

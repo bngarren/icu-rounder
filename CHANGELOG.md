@@ -6,8 +6,12 @@
 
 - New import functionality. Can select specific bedspaces for import [c1e7db2](https://github.com/bngarren/icu-rounder/commit/c1e7db223223c510e2ddee9272b62d262fa685e1)
 - App now includes react testing library and starting to integrate testing. The import functionality is now well-tested.
+- New UI for the nested content input [b6aac67](https://github.com/bngarren/icu-rounder/commit/b6aac67f5f708f0926eff03d9b7ea763a9cad7fe)
 
 ### Changed
+
+- Refactored (major) to use React-hook-form. [b6aac67](https://github.com/bngarren/icu-rounder/commit/b6aac67f5f708f0926eff03d9b7ea763a9cad7fe)
+- Major change to gridData schema (old grids/jsons will not work) [ba8108d](https://github.com/bngarren/icu-rounder/commit/ba8108d385c8ae843fba1ab593261df91e359ee0)
 
 ### Removed
 

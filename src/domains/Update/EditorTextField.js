@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, forwardRef } from "react";
 
 // MUI
 import { TextField } from "@mui/material";
@@ -10,7 +10,6 @@ const StyledTextField = styled(TextField, {
   slot: "Root",
   shouldForwardProp: (prop) => prop !== "diff",
 })(({ diff, theme }) => ({
-  margin: "6px 0px",
   // Change label color based on diff status (unsaved vs saved)
   "& .MuiFormLabel-root": {
     fontWeight: "bold",
@@ -52,11 +51,11 @@ const StyledTextField = styled(TextField, {
   },
 }));
 
-const EditorTextField = ({ id, inputSize = 20, diff, ...props }) => {
+const EditorTextField = forwardRef(({ inputSize = 20, ...props }, ref) => {
   return (
     <StyledTextField
-      id={id}
-      diff={diff}
+      ref={ref}
+      margin="none"
       InputLabelProps={{
         shrink: true,
       }}
@@ -66,6 +65,6 @@ const EditorTextField = ({ id, inputSize = 20, diff, ...props }) => {
       {...props}
     />
   );
-};
+});
 
 export default memo(EditorTextField);

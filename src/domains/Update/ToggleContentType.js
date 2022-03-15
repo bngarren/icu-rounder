@@ -1,3 +1,5 @@
+import * as React from "react";
+
 // MUI
 import { ToggleButtonGroup, ToggleButton, Tooltip } from "@mui/material";
 import NotesIcon from "@mui/icons-material/Notes";
@@ -34,22 +36,19 @@ const StyledToggleButton = styled(TooltipToggleButton, {
 
 const iconSize = "1.3rem";
 
-const ToggleContentType = ({ value, onChange = (f) => f }) => {
-  /* modify the onChange before sending the rest of the handling to the callback.
-  This lets us always keep a value in the toggle
-  */
-  const handleOnChange = (event, value) => {
-    if (value !== null) {
-      onChange(event, value);
-    }
-  };
-
+/**
+ * Renders the toggle button for switching the contentType.
+ * Receives a 'field' prop from the Controller that wraps it (from
+ * react-hook-form).
+ */
+const ToggleContentType = ({ field }) => {
   return (
     <ToggleButtonGroup
+      ref={field.ref}
       exclusive
       aria-label="content type"
-      value={value}
-      onChange={handleOnChange}
+      value={field.value}
+      onChange={(_, data) => field.onChange(data)}
       sx={{ backgroundColor: "white" }}
     >
       <StyledToggleButton
@@ -57,16 +56,16 @@ const ToggleContentType = ({ value, onChange = (f) => f }) => {
         aria-label="simple input"
         size="small"
         title="Simple"
-        disabled={value === "simple"}
+        disabled={field.value === "simple"}
       >
         <NotesIcon sx={{ fontSize: iconSize }} />
       </StyledToggleButton>
       <StyledToggleButton
         value="nested"
-        aria-label="nested input"
+        aria-label="advanced input"
         size="small"
         title="Advanced"
-        disabled={value === "nested"}
+        disabled={field.value === "nested"}
       >
         <VerticalSplitIcon sx={{ fontSize: iconSize }} />
       </StyledToggleButton>
