@@ -46,6 +46,8 @@ const UpdatePage = () => {
     []
   );
 
+  const { confirm } = useDialog();
+
   /* UpdatePage keeps this default gridDataElement data in its state in order to pass
   to EditorController when a gridDataElement is selected. It combines any of
   the selected GDE's data with default data so that EditorController
@@ -67,9 +69,6 @@ const UpdatePage = () => {
   const handleDirtyEditor = useCallback((isDirty, dirtyFields) => {
     dirtyEditorController.current = isDirty;
   }, []);
-
-  /* Hook for our Dialog modal */
-  const { dialogIsOpen, dialog, showYesNoDialog } = useDialog();
 
   /* Used as a target for the scrollToElement(), in order to put
  the GridDataElementEditor into view after clicking the edit icon on smaller screens */
@@ -99,8 +98,20 @@ const UpdatePage = () => {
   );
 
   const handleGridDataElementActionEdit = useCallback(
-    (key) => {
-      const doAction = () => {
+    async (key) => {
+      let proceed = true;
+      if (dirtyEditorController.current) {
+        // Show a confirm dialog if there is data that isn't saved
+        const gdeData = { ...gridData[selectedKey] };
+        const dialogTemplate = {
+          title: "There is unsaved data for this location",
+          content: `Location: ${gdeData.location}`,
+        };
+        const res = await confirm(dialogTemplate);
+        proceed = res;
+      }
+      if (proceed) {
+        /* Go ahead with changing the selectedKey  */
         if (selectedKey === key) {
           // re-clicked on the same gridDataElement
           setSelectedKey(null);
@@ -113,54 +124,9 @@ const UpdatePage = () => {
             }, 200);
           }
         }
-      };
-
-      if (dirtyEditorController.current) {
-        // Show a warning dialog if there is data that isn't saved
-
-        // Construct the message for the Dialog
-        const content = (
-          <>
-            <div>
-              There are{" "}
-              <span style={{ color: theme.palette.warning.main }}>
-                unsaved{" "}
-              </span>
-              changes for this person. Continue <i>without</i> saving?
-            </div>
-            <div>
-              Location: {gridData[selectedKey].location}
-              <br />
-              {gridData[selectedKey].lastName
-                ? `Name: ${gridData[selectedKey].lastName}`
-                : ""}
-            </div>
-          </>
-        );
-
-        showYesNoDialog(
-          content,
-          () => {
-            // chose to continue without saving
-            doAction();
-          },
-          () => {
-            // chose to cancel
-            return;
-          }
-        );
-      } else {
-        doAction();
       }
     },
-    [
-      gridData,
-      media_atleast_md,
-      dirtyEditorController,
-      selectedKey,
-      showYesNoDialog,
-      theme.palette.warning.main,
-    ]
+    [media_atleast_md, dirtyEditorController, gridData, selectedKey, confirm]
   );
 
   /**
@@ -168,88 +134,54 @@ const UpdatePage = () => {
    * @param {number} key Index of the gridDataElement to clear the data
    */
   const handleGridDataElementActionClear = useCallback(
-    (key) => {
-      // Construct the message for the Dialog
-      const content = (
-        <>
-          <div>
-            Are you sure you want to{" "}
-            <b>
-              <span style={{ color: theme.palette.warning.main }}>CLEAR</span>
-            </b>{" "}
-            the data for this person?
-            <br />
-            <i>(The location will remain in your grid.)</i>
-          </div>
-          <div>
-            Location: {gridData[key].location}
-            <br />
-            {gridData[key].lastName ? `Name: ${gridData[key].lastName}` : ""}
-          </div>
-        </>
-      );
+    async (key) => {
+      let proceed = false;
 
-      // Show the confirmation dialog before clearing
-      showYesNoDialog(
-        content,
-        () => {
-          //should clear callback
-          let updatedData = [...gridData];
-          // only keep the id and location
-          updatedData[key] = {
-            id: updatedData[key].id,
-            location: updatedData[key].location,
-          };
-          updateGridData(updatedData); //send new data to GridState context (handles truth data)
-        },
-        () => {
-          //should cancel callback
-          return false;
-        }
-      );
+      // Show a confirm dialog before clearing
+      const gdeData = { ...gridData[key] };
+      const dialogTemplate = {
+        title: "Clear the data at this location",
+        content: `Location: ${gdeData.location}
+        (The location will remain.)`,
+      };
+      const res = await confirm(dialogTemplate);
+      proceed = res;
+
+      if (proceed) {
+        let updatedData = [...gridData];
+        // only keep the id and location
+        updatedData[key] = {
+          id: updatedData[key].id,
+          location: updatedData[key].location,
+        };
+        updateGridData(updatedData); //send new data to GridState context (handles truth data)
+      }
     },
-    [gridData, showYesNoDialog, theme.palette.warning.main, updateGridData]
+    [gridData, updateGridData, confirm]
   );
 
   const handleGridDataElementActionDelete = useCallback(
-    (key) => {
-      // Construct the delete message for the Dialog
-      // Construct the message for the Dialog
-      const content = (
-        <>
-          <div>
-            Are you sure you want to{" "}
-            <b>
-              <span style={{ color: theme.palette.warning.main }}>REMOVE</span>
-            </b>{" "}
-            this location and it&#39;s data?
-          </div>
-          <div>
-            Location: {gridData[key].location}
-            <br />
-            {gridData[key].lastName ? `Name: ${gridData[key].lastName}` : ""}
-          </div>
-        </>
-      );
+    async (key) => {
+      let proceed = false;
 
-      // Show the confirmation dialog before deleting
-      showYesNoDialog(
-        content,
-        () => {
-          //should delete callback
-          let updatedData = [...gridData];
-          updatedData.splice(key, 1); // will return the deleted items, but we don't use them for now
-          updateGridData(updatedData); //send new data to GridStateContext (handles truth data)
+      // Show a confirm dialog before removing
+      const gdeData = { ...gridData[key] };
+      const dialogTemplate = {
+        title: "Remove this location and all data?",
+        content: `Location: ${gdeData.location}`,
+      };
+      const res = await confirm(dialogTemplate);
+      proceed = res;
 
-          setSelectedKey(null);
-        },
-        () => {
-          //should cancel callback
-          return false;
-        }
-      );
+      if (proceed) {
+        let updatedData = [...gridData];
+        updatedData.splice(key, 1); // will return the deleted items, but we don't use them for now
+        updateGridData(updatedData); //send new data to GridStateContext (handles truth data)
+
+        setSelectedKey(null);
+      }
     },
-    [gridData, showYesNoDialog, theme.palette.warning.main, updateGridData]
+    [gridData, updateGridData, confirm]
   );
 
   /* Handles the SAVE action.
@@ -292,63 +224,9 @@ const UpdatePage = () => {
       //! See if gridDataElementEditor's data has changed the location for this gridDataElement
       if (editorData.location !== gridData[selectedKey].location) {
         // create the warning message
-        const content = (
-          <>
-            <div>
-              You are changing the location for this person.{" "}
-              <b>
-                <span
-                  style={{
-                    color: theme.palette.warning.main,
-                  }}
-                >
-                  WARNING:{" "}
-                </span>
-              </b>
-              This will overwrite any data already present in the new location.
-            </div>
-            <div>
-              Current Location: {gridData[selectedKey].location}
-              <br />
-              New Location: {editorData.location}
-            </div>
-          </>
-        );
-
-        // Show the confirmation dialog before changing location
-        showYesNoDialog(
-          content,
-          () => {
-            //should change location
-
-            //* clear the gridDataElement's data at the previous location, but keep the location present (don't delete)
-            updatedData[selectedKey] = {
-              id: uuidv4(), // new id for the old gridDataElement
-              location: updatedData[selectedKey].location,
-            };
-
-            //* Commit the save action
-            saveGridDataElementEditorData(updatedData);
-          },
-          () => {
-            //should cancel callback
-            return false;
-          }
-        );
-      } else {
-        // Not changing the location, just other gridDataElement data
-
-        //* Commit the save action
-        saveGridDataElementEditorData(updatedData);
       }
     },
-    [
-      gridData,
-      selectedKey,
-      showYesNoDialog,
-      theme.palette.warning.main,
-      updateGridData,
-    ]
+    [gridData, selectedKey, updateGridData, confirm]
   );
 
   const gridDataElementActions = useMemo(
@@ -419,7 +297,6 @@ const UpdatePage = () => {
               )}
           </Grid>
         </Grid>
-        {dialogIsOpen && dialog}
       </div>
     );
   } else {

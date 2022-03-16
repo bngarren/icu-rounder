@@ -9,7 +9,7 @@ import theme from "./context/Theme";
 import { SettingsProvider } from "./context/Settings";
 
 // Components
-import { Header, Footer, PageRouter } from "./components";
+import { Header, Footer, PageRouter, DialogProvider } from "./components";
 
 // Routing
 import { BrowserRouter } from "react-router-dom";
@@ -30,15 +30,17 @@ function App() {
           <CssBaseline />
           <AuthStateProvider Firebase={fb}>
             <GridStateProvider Firebase={fb}>
-              <BrowserRouter>
-                <Container maxWidth="xl">
-                  <Header />
-                  <main>
-                    <PageRouter />
-                  </main>
-                </Container>
-                <Footer />
-              </BrowserRouter>
+              <DialogProvider>
+                <BrowserRouter>
+                  <Container maxWidth="xl">
+                    <Header />
+                    <main>
+                      <PageRouter />
+                    </main>
+                  </Container>
+                  <Footer />
+                </BrowserRouter>
+              </DialogProvider>
             </GridStateProvider>
           </AuthStateProvider>
         </ThemeProvider>

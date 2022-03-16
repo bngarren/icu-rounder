@@ -35,8 +35,7 @@ const SettingsPage = () => {
   /* Get GridData and locationLayout from context */
   const { locationLayout, gridData, updateGridData } = useGridStateContext();
 
-  /* Hook for our Dialog modal */
-  const { dialogIsOpen, dialog, showYesNoDialog } = useDialog();
+  const { confirm } = useDialog();
 
   /**
   * Handles the saving of the Settings data by passing
@@ -80,7 +79,7 @@ const SettingsPage = () => {
    * @param {string} newLocationLayout The "new" locationLayout string from user input
    * @return {bool} Returns true if save was successful, false if not
    */
-  const handleSaveLocationLayout = (newLocationLayout) => {
+  const handleSaveLocationLayout = async (newLocationLayout) => {
     /* Convert the input locationLayout string (CSV format) to an array */
     const formattedLocationLayout =
       getLocationLayoutArrayFromCsv(newLocationLayout);
@@ -101,36 +100,26 @@ const SettingsPage = () => {
         }
       });
     }
+    let proceed = true;
     // If there are location(s) with data that are missing from new locationLayout
     if (risklocations.length > 0) {
-      // Construct the message for the Dialog
-      const content = (
-        <div>
-          <p>
-            This new layout will <b>NOT</b> include the following locations
-            which contain data:
-          </p>
-          <p>
-            {risklocations.map((i) => {
-              return `| ${i} |     `;
-            })}
-          </p>
-        </div>
-      );
-      showYesNoDialog(
-        content,
-        () => {
-          // chose to continue
-          updateGridData(gridData, formattedLocationLayout);
-          return true;
-        },
-        () => {
-          // chose to cancel
-          return false;
-        },
-        { yes: "Continue", no: "Cancel" }
-      );
-    } else {
+      proceed = false;
+      const riskLocationsString = risklocations.map((i) => {
+        return `| ${i} |     `;
+      });
+      // Show a confirm dialog before dropping non-empty locations from layout
+      const dialogTemplate = {
+        title: "Warning!",
+        content: [
+          "You are about to remove the following non-empty locations:",
+          riskLocationsString,
+        ],
+      };
+      const res = await confirm(dialogTemplate);
+      proceed = res;
+    }
+
+    if (proceed) {
       updateGridData(gridData, formattedLocationLayout);
       return true;
     }
@@ -183,10 +172,9 @@ const SettingsPage = () => {
         <SettingsPageSection
           title="Security & Privacy"
           subtitle="Manage your browser data."
-          section={<SecuritySection showYesNoDialog={showYesNoDialog} />}
+          section={<SecuritySection />}
         />
       </StyledBodyStack>
-      {dialogIsOpen && dialog}
     </Container>
   );
 };
