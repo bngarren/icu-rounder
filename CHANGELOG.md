@@ -4,18 +4,27 @@
 
 ### Added
 
+- Added custom hotkeys! Hotkeys are stored in settings (and will eventually be modifiable by the user). At this time, using react-hotkeys-hook v3.4.4. [e3ebe60](https://github.com/bngarren/icu-rounder/commit/e3ebe6008ad4b3f4133daabf14d2b1d3fafc071c)
 - New import functionality. Can select specific bedspaces for import [c1e7db2](https://github.com/bngarren/icu-rounder/commit/c1e7db223223c510e2ddee9272b62d262fa685e1)
-- App now includes react testing library and starting to integrate testing. The import functionality is now well-tested.
+- App now includes react testing library and starting to integrate testing. The import functionality is now well-tested [3cf42a8](https://github.com/bngarren/icu-rounder/commit/3cf42a8ece83c3bd2c9851f11472f9fc7c564ddf)
 - New UI for the nested content input [b6aac67](https://github.com/bngarren/icu-rounder/commit/b6aac67f5f708f0926eff03d9b7ea763a9cad7fe)
 
 ### Changed
 
 - Refactored (major) to use React-hook-form. [b6aac67](https://github.com/bngarren/icu-rounder/commit/b6aac67f5f708f0926eff03d9b7ea763a9cad7fe)
 - Major change to gridData schema (old grids/jsons will not work) [ba8108d](https://github.com/bngarren/icu-rounder/commit/ba8108d385c8ae843fba1ab593261df91e359ee0)
+- Refactored (major) the Dialog system (#11), now using DialogContext and useDialog hook, allowing for Promise-based handling of the user choices [2246417](https://github.com/bngarren/icu-rounder/commit/224641776fe821bf5bdfac1a22a5d552381ad31b)
+- Now using a constants.js file [e1f3f47](https://github.com/bngarren/icu-rounder/commit/e1f3f47bb16e98555c8cb6a25b4215f63bd3dc6d)
+- New message to TableBedList when no beds are present, prompting user to create new bed [445ffb5](https://github.com/bngarren/icu-rounder/commit/445ffb5bcbda6bfc2c10dd44ab614b647461719f)
+- Major, breaking change in app file structure, addressing #13 [3dfe93e](https://github.com/bngarren/icu-rounder/commit/3dfe93e3d7d6d6a6df556eb64d648b7066facdda).
+- Global or shared components are now kept together, and domain-specific components are kept close to their nearby pages [0b98afd](https://github.com/bngarren/icu-rounder/commit/0b98afd2c9e31b5794da6b3150e0ab7403154352)
+- Switched from lodash to lodash-es [e8edd08](https://github.com/bngarren/icu-rounder/commit/e8edd084344b4857115466e93a907d0109ecbc4a)
 
 ### Removed
 
 ### Fixed
+
+- TableBedList now resizes in columns more dynamically and improves the appearance when dealing with longer bed numbers, patient names, or team names, etc. [6ceac95](https://github.com/bngarren/icu-rounder/commit/6ceac95e64bd6ff7f85fc2f2844173c4450bef55)
 
 ---
 
