@@ -10,10 +10,12 @@ import {
   Switch,
   IconButton,
   Tooltip,
+  Fade,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import CircleIcon from "@mui/icons-material/Circle";
 
 // React-hook-form
 import { useForm, FormProvider } from "react-hook-form";
@@ -49,6 +51,9 @@ const StyledToolbarTop = styled(Toolbar, {
   shouldForwardProp: (prop) => prop !== "isDirty",
 })(({ theme, isDirty }) => ({
   minHeight: "36px",
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "space-between",
   backgroundColor: isDirty
     ? theme.palette.primary.light
     : theme.palette.primary.main,
@@ -66,7 +71,7 @@ const StyledToolbarBottom = styled(Toolbar, {
   flexDirection: "row",
   justifyContent: "center",
   fontSize: theme.typography.formFontSizeLevel3,
-  color: theme.palette.primary.contrastText,
+  color: theme.palette.secondary.light,
   backgroundColor: isDirty
     ? theme.palette.primary.light
     : theme.palette.primary.main,
@@ -249,35 +254,38 @@ const EditorController = ({
   Navigation arrows, Save, and Reset buttons */
   const renderToolbarTop = () => (
     <StyledToolbarTop variant="dense" isDirty={isDirty}>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          minWidth: "100px",
-        }}
-      >
-        <StyledNavigateIconButton
-          disabled={isDirty}
-          disableRipple
-          onClick={() => onChangeGridDataElement(true)}
+      <Stack direction="row" spacing={2}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            minWidth: "100px",
+          }}
         >
-          <NavigateBeforeIcon
-            sx={{ fontSize: "1.2rem", textShadow: "shadows.1" }}
-          />
-        </StyledNavigateIconButton>
-        <Typography variant="h5" sx={{ fontSize: "1rem", color: "grey.300" }}>
-          {initialGridDataElementData.location || ""}
-        </Typography>
-        <StyledNavigateIconButton
-          disabled={isDirty}
-          disableRipple
-          onClick={() => onChangeGridDataElement(false)}
-        >
-          <NavigateNextIcon sx={{ fontSize: "1.2rem" }} />
-        </StyledNavigateIconButton>
-      </Box>
-      <Stack direction="row" spacing={1} alignItems="center">
+          <StyledNavigateIconButton
+            disabled={isDirty}
+            disableRipple
+            onClick={() => onChangeGridDataElement(true)}
+          >
+            <NavigateBeforeIcon
+              sx={{ fontSize: "1.4rem", textShadow: "shadows.1" }}
+            />
+          </StyledNavigateIconButton>
+          <Typography
+            variant="h5"
+            sx={{ fontSize: "1.2rem", color: "grey.200" }}
+          >
+            {initialGridDataElementData.location || ""}
+          </Typography>
+          <StyledNavigateIconButton
+            disabled={isDirty}
+            disableRipple
+            onClick={() => onChangeGridDataElement(false)}
+          >
+            <NavigateNextIcon sx={{ fontSize: "1.4rem" }} />
+          </StyledNavigateIconButton>
+        </Box>
         <Tooltip
           title={
             (demoBoxCollapsed ? APP_TEXT.showDemoBox : APP_TEXT.hideDemoBox) +
@@ -291,28 +299,41 @@ const EditorController = ({
             onChange={handleToggleDemoBox}
           />
         </Tooltip>
-        <ButtonStandard
-          sx={{
-            maxHeight: "30px",
-          }}
-          disabled={!isDirty}
-          onClick={onClickSaveButton}
-        >
-          {APP_TEXT.editorSave}
-        </ButtonStandard>
-        <ButtonStandard
-          sx={{
-            maxHeight: "30px",
-          }}
-          disabled={!isDirty}
-          secondary
-          onClick={() => {
-            reset();
-          }}
-        >
-          {APP_TEXT.editorReset}
-        </ButtonStandard>
       </Stack>
+      <Fade in={isDirty}>
+        <Stack direction="row" spacing={1} alignItems="center">
+          <ButtonStandard
+            sx={{
+              maxHeight: "30px",
+              color: "secondary.light",
+            }}
+            startIcon={
+              <CircleIcon
+                sx={{
+                  color: "secondary.dark",
+                }}
+              />
+            }
+            disabled={!isDirty}
+            secondary
+            onClick={onClickSaveButton}
+          >
+            {APP_TEXT.editorSave}
+          </ButtonStandard>
+          <ButtonStandard
+            sx={{
+              maxHeight: "30px",
+            }}
+            disabled={!isDirty}
+            secondary
+            onClick={() => {
+              reset();
+            }}
+          >
+            {APP_TEXT.editorReset}
+          </ButtonStandard>
+        </Stack>
+      </Fade>
     </StyledToolbarTop>
   );
 
@@ -332,7 +353,7 @@ const EditorController = ({
           <Grid item xs={12}>
             {renderToolbarTop()}
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} sx={{ pt: "8px" }}>
             <Editor control={control} />
           </Grid>
           <Grid item xs={12}>

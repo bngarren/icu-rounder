@@ -45,7 +45,7 @@ const StyledAutocomplete = styled(Autocomplete)(({ theme }) => ({
 /* Should be wrapped by a Controller component from react-hook-form which renders
 this ContingencyInput component and passes in the field prop */
 const ContingencyInput = React.forwardRef(
-  ({ options, label, field, ...props }, ref) => {
+  ({ options, text, field, isDirty, ...props }, ref) => {
     return (
       <StyledAutocomplete
         {...props}
@@ -66,7 +66,8 @@ const ContingencyInput = React.forwardRef(
               InputLabelProps={{
                 shrink: true,
               }}
-              label={label}
+              text={text}
+              isDirty={isDirty}
               placeholder="Add contingency"
             />
           );

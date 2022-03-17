@@ -4,6 +4,9 @@ import { memo, forwardRef } from "react";
 import { TextField } from "@mui/material";
 import { styled } from "@mui/system";
 
+// Components
+import CustomLabel from "./CustomLabel";
+
 /* Styling */
 const StyledTextField = styled(TextField, {
   name: "EditorTextField",
@@ -51,20 +54,23 @@ const StyledTextField = styled(TextField, {
   },
 }));
 
-const EditorTextField = forwardRef(({ inputSize = 20, ...props }, ref) => {
-  return (
-    <StyledTextField
-      ref={ref}
-      margin="none"
-      InputLabelProps={{
-        shrink: true,
-      }}
-      inputProps={{
-        size: inputSize,
-      }}
-      {...props}
-    />
-  );
-});
+const EditorTextField = forwardRef(
+  ({ inputSize = 20, isDirty, text, ...props }, ref) => {
+    return (
+      <StyledTextField
+        ref={ref}
+        margin="none"
+        label={<CustomLabel label={text} isDirty={isDirty} />}
+        InputLabelProps={{
+          shrink: true,
+        }}
+        inputProps={{
+          size: inputSize,
+        }}
+        {...props}
+      />
+    );
+  }
+);
 
 export default memo(EditorTextField);

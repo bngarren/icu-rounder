@@ -10,6 +10,7 @@ import { Controller, useFormState, useFormContext } from "react-hook-form";
 // Components
 import ContentInputToolbar from "./ContentInputToolbar";
 import NestedContentInput from "./NestedContentInput";
+import CustomLabel from "./CustomLabel";
 
 // Util
 import { v4 as uuidv4 } from "uuid";
@@ -19,10 +20,20 @@ import { v4 as uuidv4 } from "uuid";
 const StyledRoot = styled(Box, {
   name: "ContentInput",
   slot: "Root",
-})(() => ({
+})(({ theme }) => ({
   backgroundColor: "white",
   padding: 0,
   minHeight: "225px",
+  border: "1px solid transparent",
+  borderRadius: "2px",
+  "&:hover": {
+    borderColor: theme.palette.primary.light,
+  },
+  "&:focus, &:focus-within": {
+    borderWidth: "0.1em",
+    borderColor: theme.palette.primary.main,
+    boxShadow: "rgba(17, 17, 26, 0.15) 0px 1px 0px",
+  },
 }));
 
 const StyledHeader = styled(Stack, {
@@ -71,6 +82,7 @@ const ContentInput = () => {
   }, [contentType, unregister]);
 
   /* Tracks whether any of these form values have become dirty */
+  //! ERROR: seem to have a problem with isDirty starting off true??
   const { isDirty: contentInputIsDirty } = useFormState({
     control,
     name: ["contentType", "simpleContent", "nestedContent"],
@@ -118,7 +130,7 @@ const ContentInput = () => {
   );
 
   return (
-    <StyledRoot>
+    <StyledRoot tabIndex={-1}>
       <StyledHeader direction="row" spacing={1}>
         <Typography
           variant="h6"
@@ -129,10 +141,10 @@ const ContentInput = () => {
             fontSize: "1rem",
             fontWeight: "bold",
             transform: "scale(0.75)",
-            color: contentInputIsDirty && "secondary.dark",
+            color: "primary.light",
           }}
         >
-          Content
+          <CustomLabel label="Content" isDirty={contentInputIsDirty} />
         </Typography>
 
         <ContentInputToolbar

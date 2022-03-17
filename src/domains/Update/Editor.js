@@ -137,42 +137,56 @@ const Editor = ({ control }) => {
             <Controller
               control={control}
               name="location"
-              render={({ field }) => (
-                <EditorTextField label="Location" inputSize={10} {...field} />
+              render={({ field, fieldState: { isDirty } }) => (
+                <EditorTextField
+                  text="Location"
+                  inputSize={10}
+                  isDirty={isDirty}
+                  {...field}
+                />
               )}
             />
             <Controller
               control={control}
               name="lastName"
-              render={({ field }) => (
-                <EditorTextField label="Last Name" {...field} />
+              render={({ field, fieldState: { isDirty } }) => (
+                <EditorTextField
+                  text="Last Name"
+                  isDirty={isDirty}
+                  {...field}
+                />
               )}
             />
             <Controller
               control={control}
               name="firstName"
-              render={({ field }) => (
-                <EditorTextField label="First Name" {...field} />
+              render={({ field, fieldState: { isDirty } }) => (
+                <EditorTextField
+                  text="First Name"
+                  isDirty={isDirty}
+                  {...field}
+                />
               )}
             />
             <Controller
               control={control}
               name="team"
-              render={({ field }) => (
-                <EditorTextField label="Team" inputSize={10} {...field} />
+              render={({ field, fieldState: { isDirty } }) => (
+                <EditorTextField text="Team" isDirty={isDirty} {...field} />
               )}
             />
           </Stack>
           <Controller
             control={control}
             name="summary"
-            render={({ field }) => (
+            render={({ field, formState: { isDirty } }) => (
               <EditorTextField
-                label="Summary"
+                text="Summary"
                 fullWidth
                 multiline
                 minRows={2}
                 maxRows={6}
+                isDirty={isDirty}
                 {...field}
               />
             )}
@@ -180,10 +194,11 @@ const Editor = ({ control }) => {
           <Controller
             control={control}
             name="contingencies"
-            render={({ field }) => (
+            render={({ field, formState: { isDirty } }) => (
               <ContingencyInput
-                label="Contingencies"
+                text="Contingencies"
                 options={settings.contingencyOptions}
+                isDirty={isDirty}
                 field={field}
               />
             )}
@@ -195,8 +210,13 @@ const Editor = ({ control }) => {
           <Controller
             control={control}
             name="bottomText"
-            render={({ field }) => (
-              <EditorTextField label="Bottom Text" inputSize={30} {...field} />
+            render={({ field, fieldState: { isDirty } }) => (
+              <EditorTextField
+                text="Bottom Text"
+                inputSize={30}
+                isDirty={isDirty}
+                {...field}
+              />
             )}
           />
         </Stack>
