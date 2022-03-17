@@ -95,7 +95,7 @@ export default function GridStateProvider({ children }) {
         finalLocationLayout = incomingLocationLayout || [];
       }
 
-      /* Merge the incoming data with locationLayout array and then sort the data array by location*/
+      /* Merge the incoming data with locationLayout array and then sort the data array by location */
       try {
         const mergedData = mergeWithLocationLayout(
           incomingDataArray,
@@ -107,9 +107,12 @@ export default function GridStateProvider({ children }) {
         return sortedArrayData;
       } catch (error) {
         console.error(
-          `Error updating grid in GridStateProvider: ${error.message}`
+          `Error merging/sorting gridData and locationLayout in GridStateProvider: ${error.message}`
         );
-        return false;
+        /* When an error occurs, just default to empty arrays */
+        setGridData([]);
+        setLocationLayout([]);
+        return [];
       }
     },
     []
