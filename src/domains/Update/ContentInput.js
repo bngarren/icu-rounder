@@ -76,40 +76,46 @@ const ContentInput = () => {
     name: ["contentType", "simpleContent", "nestedContent"],
   });
 
-  const handleOnAddSection = (value) => {
-    const current = getValues("nestedContent");
-    const newSection = {
-      id: uuidv4(),
-      title: value || "",
-      top: "",
-      items: [],
-    };
+  const handleOnAddSection = React.useCallback(
+    (value) => {
+      const current = getValues("nestedContent");
+      const newSection = {
+        id: uuidv4(),
+        title: value || "",
+        top: "",
+        items: [],
+      };
 
-    let result;
-    if (Array.isArray(current)) {
-      result = current.concat([newSection]);
-    } else {
-      result = [newSection];
-    }
-    setValue("nestedContent", result, { shouldDirty: true });
-  };
+      let result;
+      if (Array.isArray(current)) {
+        result = current.concat([newSection]);
+      } else {
+        result = [newSection];
+      }
+      setValue("nestedContent", result, { shouldDirty: true });
+    },
+    [getValues, setValue]
+  );
 
-  const handleOnSelectTemplate = (value) => {
-    /* create a new nestedContent array based on the template */
-    let newNestedContent = [];
-    if (Array.isArray(value)) {
-      value.forEach((el) => {
-        newNestedContent.push({
-          id: uuidv4(),
-          title: el || "",
-          top: "",
-          items: [],
+  const handleOnSelectTemplate = React.useCallback(
+    (value) => {
+      /* create a new nestedContent array based on the template */
+      let newNestedContent = [];
+      if (Array.isArray(value)) {
+        value.forEach((el) => {
+          newNestedContent.push({
+            id: uuidv4(),
+            title: el || "",
+            top: "",
+            items: [],
+          });
         });
-      });
-    }
+      }
 
-    setValue("nestedContent", newNestedContent, { shouldDirty: true });
-  };
+      setValue("nestedContent", newNestedContent, { shouldDirty: true });
+    },
+    [setValue]
+  );
 
   return (
     <StyledRoot>
@@ -193,7 +199,6 @@ const ContentInput = () => {
               fieldState,
               formState,
             }) => {
-              console.log("value", value);
               return (
                 <NestedContentInput
                   data={value}
@@ -215,4 +220,4 @@ const ContentInput = () => {
   logOnDifferentValues: true,
 }; */
 
-export default ContentInput;
+export default React.memo(ContentInput);

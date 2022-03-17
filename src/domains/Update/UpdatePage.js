@@ -27,8 +27,6 @@ import { v4 as uuidv4 } from "uuid";
 import { useGridStateContext } from "../../context/GridState";
 
 const UpdatePage = () => {
-  const theme = useTheme();
-
   // Media queries for CSS
   const media_atleast_md = useMediaQuery("(min-width:960px)");
 
@@ -89,12 +87,27 @@ const UpdatePage = () => {
    * @param {boolean} reverse If true, move backwards a gridDataElement. If false, move forwards.
    */
   const navigateAdjacentGridDataElement = useCallback(
-    (reverse) => {
-      setCurrentGridDataElement(
-        getAdjacentGridDataElement(gridData, selectedKey, reverse)
-      );
+    async (reverse) => {
+      let proceed = true;
+      if (dirtyEditorController.current) {
+        proceed = false;
+        // Show a confirm dialog if there is data that isn't saved
+        const gdeData = { ...gridData[selectedKey] };
+        const dialogTemplate = {
+          title: "There is unsaved data for this location",
+          content: `Location: ${gdeData.location}`,
+        };
+        const res = await confirm(dialogTemplate);
+        proceed = res;
+      }
+
+      if (proceed) {
+        setCurrentGridDataElement(
+          getAdjacentGridDataElement(gridData, selectedKey, reverse)
+        );
+      }
     },
-    [gridData, selectedKey]
+    [gridData, selectedKey, confirm]
   );
 
   const handleGridDataElementActionEdit = useCallback(
@@ -190,40 +203,64 @@ const UpdatePage = () => {
   we will warn the user that this may overwrite any data in that target location
   */
   const onEditorControllerSave = useCallback(
-    (editorData) => {
+    async (editorData) => {
       const updatedData = [...gridData]; // copy the current gridData
 
-      /* The actual save action that merges this modified gridDataElementEditorData
-      with the truth data in GridDataContext */
-      const saveGridDataElementEditorData = (gridDataToSave) => {
-        // See if this location already exists in gridData
-        const { objIndex, locationAlreadyExists } = doesLocationExistInGridData(
-          editorData,
-          gridDataToSave
-        );
-        /* If location already exists, overwrite with new data */
-        if (locationAlreadyExists) {
-          gridDataToSave[objIndex] = editorData;
-        } else {
-          // If location doesn't exist, add new one
-          gridDataToSave.push(editorData);
-        }
-        // send updated data to GridStateContext
-        updateGridData(gridDataToSave).then((res) => {
-          if (res) {
-            const newKey = getKeyForGridDataElementID(res, editorData.id);
-            setSelectedKey(newKey);
-            return res;
-          } else {
-            setSelectedKey(null);
-            return false;
-          }
-        });
-      };
+      let changingLocation = Boolean(
+        editorData.location !== gridData[selectedKey].location
+      );
+      let proceed = true;
+      //* See if gridDataElementEditor's data has changed the location for this gridDataElement
+      if (changingLocation) {
+        proceed = false;
+        // Show a confirm dialog before changing location (could overwrite other location's data)
+        const dialogTemplate = {
+          title: "Changing to this location will overwrite any current data",
+          content: `Target location: ${editorData.location}`,
+        };
+        const confirmResult = await confirm(dialogTemplate);
+        proceed = confirmResult;
 
-      //! See if gridDataElementEditor's data has changed the location for this gridDataElement
-      if (editorData.location !== gridData[selectedKey].location) {
-        // create the warning message
+        if (!proceed) {
+          /* The user has chosen not to proceed */
+          return proceed;
+        } else {
+          /* We are proceeding with saving data in a new location... */
+          // See if this location already exists in gridData
+          const { objIndex, locationAlreadyExists } =
+            doesLocationExistInGridData(editorData, updatedData);
+          /* If location already exists, overwrite with new data */
+          if (locationAlreadyExists) {
+            updatedData[objIndex] = editorData;
+          } else {
+            // If location doesn't exist, add new one
+            updatedData.push(editorData);
+          }
+
+          // clear the gridDataElement's data at the previous location, but keep the location present (don't delete)
+          updatedData[selectedKey] = {
+            id: uuidv4(), // new id for the old gridDataElement
+            location: updatedData[selectedKey].location,
+          };
+        }
+      } else {
+        /* Changed some aspect of the gridDataElement but not the location */
+        updatedData[selectedKey] = editorData;
+      }
+
+      //* Send updated data to GridStateContext
+      try {
+        let res = await updateGridData(updatedData);
+        if (res) {
+          const newKey = getKeyForGridDataElementID(res, editorData.id);
+          setSelectedKey(newKey);
+          return res;
+        } else {
+          throw new Error("bad result from updateGridData");
+        }
+      } catch (error) {
+        setSelectedKey(null);
+        console.error("UpdatePage", error);
       }
     },
     [gridData, selectedKey, updateGridData, confirm]

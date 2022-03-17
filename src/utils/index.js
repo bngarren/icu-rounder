@@ -16,5 +16,6 @@ export {
   TEST_GRID_DATA,
   EXAMPLE_SNIPPETS,
   DEFAULT_SETTINGS,
+  DEFAULT_HOTKEYS,
   APP_TEXT,
 } from "./constants";
