@@ -40,6 +40,13 @@ export const EXAMPLE_SNIPPETS = [
   { key: "SDS contingency", content: "would need SDS" },
 ];
 
+export const DEFAULT_HOTKEYS = {
+  navigateNextGridDataElement: "shift+.",
+  navigatePreviousGridDataElement: "shift+,",
+  saveGridData: "ctrl+s",
+  toggleDemoBox: "ctrl+d",
+};
+
 export const DEFAULT_SETTINGS = {
   document_cols_per_page: 4,
   document_title: "",
@@ -57,10 +64,17 @@ export const DEFAULT_SETTINGS = {
     "Pulm HTN",
   ],
   show_demoBox: false,
+  hotkeys: {
+    ...DEFAULT_HOTKEYS,
+  },
 };
 
 export const APP_TEXT = {
   addGridDataElement: "Add item",
   addFirstGridDataElementPrompt: "Add your first item below, or ",
   createLayoutLink: "create a layout",
+  editorSave: "Save",
+  editorReset: "Reset",
+  hideDemoBox: "Hide example",
+  showDemoBox: "Show example",
 };

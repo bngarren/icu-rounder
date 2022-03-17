@@ -2,25 +2,27 @@
 import { Box } from "@mui/material";
 
 // Custom components
-import { ButtonStandard } from "../../components";
+import { ButtonStandard, useDialog } from "../../components";
 
-const SecuritySection = ({ showYesNoDialog = (f) => f }) => {
-  const handleClearStorage = () => {
-    const content = "Delete local data?";
+const SecuritySection = () => {
+  const { confirm } = useDialog();
 
-    showYesNoDialog(
-      content,
-      () => {
-        // confirmed
-        localStorage.clear();
-        window.location.reload(false);
-      },
-      () => {
-        // chose to cancel
-        return;
-      },
-      { yes: "Continue", no: "Cancel" }
-    );
+  const handleClearStorage = async () => {
+    let proceed = false;
+
+    // Show a confirm dialog before clearing storage
+    const dialogTemplate = {
+      title: "Remove browser (local) storage?",
+      content: `This will clear all data within the app. Make sure you have exported your data.`,
+    };
+    const res = await confirm(dialogTemplate);
+    proceed = res;
+
+    if (proceed) {
+      // confirmed
+      localStorage.clear();
+      window.location.reload(false);
+    }
   };
 
   return (

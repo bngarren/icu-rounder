@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback, useRef, memo } from "react";
 
 // MUI
 import { Paper, Stack } from "@mui/material";
@@ -22,13 +22,7 @@ import { getCursorPos, setCursorPos } from "../../utils/CursorPos";
 
 /* Styling */
 
-const Editor = ({
-  control,
-  setValue,
-  getValues,
-  watch,
-  isSubmitSuccessful,
-}) => {
+const Editor = ({ control }) => {
   const { settings } = useSettings();
 
   /* Ref to last name input field, so we can focus() here when a gridDataElement is selected */
@@ -212,4 +206,4 @@ const Editor = ({
   );
 };
 
-export default Editor;
+export default memo(Editor);
