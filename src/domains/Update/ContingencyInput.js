@@ -59,13 +59,25 @@ const ContingencyInput = React.forwardRef(
         options={options}
         onChange={(_, data) => field.onChange(data)}
         value={field.value}
-        renderInput={(params) => {
+        renderInput={({
+          InputLabelProps,
+          InputProps,
+          inputProps,
+          ...params
+        }) => {
           return (
             <EditorTextField
-              {...params}
-              InputLabelProps={{
-                shrink: true,
+              InputProps={{
+                ...InputProps,
               }}
+              InputLabelProps={{
+                ...InputLabelProps,
+              }}
+              ref={InputProps.ref}
+              inputProps={{
+                ...inputProps,
+              }}
+              {...params}
               text={text}
               isDirty={isDirty}
               placeholder="Add contingency"

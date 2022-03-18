@@ -1,5 +1,5 @@
 // MUI
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import CircleIcon from "@mui/icons-material/Circle";
 
 const CustomLabel = ({ label, isDirty }) => {
@@ -8,21 +8,29 @@ const CustomLabel = ({ label, isDirty }) => {
       sx={{
         display: "flex",
         flexDirection: "row",
-        justifyContent: "space-between",
         alignItems: "center",
       }}
     >
+      <Typography
+        variant="caption"
+        sx={{
+          color: "primary.light",
+          fontSize: "0.8rem",
+          fontWeight: "bold",
+        }}
+      >
+        {label}
+      </Typography>
+
       {isDirty && (
         <CircleIcon
           sx={{
             fontSize: "0.8rem",
             color: "secondary.dark",
-            pr: "2px",
+            pl: "2px",
           }}
         />
       )}
-
-      {label}
     </Box>
   );
 };

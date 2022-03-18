@@ -41,6 +41,7 @@ const divider_sx = {
 };
 
 const ContentInputToolbar = ({
+  label,
   control,
   contentType,
   onAddSection = (f) => f,
@@ -49,6 +50,7 @@ const ContentInputToolbar = ({
   return (
     <StyledAppBar position="static" square={true} elevation={0}>
       <StyledToolBar disableGutters variant="dense">
+        {label}
         <Stack direction="row" spacing={2}>
           {/* Registers ToggleContentType as an input field of the form declared in EditorController */}
           <Controller

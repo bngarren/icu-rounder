@@ -1,74 +1,48 @@
-import { memo, forwardRef } from "react";
+import { memo, forwardRef, useRef } from "react";
 
 // MUI
-import { TextField } from "@mui/material";
+import { FormControl, InputLabel, FormHelperText, Input } from "@mui/material";
 import { styled } from "@mui/system";
 
 // Components
 import CustomLabel from "./CustomLabel";
 
 /* Styling */
-const StyledTextField = styled(TextField, {
+const StyledInput = styled(Input, {
   name: "EditorTextField",
-  slot: "Root",
-  shouldForwardProp: (prop) => prop !== "diff",
-})(({ diff, theme }) => ({
-  // Change label color based on diff status (unsaved vs saved)
-  "& .MuiFormLabel-root": {
-    fontWeight: "bold",
-    ...(diff
-      ? {
-          color: theme.palette.secondary.dark,
-          fontWeight: theme.typography.fontWeightBold,
-        }
-      : {
-          color: theme.palette.primary.light,
-        }),
-  },
-  "& .MuiOutlinedInput-root": {
-    borderRadius: "2px",
-    "& fieldset": {
-      // Baseline border
-      borderColor: "transparent",
-    },
-    "&:hover fieldset": {
-      borderColor: theme.palette.primary.light,
-    },
-    "&.Mui-focused fieldset": {
-      // Focused border
-      borderWidth: "0.1em",
-      borderColor: theme.palette.primary.main,
-      boxShadow: "rgba(17, 17, 26, 0.15) 0px 1px 0px",
-    },
-  },
-  "& .MuiOutlinedInput-input": {
-    fontSize: theme.typography.formFontSizeLevel1,
-    paddingTop: "10px",
-    paddingBottom: "4px",
-  },
-  "& .MuiInputBase-multiline": {
-    padding: 0,
-    "& .MuiOutlinedInput-input": {
-      padding: "10px 14px 4px 14px",
-    },
-  },
-}));
+  slot: "Input",
+})(({ theme }) => ({}));
 
 const EditorTextField = forwardRef(
-  ({ inputSize = 20, isDirty, text, ...props }, ref) => {
+  (
+    {
+      inputSize = 20,
+      isDirty,
+      label,
+      InputLabelProps,
+      InputProps,
+      inputProps,
+      ...props
+    },
+    ref
+  ) => {
     return (
-      <StyledTextField
-        ref={ref}
-        margin="none"
-        label={<CustomLabel label={text} isDirty={isDirty} />}
-        InputLabelProps={{
-          shrink: true,
-        }}
-        inputProps={{
-          size: inputSize,
-        }}
-        {...props}
-      />
+      <FormControl sx={{ width: props.fullWidth && "100%" }}>
+        <div htmlFor="editorTextField" {...InputLabelProps}>
+          <CustomLabel label={label} isDirty={isDirty} />
+        </div>
+        <StyledInput
+          id="editorTextField"
+          inputProps={{
+            ...inputProps,
+            size: inputSize,
+          }}
+          {...InputProps}
+          {...props}
+          ref={ref}
+        />
+        <FormHelperText id="editorTextField-helperText"></FormHelperText>
+      </FormControl>
     );
   }
 );

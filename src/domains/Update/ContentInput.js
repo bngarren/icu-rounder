@@ -14,6 +14,7 @@ import CustomLabel from "./CustomLabel";
 
 // Util
 import { v4 as uuidv4 } from "uuid";
+import { forOwn } from "lodash-es";
 
 /* Styling - ContentInput */
 
@@ -30,7 +31,8 @@ const StyledRoot = styled(Box, {
     borderColor: theme.palette.primary.light,
   },
   "&:focus, &:focus-within": {
-    borderWidth: "0.1em",
+    borderWidth: "1.5px",
+    margin: "-0.5px",
     borderColor: theme.palette.primary.main,
     boxShadow: "rgba(17, 17, 26, 0.15) 0px 1px 0px",
   },
@@ -63,7 +65,14 @@ const StyledContentInputContainer = styled(Grid, {
  *
  */
 const ContentInput = () => {
-  const { control, setValue, getValues, watch, unregister } = useFormContext();
+  const {
+    control,
+    setValue,
+    getValues,
+    watch,
+    unregister,
+    formState: { dirtyFields },
+  } = useFormContext();
 
   /* want to know if the content type has been changed in the toolbar
   so we can display the correct one, i.e. simple versus nested */
@@ -74,18 +83,21 @@ const ContentInput = () => {
   there was a bug with the field values getting mixed up between simple vs nestedContent */
   React.useEffect(() => {
     if (contentType === "simple") {
-      unregister("nestedContent", { keepDefaultValue: true, keepValue: true });
+      unregister("nestedContent", { keepDefaultValue: true });
     }
     if (contentType === "nested") {
-      unregister("simpleContent", { keepDefaultValue: true, keepValue: true });
+      unregister("simpleContent", { keepDefaultValue: true });
     }
   }, [contentType, unregister]);
 
-  /* Tracks whether any of these form values have become dirty */
-  //! ERROR: seem to have a problem with isDirty starting off true??
-  const { isDirty: contentInputIsDirty } = useFormState({
-    control,
-    name: ["contentType", "simpleContent", "nestedContent"],
+  /* Tracks whether any of these fields have become dirty */
+  /*//! using isDirty rather than dirtyFields did not work... */
+  let contentInputIsDirty = false;
+  forOwn(dirtyFields, (_, key) => {
+    if (["contentType", "simpleContent", "nestedContent"].includes(key)) {
+      contentInputIsDirty = true;
+      return false;
+    }
   });
 
   const handleOnAddSection = React.useCallback(
@@ -132,22 +144,28 @@ const ContentInput = () => {
   return (
     <StyledRoot tabIndex={-1}>
       <StyledHeader direction="row" spacing={1}>
-        <Typography
-          variant="h6"
-          sx={{
-            /* needs to match font appearance of
-          EditorTextField labels */
-            px: 0.8,
-            fontSize: "1rem",
-            fontWeight: "bold",
-            transform: "scale(0.75)",
-            color: "primary.light",
-          }}
-        >
-          <CustomLabel label="Content" isDirty={contentInputIsDirty} />
-        </Typography>
-
         <ContentInputToolbar
+          label={
+            <CustomLabel
+              label={
+                <Typography
+                  variant="h6"
+                  sx={{
+                    /* needs to match font appearance of
+            EditorTextField labels */
+                    px: 0,
+                    fontSize: "1rem",
+                    fontWeight: "bold",
+                    color: "primary.light",
+                  }}
+                >
+                  Content
+                </Typography>
+              }
+              isDirty={contentInputIsDirty}
+              scale={0.75}
+            />
+          }
           control={control}
           contentType={contentType}
           onAddSection={handleOnAddSection}

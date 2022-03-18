@@ -139,7 +139,7 @@ const Editor = ({ control }) => {
               name="location"
               render={({ field, fieldState: { isDirty } }) => (
                 <EditorTextField
-                  text="Location"
+                  label="Location"
                   inputSize={10}
                   isDirty={isDirty}
                   {...field}
@@ -151,7 +151,7 @@ const Editor = ({ control }) => {
               name="lastName"
               render={({ field, fieldState: { isDirty } }) => (
                 <EditorTextField
-                  text="Last Name"
+                  label="Last Name"
                   isDirty={isDirty}
                   {...field}
                 />
@@ -162,7 +162,7 @@ const Editor = ({ control }) => {
               name="firstName"
               render={({ field, fieldState: { isDirty } }) => (
                 <EditorTextField
-                  text="First Name"
+                  label="First Name"
                   isDirty={isDirty}
                   {...field}
                 />
@@ -172,7 +172,7 @@ const Editor = ({ control }) => {
               control={control}
               name="team"
               render={({ field, fieldState: { isDirty } }) => (
-                <EditorTextField text="Team" isDirty={isDirty} {...field} />
+                <EditorTextField label="Team" isDirty={isDirty} {...field} />
               )}
             />
           </Stack>
@@ -181,7 +181,7 @@ const Editor = ({ control }) => {
             name="summary"
             render={({ field, formState: { isDirty } }) => (
               <EditorTextField
-                text="Summary"
+                label="Summary"
                 fullWidth
                 multiline
                 minRows={2}
@@ -196,7 +196,7 @@ const Editor = ({ control }) => {
             name="contingencies"
             render={({ field, formState: { isDirty } }) => (
               <ContingencyInput
-                text="Contingencies"
+                label="Contingencies"
                 options={settings.contingencyOptions}
                 isDirty={isDirty}
                 field={field}
@@ -212,7 +212,7 @@ const Editor = ({ control }) => {
             name="bottomText"
             render={({ field, fieldState: { isDirty } }) => (
               <EditorTextField
-                text="Bottom Text"
+                label="Bottom Text"
                 inputSize={30}
                 isDirty={isDirty}
                 {...field}
