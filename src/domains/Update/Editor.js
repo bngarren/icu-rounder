@@ -1,7 +1,8 @@
 import { useEffect, useCallback, useRef, memo } from "react";
 
 // MUI
-import { Paper, Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
+import { styled } from "@mui/system";
 
 import { usePopupState } from "material-ui-popup-state/hooks";
 
@@ -21,6 +22,13 @@ import { useSettings } from "../../context/Settings";
 import { getCursorPos, setCursorPos } from "../../utils/CursorPos";
 
 /* Styling */
+
+const StyledEditorRoot = styled(Box, {
+  name: "Editor",
+  slot: "Root",
+})(({ theme }) => ({
+  padding: "10px",
+}));
 
 const Editor = ({ control }) => {
   const { settings } = useSettings();
@@ -124,13 +132,7 @@ const Editor = ({ control }) => {
 
   /*  - - - - - RETURN - - - -  */
   return (
-    <Paper
-      sx={{
-        p: 1,
-        backgroundColor: "transparent",
-        boxShadow: "none",
-      }}
-    >
+    <StyledEditorRoot>
       <form id="editor" autoComplete="off" spellCheck="false">
         <Stack direction="column" spacing={2}>
           <Stack direction="row" spacing={1}>
@@ -172,7 +174,12 @@ const Editor = ({ control }) => {
               control={control}
               name="team"
               render={({ field, fieldState: { isDirty } }) => (
-                <EditorTextField label="Team" isDirty={isDirty} {...field} />
+                <EditorTextField
+                  label="Team"
+                  inputSize={15}
+                  isDirty={isDirty}
+                  {...field}
+                />
               )}
             />
           </Stack>
@@ -222,7 +229,7 @@ const Editor = ({ control }) => {
         </Stack>
       </form>
       <SnippetPopover popupState={popupState} onSelect={onSnippetSelected} />
-    </Paper>
+    </StyledEditorRoot>
   );
 };
 

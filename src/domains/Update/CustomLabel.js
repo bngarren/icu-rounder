@@ -15,7 +15,7 @@ const CustomLabel = ({ label, isDirty }) => {
         variant="caption"
         sx={{
           color: "primary.light",
-          fontSize: "0.8rem",
+          fontSize: "0.85rem",
           fontWeight: "bold",
         }}
       >

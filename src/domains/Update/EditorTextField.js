@@ -1,7 +1,7 @@
 import { memo, forwardRef, useRef } from "react";
 
 // MUI
-import { FormControl, InputLabel, FormHelperText, Input } from "@mui/material";
+import { FormControl, Box, FormHelperText, Input } from "@mui/material";
 import { styled } from "@mui/system";
 
 // Components
@@ -12,6 +12,14 @@ const StyledInput = styled(Input, {
   name: "EditorTextField",
   slot: "Input",
 })(({ theme }) => ({}));
+
+const StyledInputLabel = styled(Box, {
+  name: "EditorTextField",
+  slot: "InputLabel",
+})(({ theme }) => ({
+  position: "absolute",
+  top: "-16px",
+}));
 
 const EditorTextField = forwardRef(
   (
@@ -28,11 +36,14 @@ const EditorTextField = forwardRef(
   ) => {
     return (
       <FormControl sx={{ width: props.fullWidth && "100%" }}>
-        <div htmlFor="editorTextField" {...InputLabelProps}>
+        <StyledInputLabel
+          htmlFor={`editorTextField-${label}`}
+          {...InputLabelProps}
+        >
           <CustomLabel label={label} isDirty={isDirty} />
-        </div>
+        </StyledInputLabel>
         <StyledInput
-          id="editorTextField"
+          id={`editorTextField-${label}`}
           inputProps={{
             ...inputProps,
             size: inputSize,

@@ -25,27 +25,6 @@ const StyledRoot = styled(Box, {
   backgroundColor: "white",
   padding: 0,
   minHeight: "225px",
-  border: "1px solid transparent",
-  borderRadius: "2px",
-  "&:hover": {
-    borderColor: theme.palette.primary.light,
-  },
-  "&:focus, &:focus-within": {
-    borderWidth: "1.5px",
-    margin: "-0.5px",
-    borderColor: theme.palette.primary.main,
-    boxShadow: "rgba(17, 17, 26, 0.15) 0px 1px 0px",
-  },
-}));
-
-const StyledHeader = styled(Stack, {
-  name: "ContentInput",
-  slot: "header",
-})(() => ({
-  alignItems: "center",
-  paddingTop: "10px",
-  paddingBottom: "8px",
-  minHeight: "45px",
 }));
 
 const StyledContentInputContainer = styled(Grid, {
@@ -83,10 +62,10 @@ const ContentInput = () => {
   there was a bug with the field values getting mixed up between simple vs nestedContent */
   React.useEffect(() => {
     if (contentType === "simple") {
-      unregister("nestedContent", { keepDefaultValue: true });
+      unregister("nestedContent", { keepDefaultValue: true, keepValue: true });
     }
     if (contentType === "nested") {
-      unregister("simpleContent", { keepDefaultValue: true });
+      unregister("simpleContent", { keepDefaultValue: true, keepValue: true });
     }
   }, [contentType, unregister]);
 
@@ -143,35 +122,13 @@ const ContentInput = () => {
 
   return (
     <StyledRoot tabIndex={-1}>
-      <StyledHeader direction="row" spacing={1}>
-        <ContentInputToolbar
-          label={
-            <CustomLabel
-              label={
-                <Typography
-                  variant="h6"
-                  sx={{
-                    /* needs to match font appearance of
-            EditorTextField labels */
-                    px: 0,
-                    fontSize: "1rem",
-                    fontWeight: "bold",
-                    color: "primary.light",
-                  }}
-                >
-                  Content
-                </Typography>
-              }
-              isDirty={contentInputIsDirty}
-              scale={0.75}
-            />
-          }
-          control={control}
-          contentType={contentType}
-          onAddSection={handleOnAddSection}
-          onSelectTemplate={handleOnSelectTemplate}
-        />
-      </StyledHeader>
+      <CustomLabel label="Content" isDirty={contentInputIsDirty} />
+      <ContentInputToolbar
+        control={control}
+        contentType={contentType}
+        onAddSection={handleOnAddSection}
+        onSelectTemplate={handleOnSelectTemplate}
+      />
       <StyledContentInputContainer>
         {contentType === "simple" && (
           <Controller
