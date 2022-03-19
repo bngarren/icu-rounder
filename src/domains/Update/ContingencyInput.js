@@ -40,6 +40,9 @@ const StyledAutocomplete = styled(Autocomplete)(({ theme }) => ({
     fontSize: 14,
     backgroundColor: "#f6f8fa",
   },
+  "& .MuiAutocomplete-inputRoot": {
+    padding: "4px 4px 5px 6px",
+  },
 }));
 
 /* Should be wrapped by a Controller component from react-hook-form which renders

@@ -27,7 +27,8 @@ const StyledEditorRoot = styled(Box, {
   name: "Editor",
   slot: "Root",
 })(({ theme }) => ({
-  padding: "10px",
+  padding: "20px 20px 20px 20px",
+  backgroundColor: theme.palette.grey[50],
 }));
 
 const Editor = ({ control }) => {
@@ -142,7 +143,10 @@ const Editor = ({ control }) => {
               render={({ field, fieldState: { isDirty } }) => (
                 <EditorTextField
                   label="Location"
-                  inputSize={10}
+                  inputSize={6}
+                  inputProps={{
+                    sx: { textAlign: "center" },
+                  }}
                   isDirty={isDirty}
                   {...field}
                 />
@@ -189,6 +193,7 @@ const Editor = ({ control }) => {
             render={({ field, formState: { isDirty } }) => (
               <EditorTextField
                 label="Summary"
+                placeholder="Enter some identifying data (usually 1-2 sentences)"
                 fullWidth
                 multiline
                 minRows={2}
@@ -211,14 +216,13 @@ const Editor = ({ control }) => {
             )}
             onChange={([, data]) => data}
           />
-        </Stack>
-        <Stack direction="column" spacing={2}>
           <ContentInput />
           <Controller
             control={control}
             name="bottomText"
             render={({ field, fieldState: { isDirty } }) => (
               <EditorTextField
+                placeholder="One to several words on the bottom"
                 label="Bottom Text"
                 inputSize={30}
                 isDirty={isDirty}

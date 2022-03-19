@@ -1,6 +1,17 @@
 // MUI
 import { Box, Typography } from "@mui/material";
 import CircleIcon from "@mui/icons-material/Circle";
+import { styled } from "@mui/system";
+
+const StyledCircleIcon = styled(CircleIcon, {
+  name: "CustomLabel",
+  slot: "icon",
+})(({ theme }) => ({
+  fontSize: "0.70rem",
+  color: theme.palette.secondary.dark,
+  paddingLeft: "2px",
+  transition: "visibility 0s, opacity 0.3s linear",
+}));
 
 const CustomLabel = ({ label, isDirty }) => {
   return (
@@ -14,7 +25,7 @@ const CustomLabel = ({ label, isDirty }) => {
       <Typography
         variant="caption"
         sx={{
-          color: "primary.light",
+          color: isDirty ? "primary.light" : "grey.700",
           fontSize: "0.85rem",
           fontWeight: "bold",
         }}
@@ -22,15 +33,12 @@ const CustomLabel = ({ label, isDirty }) => {
         {label}
       </Typography>
 
-      {isDirty && (
-        <CircleIcon
-          sx={{
-            fontSize: "0.8rem",
-            color: "secondary.dark",
-            pl: "2px",
-          }}
-        />
-      )}
+      <StyledCircleIcon
+        sx={{
+          visibility: isDirty ? "visibile" : "hidden",
+          opacity: isDirty ? 1 : 0,
+        }}
+      />
     </Box>
   );
 };

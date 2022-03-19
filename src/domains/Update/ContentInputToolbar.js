@@ -22,17 +22,19 @@ import ToggleContentType from "./ToggleContentType";
 const StyledAppBar = styled(AppBar, {
   name: "ContentInputToolbar",
   slot: "appbar",
-})(() => ({
+})(({ theme }) => ({
   backgroundColor: "transparent",
   flexShrink: "inherit",
   zIndex: "100",
+  borderBottom: `1px solid ${theme.palette.grey[100]}`,
 }));
 
 const StyledToolBar = styled(Toolbar, {
   name: "ContentInputToolbar",
   slot: "toolbar",
 })(() => ({
-  minHeight: "auto",
+  padding: "4px 2px 2px 8px",
+  minHeight: "3rem",
 }));
 
 const divider_sx = {
@@ -63,7 +65,7 @@ const ContentInputToolbar = ({
           />
           {contentType === "nested" && (
             <>
-              <QuickAddInput label="Add Section" onSubmit={onAddSection} />
+              <QuickAddInput onSubmit={onAddSection} />
               <Divider orientation="vertical" flexItem sx={{ ...divider_sx }} />
               <SelectTemplate onSelect={onSelectTemplate} />
             </>
@@ -124,12 +126,8 @@ const SelectTemplate = ({ onSelect = (f) => f }) => {
       onChange={handleChange}
       select
       id="selectTemplate"
-      label="Template"
       overflow="hidden"
       size="small"
-      InputLabelProps={{
-        shrink: true,
-      }}
       SelectProps={{
         sx: selectSx,
         displayEmpty: true,
@@ -149,7 +147,7 @@ const SelectTemplate = ({ onSelect = (f) => f }) => {
       }}
     >
       <MenuItem value="" sx={{ fontSize: "formFontSizeLevel2" }}>
-        Select...
+        Select a template...
       </MenuItem>
 
       {OPTIONS.map((option) => {

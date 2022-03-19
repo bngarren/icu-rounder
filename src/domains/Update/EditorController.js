@@ -39,10 +39,11 @@ import { APP_TEXT } from "../../utils";
 const StyledGridContainer = styled(Grid, {
   name: "EditorController",
   slot: "container",
-  shouldForwardProp: (prop) => prop !== "isDirty",
-})(({ theme, isDirty }) => ({
+  shouldForwardProp: (prop) => prop !== "isDirty" && prop !== "addTopMargin",
+})(({ theme, isDirty, addTopMargin }) => ({
   boxShadow: isDirty ? theme.shadows[5] : theme.shadows[1],
   borderRadius: "4px",
+  marginTop: addTopMargin && theme.spacing(1),
 }));
 
 const StyledToolbarTop = styled(Toolbar, {
@@ -59,6 +60,7 @@ const StyledToolbarTop = styled(Toolbar, {
     : theme.palette.primary.main,
   borderTopRightRadius: "4px",
   borderTopLeftRadius: "4px",
+  transition: theme.transitions.create(["background-color"]),
 }));
 
 const StyledToolbarBottom = styled(Toolbar, {
@@ -77,6 +79,7 @@ const StyledToolbarBottom = styled(Toolbar, {
     : theme.palette.primary.main,
   borderBottomRightRadius: "4px",
   borderBottomLeftRadius: "4px",
+  transition: theme.transitions.create(["background-color"]),
 }));
 
 const StyledNavigateIconButton = styled(IconButton)(({ theme }) => ({
@@ -254,7 +257,7 @@ const EditorController = ({
   Navigation arrows, Save, and Reset buttons */
   const renderToolbarTop = () => (
     <StyledToolbarTop variant="dense" isDirty={isDirty}>
-      <Stack direction="row" spacing={2}>
+      <Stack direction="row" spacing={2} alignItems="center">
         <Box
           sx={{
             display: "flex",
@@ -269,7 +272,7 @@ const EditorController = ({
             onClick={() => onChangeGridDataElement(true)}
           >
             <NavigateBeforeIcon
-              sx={{ fontSize: "1.4rem", textShadow: "shadows.1" }}
+              sx={{ fontSize: "1.6rem", textShadow: "shadows.1" }}
             />
           </StyledNavigateIconButton>
           <Typography
@@ -283,7 +286,7 @@ const EditorController = ({
             disableRipple
             onClick={() => onChangeGridDataElement(false)}
           >
-            <NavigateNextIcon sx={{ fontSize: "1.4rem" }} />
+            <NavigateNextIcon sx={{ fontSize: "1.6rem" }} />
           </StyledNavigateIconButton>
         </Box>
         <Tooltip
@@ -297,6 +300,7 @@ const EditorController = ({
             size="small"
             checked={!demoBoxCollapsed}
             onChange={handleToggleDemoBox}
+            color="default"
           />
         </Tooltip>
       </Stack>
@@ -345,22 +349,24 @@ const EditorController = ({
 
   if (initialGridDataElementData) {
     return (
-      <StyledGridContainer container isDirty={isDirty}>
-        <FormProvider {...form}>
-          <Grid item xs={12}>
-            <DemoBox collapsed={demoBoxCollapsed} />
-          </Grid>
+      <FormProvider {...form}>
+        <DemoBox collapsed={demoBoxCollapsed} />
+        <StyledGridContainer
+          container
+          isDirty={isDirty}
+          addTopMargin={!demoBoxCollapsed}
+        >
           <Grid item xs={12}>
             {renderToolbarTop()}
           </Grid>
-          <Grid item xs={12} sx={{ pt: "8px" }}>
+          <Grid item xs={12}>
             <Editor control={control} />
           </Grid>
           <Grid item xs={12}>
             {renderToolbarBottom()}
           </Grid>
-        </FormProvider>
-      </StyledGridContainer>
+        </StyledGridContainer>
+      </FormProvider>
     );
   } else {
     return <></>;

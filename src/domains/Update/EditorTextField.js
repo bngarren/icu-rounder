@@ -1,25 +1,34 @@
 import { memo, forwardRef, useRef } from "react";
 
 // MUI
-import { FormControl, Box, FormHelperText, Input } from "@mui/material";
+import { FormControl, FormHelperText, OutlinedInput } from "@mui/material";
 import { styled } from "@mui/system";
 
 // Components
 import CustomLabel from "./CustomLabel";
 
 /* Styling */
-const StyledInput = styled(Input, {
+const StyledInput = styled(OutlinedInput, {
   name: "EditorTextField",
   slot: "Input",
-})(({ theme }) => ({}));
+})(({ theme }) => ({
+  backgroundColor: "white",
+  borderRadius: "3px",
 
-const StyledInputLabel = styled(Box, {
+  "& .MuiOutlinedInput-input": {
+    padding: "4px 4px 5px 8px",
+  },
+
+  //multiline
+  "&.MuiInputBase-multiline": {
+    padding: "6px 0px 0px 4px",
+  },
+}));
+
+const StyledInputLabel = styled("label", {
   name: "EditorTextField",
   slot: "InputLabel",
-})(({ theme }) => ({
-  position: "absolute",
-  top: "-16px",
-}));
+})(({ theme }) => ({}));
 
 const EditorTextField = forwardRef(
   (
@@ -50,7 +59,7 @@ const EditorTextField = forwardRef(
           }}
           {...InputProps}
           {...props}
-          ref={ref}
+          inputRef={ref}
         />
         <FormHelperText id="editorTextField-helperText"></FormHelperText>
       </FormControl>

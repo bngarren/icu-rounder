@@ -1,7 +1,7 @@
 import * as React from "react";
 
 // MUI
-import { Grid, Box, Stack, Typography, TextField } from "@mui/material";
+import { Grid, Box, Stack, Typography, OutlinedInput } from "@mui/material";
 import { styled } from "@mui/system";
 
 // React-hook-form
@@ -22,15 +22,18 @@ const StyledRoot = styled(Box, {
   name: "ContentInput",
   slot: "Root",
 })(({ theme }) => ({
+  position: "relative",
   backgroundColor: "white",
   padding: 0,
-  minHeight: "225px",
+  minHeight: "250px",
+  border: "1px solid rgba(0, 0, 0, 0.23)", //to match mui outlined input
+  borderRadius: "4px",
 }));
 
 const StyledContentInputContainer = styled(Grid, {
   name: "ContentInput",
   slot: "contentInput",
-})(() => ({
+})(({ theme }) => ({
   flexDirection: "row",
   flex: "2",
 }));
@@ -121,85 +124,70 @@ const ContentInput = () => {
   );
 
   return (
-    <StyledRoot tabIndex={-1}>
+    <Box>
       <CustomLabel label="Content" isDirty={contentInputIsDirty} />
-      <ContentInputToolbar
-        control={control}
-        contentType={contentType}
-        onAddSection={handleOnAddSection}
-        onSelectTemplate={handleOnSelectTemplate}
-      />
-      <StyledContentInputContainer>
-        {contentType === "simple" && (
-          <Controller
-            name="simpleContent"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                fullWidth
-                multiline
-                minRows={10}
-                maxRows={20}
-                sx={{
-                  lineHeight: "1.5em",
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    //border: "none",
-                  },
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "2px",
+      <StyledRoot tabIndex={-1}>
+        <ContentInputToolbar
+          control={control}
+          contentType={contentType}
+          onAddSection={handleOnAddSection}
+          onSelectTemplate={handleOnSelectTemplate}
+        />
+        <StyledContentInputContainer>
+          {contentType === "simple" && (
+            <Controller
+              name="simpleContent"
+              control={control}
+              render={({ field }) => (
+                <OutlinedInput
+                  fullWidth
+                  placeholder="Enter some information here"
+                  multiline
+                  minRows={10}
+                  maxRows={20}
+                  sx={{
+                    lineHeight: "1.5em",
+                    backgroundColor: "white",
                     "& fieldset": {
-                      // Baseline border
-                      borderColor: "transparent",
+                      border: "none",
                     },
-                    "&:hover fieldset": {
-                      borderColor: "primary.light",
-                    },
-                    "&.Mui-focused fieldset": {
-                      // Focused border
-                      borderWidth: "0.1em",
-                      borderColor: "primary.main",
-                      boxShadow: "rgba(17, 17, 26, 0.15) 0px 1px 0px",
-                    },
-                  },
-                  "& .MuiOutlinedInput-input": {
-                    fontSize: "formFontSizeLevel1",
-                  },
-                  "& .MuiInputBase-multiline": {
-                    padding: 0,
                     "& .MuiOutlinedInput-input": {
-                      padding: "10px 14px 4px 14px",
+                      fontSize: "formFontSizeLevel1",
                     },
-                  },
-                }}
-                {...field}
-              />
-            )}
-          />
-        )}
-
-        {contentType === "nested" && (
-          <Controller
-            control={control}
-            name="nestedContent"
-            render={({
-              field: { value, onChange, ref },
-              fieldState,
-              formState,
-            }) => {
-              return (
-                <NestedContentInput
-                  data={value}
-                  onChange={onChange}
-                  inputRef={ref}
-                  fieldState={fieldState}
-                  formState={formState}
+                    "&.MuiInputBase-multiline": {
+                      padding: "10px 4px 5px 12px",
+                    },
+                  }}
+                  {...field}
                 />
-              );
-            }}
-          />
-        )}
-      </StyledContentInputContainer>
-    </StyledRoot>
+              )}
+            />
+          )}
+
+          {contentType === "nested" && (
+            <Controller
+              control={control}
+              name="nestedContent"
+              render={({
+                field: { value, onChange, ref },
+                fieldState,
+                formState,
+              }) => {
+                return (
+                  <NestedContentInput
+                    data={value}
+                    onChange={onChange}
+                    inputRef={ref}
+                    fieldState={fieldState}
+                    formState={formState}
+                  />
+                );
+              }}
+            />
+          )}
+        </StyledContentInputContainer>
+      </StyledRoot>
+    </Box>
   );
 };
 
